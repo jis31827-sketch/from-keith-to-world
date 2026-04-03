@@ -1857,16 +1857,24 @@
         @keyframes typewriter { from { width: 0; } to { width: 60ch; } }
         @keyframes caretBlink { 50% { border-color: transparent; } }
         @keyframes caretHide { to { border-color: transparent; } }
-        .t-line { opacity: 0; animation: tIn 0.25s ease forwards; }
+
+        /* Animations paused by default, triggered by .cli-animate */
+        .t-line { opacity: 0; }
+        .cli-animate .t-line { animation: tIn 0.25s ease forwards; }
         .t-type-wrap { display: flex; align-items: baseline; margin-bottom: 16px; }
         .t-type {
           display: inline-block; overflow: hidden; white-space: nowrap;
           width: 0; vertical-align: bottom;
-          border-right: 2px solid #d4a574;
+          border-right: 2px solid transparent;
+        }
+        .cli-animate .t-type {
+          border-right-color: #d4a574;
           animation: typewriter 1.2s steps(40, end) 0.3s forwards, caretBlink 0.5s step-end 5 0.3s, caretHide 0s forwards 1.5s;
         }
+        .cli-cursor { opacity: 0; }
+        .cli-animate .cli-cursor { display: inline-block; width: 8px; height: 15px; background: #d4a574; vertical-align: middle; animation: blink 1s step-end infinite 8.7s; }
       </style>
-      <div style="background: #1b1b1b; border-radius: 10px; overflow: hidden; font-family: 'Courier New', Consolas, 'Menlo', monospace; font-size: 12px; line-height: 1.7; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">
+      <div id="cli-terminal" style="background: #1b1b1b; border-radius: 10px; overflow: hidden; font-family: 'Courier New', Consolas, 'Menlo', monospace; font-size: 12px; line-height: 1.7; box-shadow: 0 4px 16px rgba(0,0,0,0.2);">
         <!-- Title bar -->
         <div style="background: #2d2d2d; padding: 8px 14px; display: flex; align-items: center; gap: 6px;">
           <div style="width: 10px; height: 10px; border-radius: 50%; background: #ff5f57;"></div>
@@ -1914,7 +1922,7 @@
           <!-- Cursor -->
           <div class="t-line" style="margin-top: 14px; animation-delay: 8.7s;">
             <span style="color: #d4a574; font-weight: bold;">&gt;</span>
-            <span style="display: inline-block; width: 8px; height: 15px; background: #d4a574; vertical-align: middle; animation: blink 1s step-end infinite 8.7s;"></span>
+            <span class="cli-cursor"></span>
           </div>
 
         </div>
@@ -3219,5 +3227,53 @@
 </div>
 
 </div>
+
+<!-- Password Gate -->
+<div id="pw-gate" style="position:fixed;inset:0;z-index:9999;background:#f8f9fc;display:flex;align-items:center;justify-content:center;">
+  <div style="text-align:center;max-width:360px;padding:40px;">
+    <div style="font-size:28px;font-weight:700;color:#1a1a2e;margin-bottom:8px;">Internal Document</div>
+    <div style="font-size:14px;color:#888;margin-bottom:32px;">이 문서는 내부 전략 문서입니다.<br>열람 비밀번호를 입력해 주세요.</div>
+    <input id="pw-input" type="password" placeholder="비밀번호" style="width:100%;padding:14px 18px;font-size:15px;border:2px solid #e0e0e0;border-radius:10px;outline:none;text-align:center;font-family:'Noto Sans KR',sans-serif;transition:border-color 0.2s;" onfocus="this.style.borderColor='#6c63ff'" onblur="this.style.borderColor='#e0e0e0'">
+    <div id="pw-error" style="color:#e05555;font-size:13px;margin-top:10px;height:20px;"></div>
+    <button onclick="checkPw()" style="margin-top:8px;width:100%;padding:14px;font-size:15px;font-weight:600;color:#fff;background:#6c63ff;border:none;border-radius:10px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">열람하기</button>
+    <div style="margin-top:24px;font-size:11px;color:#bbb;">Nexpace / MSU / 2026</div>
+  </div>
+</div>
+
+<script>
+// Password protection (client-side hash comparison)
+function hashStr(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}return h;}
+const HASH = 128519734;
+function checkPw(){
+  const v=document.getElementById('pw-input').value;
+  if(hashStr(v)===HASH){
+    document.getElementById('pw-gate').style.display='none';
+    document.body.style.overflow='';
+  } else {
+    document.getElementById('pw-error').textContent='비밀번호가 일치하지 않습니다.';
+    document.getElementById('pw-input').style.borderColor='#e05555';
+    setTimeout(()=>{document.getElementById('pw-input').style.borderColor='#e0e0e0';},1500);
+  }
+}
+document.getElementById('pw-input').addEventListener('keydown',function(e){if(e.key==='Enter')checkPw();});
+document.body.style.overflow='hidden';
+
+// CLI terminal: animate on scroll into view, replay on re-enter
+const terminal = document.getElementById('cli-terminal');
+if(terminal){
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        terminal.classList.remove('cli-animate');
+        void terminal.offsetWidth;
+        terminal.classList.add('cli-animate');
+      } else {
+        terminal.classList.remove('cli-animate');
+      }
+    });
+  },{threshold:0.3});
+  observer.observe(terminal);
+}
+</script>
 </body>
 </html>
