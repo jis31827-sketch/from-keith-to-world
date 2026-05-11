@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>바이브잼 2026 기획</title>
+<style>
+  :root {
+    --text: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e2e2e2;
+    --bg-soft: #f7f7f7;
+    --accent: #1a1a1a;
+    --placeholder-bg: #fafafa;
+    --placeholder-border: #d9d9d9;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Pretendard", "Apple SD Gothic Neo", system-ui, sans-serif;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 48px 28px 96px;
+    line-height: 1.7;
+    color: var(--text);
+    background: #fff;
+  }
+  header.doc-header { border-bottom: 2px solid var(--accent); padding-bottom: 18px; margin-bottom: 36px; }
+  header.doc-header h1 { margin: 0 0 8px; font-size: 26px; letter-spacing: -0.01em; }
+  .meta { color: var(--muted); font-size: 13px; }
+  nav.toc { background: var(--bg-soft); padding: 18px 22px; border-radius: 6px; margin-bottom: 40px; font-size: 14px; }
+  nav.toc strong { display: block; margin-bottom: 8px; font-size: 13px; color: var(--muted); letter-spacing: 0.05em; }
+  nav.toc ol { margin: 0; padding-left: 22px; columns: 2; column-gap: 24px; }
+  nav.toc li { margin: 2px 0; break-inside: avoid; }
+  nav.toc a { color: var(--text); text-decoration: none; }
+  nav.toc a:hover { text-decoration: underline; }
+  section { margin-bottom: 44px; }
+  h2 { font-size: 19px; border-left: 4px solid var(--accent); padding-left: 12px; margin: 0 0 16px; line-height: 1.4; }
+  h3 { font-size: 15px; margin: 22px 0 8px; color: #333; }
+  h4 { font-size: 14px; margin: 16px 0 6px; color: #444; }
+  p { margin: 8px 0; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 4px 0; }
+  .placeholder { color: #999; background: var(--placeholder-bg); padding: 14px 18px; border-radius: 4px; border: 1px dashed var(--placeholder-border); font-size: 14px; }
+  .alert { background: #fff8e1; border-left: 3px solid #d4a017; padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+  .propose { background: #eef5ff; border-left: 3px solid #3b6db5; padding: 10px 14px; margin: 12px 0; font-size: 13px; }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--line); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: var(--bg-soft); font-weight: 600; }
+  blockquote { border-left: 3px solid #ccc; padding: 4px 16px; color: var(--muted); margin: 14px 0; background: #fcfcfc; }
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #eee; color: #555; margin-right: 6px; vertical-align: middle; }
+  .tag.open { background: #fff4d6; color: #8a6d00; }
+  .tag.fixed { background: #d6f0e0; color: #1d6e3f; }
+  .tag.partial { background: #e0e8f5; color: #2c5494; }
+  footer.doc-footer { margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+  strong { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="doc-header">
+  <h1>바이브잼 2026 기획</h1>
+  <div class="meta">
+    정식 명칭: 바이브잼 (VIBE IP Gamejam) ·
+    최종 업데이트: 2026-05-08 · 6차 구술(13개 결정 일괄 반영) ·
+    파일: <code>Gamejam_2026/기획.html</code>
+  </div>
+</header>
+
+<nav class="toc">
+  <strong>목차</strong>
+  <ol>
+    <li><a href="#background">1. 배경</a></li>
+    <li><a href="#purpose">2. 목적</a></li>
+    <li><a href="#kpi">3. KPI (정량·정성)</a></li>
+    <li><a href="#audience">4. 참가자·대상</a></li>
+    <li><a href="#structure">5. 구조·트랙</a></li>
+    <li><a href="#timeline">6. 일정</a></li>
+    <li><a href="#judging">7. 심사·보상·지원</a></li>
+    <li><a href="#operations">8. 운영·리소스</a></li>
+    <li><a href="#risks">9. 결정 정리</a></li>
+    <li><a href="#landing">10. 랜딩 페이지 명세</a></li>
+    <li><a href="#raw">11. 원시 메모</a></li>
+  </ol>
+</nav>
+
+<section id="background">
+  <h2>1. 배경 <span class="tag fixed">반영 완료</span></h2>
+
+  <h3>1.1 1주년 모멘텀</h3>
+  <p>NXPC, MapleStory Universe, MapleStory N은 2025년 5월 15일 론칭하여 2026년 5월 15일 1주년을 맞이한다. 1주년 모멘텀에 맞춰 대규모 발표를 진행한다.</p>
+
+  <h3>1.2 P2E 프레임 탈피의 필요성</h3>
+  <p>현 시점에서 시장은 본 프로젝트를 P2E로 인식하는 경향이 있다. 가시화된 프로덕트가 MapleStory N(블록체인 기반 NFT·토큰 활용 게임)이 전부인 만큼 자연스러운 인식이지만, 이 프레임은 프로젝트의 잠재 가치를 저평가하게 만든다. 다수의 P2E 프로젝트가 실패·러그풀 사례로 누적되며 카테고리 자체의 신뢰도가 하락한 상태이기 때문이다.</p>
+  <p>본 프로젝트는 블록체인 게임 영역에서 전무후무한 규모의 IP인 MapleStory를 기반으로 한다는 점에서 출발 조건이 다르다. 따라서 P2E 카테고리에 머무르지 않고, 생태계 확장이라는 본래 지향을 명시적으로 드러낼 필요가 있다.</p>
+
+  <h3>1.3 VIBE IP 개념과 IP의 재정의</h3>
+  <p>1주년 발표의 중심 메시지는 <strong>VIBE IP</strong>다. 핵심 가설:</p>
+  <ul>
+    <li>AI 바이브 코딩으로 게임 창작 비용이 급격히 낮아지면서, 향후 다량의 게임이 시장에 출시되는 '대창작의 시대'가 도래한다.</li>
+    <li>창작 산출물이 폭증하면 어텐션 경쟁 비용이 치열해진다. 이때 전 세계 2억+ 명이 인지하는 MapleStory 브랜드는 어텐션 측면에서 기초적인 우위를 제공한다.</li>
+    <li>이 우위만으로는 부족하며, IP 자체를 재정의해야 한다.</li>
+  </ul>
+
+  <p><strong>IP 재정의 1단계 — 핵심 경험의 스킬화 (1주년 발표 메시지의 본체):</strong></p>
+  <ul>
+    <li>전통적 IP 프랜차이징은 이미지·사운드 에셋 제공과 상업적 활용 허가에 머물러 있었다.</li>
+    <li>대창작의 시대에는 에셋 제공만으로 부족하다. AI가 활용 가능한 형태로 IP의 핵심 경험을 스킬화해 제공해야 한다.</li>
+    <li>"메이플다움"은 사이드 스크롤·캐릭터 모션 같은 특정 물리적 문법에 한정되지 않는다. 직업·세계관·캐릭터·아이템 체계 등 IP 고유 요소가 잘 살아 있다면 다른 장르(예: 덱빌딩, 턴제 전투)에서도 메이플 색은 충분히 표현된다.</li>
+    <li>제공해야 할 것은 자연어 명령만으로 IP의 정체성이 즉시 구현되는 개발 환경이다. 코드 블록·로직 단위로 IP 요소를 호출 가능하게 만든다.</li>
+  </ul>
+
+  <p><strong>IP 재정의 2단계 — MapleStory Passport (5/15 발표에서는 제외):</strong></p>
+  <p>패스포트는 장기 비전 자산으로 보존하되 5/15 발표·바이브잼 어나운스에서는 메시지에 포함하지 않는다. 헤드라인 명료성 보호 목적.</p>
+
+  <h3>1.4 바이브 IP 개발 방향 (3축)</h3>
+  <ol>
+    <li><strong>자연어 기반 온체인 IP 라이선싱</strong></li>
+    <li><strong>통합 개발 환경</strong> (MCP 기반 스킬·리소스 호출)</li>
+    <li><strong>심리스 결제·정산</strong> (온체인 일괄 처리)</li>
+  </ol>
+  <p>이 엔드 투 엔드 구조의 완성에는 시간이 소요된다. 따라서 1주년 발표 이후 비전과 현실의 간극을 채우기 위한 가시적 사례가 필요하다.</p>
+
+  <h3>1.5 바이브잼의 위치</h3>
+  <p>본 게임잼의 정식 명칭은 <strong>바이브잼</strong>(VIBE IP Gamejam)이다. VIBE IP 비전의 <strong>concrete하고 actionable한 첫 번째 예제</strong>로 포장된다. 제작 협업 플랫폼은 NXPC가 투자한 <strong>Verse8</strong>.</p>
+
+  <h4>5/15 1주년 발표의 메시지 위계</h4>
+  <ol>
+    <li><strong>헤드라인:</strong> VIBE IP 비전 (IP 재정의 1단계)</li>
+    <li><strong>헤드라인 직속 증거:</strong> 바이브잼 어나운스</li>
+  </ol>
+</section>
+
+<section id="purpose">
+  <h2>2. 목적 <span class="tag fixed">반영 완료</span></h2>
+  <p>바이브잼의 목적은 <strong>"VIBE IP 비전의 사업적 가시화 — 비전을 단순 청사진이 아니라 손에 쥐어지는 실행 가능한 결과물로 보여주는 것"</strong>이다.</p>
+</section>
+
+<section id="kpi">
+  <h2>3. KPI (정량·정성) <span class="tag fixed">반영 완료</span></h2>
+
+  <h3>3.1 정량 목표</h3>
+  <table>
+    <tr><th>지표</th><th>목표</th><th>비고</th></tr>
+    <tr><td>참가자 수</td><td>1,500 ~ 2,000명</td><td>"수백 명" 수준은 메시지 임팩트 부족</td></tr>
+    <tr><td>최종 제출률</td><td>20%</td><td>Verse8 기존 데이터 근거</td></tr>
+    <tr><td>제출 게임 수</td><td>약 300개</td><td>이 중 약 270개가 demo 퀄리티 미달이어도 수용. 정량 임팩트는 단순 제출 수치 자체로 처리. 자격 게이트는 도입하지 않음.</td></tr>
+  </table>
+
+  <h3>3.2 정성 목표</h3>
+  <p>제출 약 300개 중 약 30개(10%) 수준에서 다음 두 반응이 끌어내져야 한다.</p>
+  <ul>
+    <li>"꽤 재미있다."</li>
+    <li>"MapleStory IP를 이렇게 활용하고 AI 바이브 코딩을 쓰니 1~2주 만에 이 정도 수준의 게임이 나오는구나."</li>
+  </ul>
+
+  <h3>3.3 정량·정성 동시 달성 메커니즘</h3>
+  <p>1인당 제출 수 제한 X. 자격 게이트 X. 베이스 보상 X. 정량 KPI는 단순 제출 수, 정성 KPI는 트랙 심사 결과로 측정. 양산 게임은 트랙 평가에서 자연스럽게 걸러진다.</p>
+</section>
+
+<section id="audience">
+  <h2>4. 참가자·대상 <span class="tag fixed">분담 확정</span></h2>
+
+  <h3>4.1 모집 풀 다층 구조 (확정)</h3>
+  <table>
+    <tr><th>레이어</th><th>대상</th><th>접촉 채널·주체</th><th>목표 규모</th><th>역할</th></tr>
+    <tr>
+      <td>L1</td>
+      <td>게임 공모전 입상자, 핵심 인디 인력</td>
+      <td>에코시스템 사업팀(BD) outreach + CEO·기획 디렉터·사업팀장 직접 미팅</td>
+      <td>5~10팀 (max)</td>
+      <td>전문가 트랙 우승 후보. 정성 KPI 30개의 핵심 출처.</td>
+    </tr>
+    <tr>
+      <td>L2</td>
+      <td>인디 게임 스튜디오, 1~2인 팀</td>
+      <td>에코시스템 사업팀 BD + 모객 페이지 + 이메일 아웃리치</td>
+      <td>약 100팀 (max)</td>
+      <td>정성·정량 양쪽 기여. 잠재력 트랙 주요 풀.</td>
+    </tr>
+    <tr>
+      <td>L3</td>
+      <td>MSU·MSN 게이머, 일반 메이플 유저, 광고 타겟 일반 게이머</td>
+      <td>MSU 트위터 등 자체 채널 + 광고·홍보 (reach 수만 명)</td>
+      <td>등록 1,400~1,890명</td>
+      <td>정량 KPI 볼륨 확보. 잠재력 트랙·대중성 투표 풀.</td>
+    </tr>
+  </table>
+  <p>총합 1,500~2,000명. L1·L2 outreach는 에코시스템 사업팀(BD)이 주도, L1 직접 미팅은 CEO·기획 디렉터·사업팀장 라인.</p>
+</section>
+
+<section id="structure">
+  <h2>5. 구조·트랙 <span class="tag fixed">반영 완료</span></h2>
+
+  <h3>5.1 메이플 IP 색의 표현 정책</h3>
+  <p>특정 장르(사이드 스크롤) 또는 물리적 문법(캐릭터 모션, 발판 레이아웃)을 강제하지 않는다. Verse8 내부 테스트에서 'Slay the Spire' 유사 덱빌딩 게임에 메이플 직업을 투입했을 때 IP 매력이 충분히 살아났음이 확인됐다. 즉 IP 색은 직업·세계관·캐릭터·아이템 체계 등 메이플 고유 요소의 활용도로 측정한다.</p>
+
+  <h3>5.2 트랙 구성 (확정)</h3>
+  <ul>
+    <li><strong>전문가 심사 트랙</strong> — 게임 디자인의 재미·완결성·퀄리티 종합 평가. 내부 심사위원(디렉터·개발실장·기획실장·COO·CEO 등) 선정.</li>
+    <li><strong>대중성·유저 반응 트랙</strong> — 플레이 수 기준. unique 계정·최소 플레이 시간 검증으로 어뷰징 차단.</li>
+    <li><strong>잠재력 트랙</strong> (구 아이디어 트랙, 명칭 변경) — 게임잼이 demo 퀄리티 영역인 점을 인정하고, 풀 스케일 개발 시 가능성·잠재능력을 평가. 자세한 metric은 §7.8.</li>
+  </ul>
+</section>
+
+<section id="timeline">
+  <h2>6. 일정 <span class="tag fixed">큰 틀 확정</span></h2>
+
+  <h3>6.1 마일스톤</h3>
+  <table>
+    <tr><th>일자</th><th>이벤트</th></tr>
+    <tr><td>2026-05-15</td><td>NXPC·MSU·MSN 1주년 발표 + 바이브잼 공식 어나운스 + 모객 시작 (랜딩 페이지 게시)</td></tr>
+    <tr><td>2026-05-15 ~ 06-02</td><td>모객 기간 (약 19일). L1 직접 컨택 + L2 이메일 아웃리치 + L3 자체 채널·광고 병행.</td></tr>
+    <tr><td>2026-06-03</td><td>제작 개시 (Day 0)</td></tr>
+    <tr><td>2026-06-23 (가안)</td><td>제작 종료 (3주, 21일)</td></tr>
+    <tr><td>2026-06-24 ~ 07-07 (가안)</td><td>심사 기간 (2주, 커뮤니티 투표 포함)</td></tr>
+    <tr><td>2026-07-07 (가안)</td><td>결과 발표 (심사 종료 직후)</td></tr>
+  </table>
+
+  <h3>6.2 5/15 게이트 통과를 위한 역산</h3>
+  <table>
+    <tr><th>일자</th><th>완료 항목</th></tr>
+    <tr><td>5/12</td><td>선영님 컨센서스 확보</td></tr>
+    <tr><td>5/13</td><td>랜딩 페이지 디자인·카피 완성 (정헌님 + Claude 바이브 코딩 자체 제작)</td></tr>
+    <tr><td>5/14</td><td>모든 §7·§8 파라미터 + 페이지 콘텐츠 최종 락</td></tr>
+    <tr><td>5/15</td><td>페이지 게시 + 발표</td></tr>
+  </table>
+
+  <h3>6.3 심사 기간 내 흐름 (가안)</h3>
+  <ul>
+    <li>심사 1주차: 전문가 트랙 1차 평가 + 대중성 투표 시작</li>
+    <li>심사 2주차: 대중성 투표 종료 + 전문가 최종 평가 + 잠재력 트랙 정리 + 결과 종합</li>
+  </ul>
+</section>
+
+<section id="judging">
+  <h2>7. 심사·보상·지원 <span class="tag fixed">결정 완료 + 추가 metric 제안</span></h2>
+
+  <h3>7.1 보상 매개체와 총 규모</h3>
+  <ul>
+    <li><strong>매개체:</strong> NXPC 토큰</li>
+    <li><strong>총 상금:</strong> $50,000 상당 NXPC (달러 환산 고정 — 시상 시점 시가로 NXPC 수량 환산 지급)</li>
+    <li><strong>가격 기준:</strong> 1 NXPC ≈ 500원 ≈ $0.33 (참고용)</li>
+  </ul>
+
+  <h3>7.2 트랙별 상금 분배 (확정)</h3>
+  <table>
+    <tr><th>트랙</th><th>인원</th><th>1인 상금</th><th>합계</th><th>비중</th></tr>
+    <tr><td>전문가 심사 (대상)</td><td>1</td><td>$20,000</td><td>$20,000</td><td>40%</td></tr>
+    <tr><td>대중성·유저 반응</td><td>2</td><td>$5,000</td><td>$10,000</td><td>20%</td></tr>
+    <tr><td>잠재력</td><td>10</td><td>$2,000</td><td>$20,000</td><td>40%</td></tr>
+    <tr><td>총합</td><td>13</td><td>—</td><td>$50,000</td><td>100%</td></tr>
+  </table>
+  <p>"잠재력 상 10명" 구조가 진입 장벽 메시지(정량 미끼)를 흡수. 별도 추첨 보너스 없음.</p>
+
+  <h3>7.3 심사위원 구성 (확정)</h3>
+  <p>내부 인력 중심. 디렉터, 개발실장, 기획실장, COO, CEO 등.</p>
+
+  <h3>7.4 NXPC 퍼블리셔급 지원 패키지 (확정)</h3>
+  <p>차별 메시지의 중핵: <strong>"넥슨의 자회사 NXPC가 직접 제공하는 퍼블리셔급 지원"</strong>. 외부 전문가 매칭이 아니라 NXPC 내부 조직 자원이 직접 투입된다.</p>
+
+  <h4>풀 지원 패키지 내용</h4>
+  <ul>
+    <li><strong>비즈니스 모델 기획 지원</strong> — NXPC 기획팀 투입</li>
+    <li><strong>개발 지원</strong> — 직접 개발은 아니나 문제 해결, 추가 리소스 제공</li>
+    <li><strong>Co-marketing 지원</strong></li>
+    <li><strong>퍼블리싱</strong> — 필요 시 NXPC/넥슨 명의 실제 퍼블리싱 (오픈)</li>
+  </ul>
+
+  <h4>적용 대상 (제안 — 컨펌 필요)</h4>
+  <p>최대 4팀까지 풀 지원 가능. 매핑 제안:</p>
+  <table>
+    <tr><th>대상</th><th>적용 방식</th></tr>
+    <tr><td>전문가 트랙 우승 1팀</td><td>풀 지원 자동 적용</td></tr>
+    <tr><td>그 외 수상작 중 추가 2~3팀</td><td>NXPC 내부 평가 후 선별 (대중성·잠재력 트랙 수상자 풀에서)</td></tr>
+  </table>
+  <p>페이지 카피: "전문가 트랙 우승작에는 풀 퍼블리셔 지원을 자동 제공. 그 외 수상작 중 NXPC 내부 평가 후 추가 2~3팀에 풀 퍼블리셔 지원 제공 (총 최대 4팀)."</p>
+
+  <h3>7.5 Verse8 크레딧 지원 (확정)</h3>
+  <p>NXPC가 Verse8에 <strong>$20,000</strong>을 게임잼 운영비 명목으로 일괄 지원. 그 외 게임잼 토큰 비용은 Verse8 측이 부담(협찬). 추가 지원은 case-by-case로 L1·L2 일부 우수 팀 대상으로 검토. Claude subscription 등 개별 도구 비용은 참가자 자체 부담.</p>
+
+  <h3>7.6 트랙별 어뷰징·평가 리스크 (확정)</h3>
+  <table>
+    <tr><th>트랙</th><th>리스크</th><th>대응</th></tr>
+    <tr><td>전문가</td><td>어뷰징 어려움. 심사위원 권위가 결과 신뢰도 결정.</td><td>내부 인력 5인 합의제로 권위 보강.</td></tr>
+    <tr><td>대중성</td><td>다중 계정 자기 게임 플레이 부풀림.</td><td>unique 계정 검증 + 최소 플레이 시간 조건. 패스포트 가중치 미사용.</td></tr>
+    <tr><td>잠재력</td><td>평가 기준 모호 → 분쟁 위험.</td><td>§7.8 명시 metric으로 정량화.</td></tr>
+  </table>
+
+  <h3>7.7 IP 활용도 평가 (확정 — 단일 축)</h3>
+  <p>요소 개수 카운팅이나 메커니즘 통합도 같은 형식적 측정은 정합한 적용이 어렵다고 판단. 평가의 본질은 "메이플 유저가 이 게임을 메이플로 인식하는가"이므로 단일 정성 축으로 단순화한다.</p>
+  <table>
+    <tr><th>축</th><th>배점</th><th>판단 기준</th></tr>
+    <tr>
+      <td><strong>메이플다움</strong></td>
+      <td>10점</td>
+      <td>
+        메이플 유저가 본 게임을 플레이했을 때 "이건 메이플이다"라고 인식하는가, 그 인식이 얼마나 강한가에 대한 정성 평가.<br>
+        장르·물리적 문법은 무관. 직업·세계관·아이템·캐릭터·세계관 사건 등 어떤 요소를 통해서든 "메이플답다"가 전달되면 된다.<br>
+        평가자: §7.3 내부 심사위원 5인이 각자 1~10점 부여 후 평균.
+      </td>
+    </tr>
+  </table>
+  <p>모든 트랙(전문가·대중성·잠재력) 평가에 가산점으로 반영. 단일 축이지만 5인 합의 평균으로 개인 편향 완화.</p>
+
+  <h3>7.8 잠재력 트랙 — Metric 제안 (10명 선정)</h3>
+  <p>게임잼은 본질적으로 demo 퀄리티 영역이다. 잠재력 트랙은 "이 demo를 풀 스케일 게임으로 키웠을 때 사업적·창작적으로 의미 있는 결과가 나올 가능성"을 평가한다. 4축 metric 제안.</p>
+  <table>
+    <tr><th>축</th><th>배점</th><th>판단 기준</th></tr>
+    <tr>
+      <td><strong>확장성</strong></td>
+      <td>5점</td>
+      <td>데모를 풀 게임으로 키웠을 때 콘텐츠 깊이가 나올 수 있는 구조인가. 게임 시스템·진행 구조의 확장 여지.</td>
+    </tr>
+    <tr>
+      <td><strong>차별화</strong></td>
+      <td>5점</td>
+      <td>출시 시 기존 시장 대비 차별 포인트가 있는가. 메커니즘·테마·체험 측면.</td>
+    </tr>
+    <tr>
+      <td><strong>상업 가능성</strong></td>
+      <td>5점</td>
+      <td>BM 적용 가능성. 인앱결제·구독·광고 등 어떤 모델로든 매출이 발생할 구조인가.</td>
+    </tr>
+    <tr>
+      <td><strong>팀 실행력</strong></td>
+      <td>5점</td>
+      <td>데모 수준에서 풀 게임 만들 수 있을 것 같은가. 팀 구성·코드 품질·기획 깊이로 추정.</td>
+    </tr>
+    <tr><td><strong>합계</strong></td><td>20점 만점</td><td>잠재력 트랙 단독 평가 점수</td></tr>
+  </table>
+  <p>잠재력 트랙은 본 행사의 "30개 정성 KPI" 중 demo 자체는 미완이지만 풀 스케일 가능성이 보이는 작품을 인정하기 위한 트랙. §7.4 퍼블리셔급 지원 추가 2~3팀 선정의 핵심 후보 풀.</p>
+
+  <h3>7.9 가이드 제공 수준 (확정)</h3>
+  <p>풀 패키지로 최대한 많이 준비. 메이플 IP 자료(캐릭터·직업·세계관 자료) + 코드 템플릿 + MCP 스킬 사전 배포. 5/15 페이지 게시 시점부터 단계적 공개, 6/3 제작 개시까지 모든 자료 접근 가능.</p>
+</section>
+
+<section id="operations">
+  <h2>8. 운영·리소스 <span class="tag fixed">반영 완료</span></h2>
+
+  <h3>8.1 Verse8 협업 조건</h3>
+  <ul>
+    <li><strong>수용 능력:</strong> 5,000명 규모도 수용 가능.</li>
+    <li><strong>워크플로:</strong> Verse8 내 작업 + Export → 외부 도구(Claude Code 등) 작업 → 다시 업로드 가능.</li>
+  </ul>
+
+  <h3>8.2 토큰 지원 정책 (확정)</h3>
+  <ul>
+    <li>NXPC가 Verse8에 $20,000 일괄 지원 (게임잼 운영비 명목)</li>
+    <li>그 외 게임잼 한정 토큰 비용은 Verse8 측 부담 (협찬)</li>
+    <li>추가 지원은 case-by-case (L1·L2 우수 팀 대상)</li>
+    <li>Claude subscription 등 개별 도구 비용은 참가자 자체 부담 (대다수 바이브 코더가 이미 보유한다는 가정)</li>
+  </ul>
+
+  <h3>8.3 운영 예산 (캡 확정)</h3>
+  <table>
+    <tr><th>항목</th><th>금액</th></tr>
+    <tr><td>상금 (NXPC 환산)</td><td>$50,000</td></tr>
+    <tr><td>Verse8 운영비 일괄 지원</td><td>$20,000</td></tr>
+    <tr><td>랜딩 페이지 제작 (자체 바이브 코딩)</td><td>$0</td></tr>
+    <tr><td>마케팅·광고 (L3 도달용)</td><td>미정 (~$15,000 추정)</td></tr>
+    <tr><td>운영 인력·잡비</td><td>미정 (~$10,000 추정)</td></tr>
+    <tr><td>예비비</td><td>잔여</td></tr>
+    <tr><td><strong>총 캡</strong></td><td><strong>~$100,000 이내</strong></td></tr>
+  </table>
+</section>
+
+<section id="risks">
+  <h2>9. 결정 정리 <span class="tag fixed">13건 일괄 처리</span></h2>
+
+  <h3>9.1 6차 구술로 확정된 13건</h3>
+  <table>
+    <tr><th>#</th><th>항목</th><th>결정</th></tr>
+    <tr><td>A1</td><td>자격 게이트</td><td>도입 X. 정량 KPI는 단순 제출 수, 270개 demo 미달 수용.</td></tr>
+    <tr><td>A2</td><td>NXPC 가격 환산</td><td>달러 환산 고정. "$50,000 상당 NXPC".</td></tr>
+    <tr><td>A3</td><td>Verse8 크레딧</td><td>협찬 협상 진행. NXPC $20K 운영비 + Verse8 측 토큰 협찬.</td></tr>
+    <tr><td>A4</td><td>퍼블리셔급 지원</td><td>NXPC 내부 조직 직접 지원. 최대 4팀. 전문가 1팀 자동 + 추가 2~3팀 선별.</td></tr>
+    <tr><td>A5</td><td>IP 활용도 metric</td><td>단일 축 "메이플다움" 10점, 5인 평균. 모든 트랙 가산. 컨펌 완료.</td></tr>
+    <tr><td>B1</td><td>심사위원</td><td>내부 인력 (디렉터·개발실장·기획실장·COO·CEO).</td></tr>
+    <tr><td>B2</td><td>대중성 어뷰징</td><td>unique 계정 + 최소 플레이 시간만. 패스포트 가중 X.</td></tr>
+    <tr><td>B3</td><td>아이디어→잠재력 트랙</td><td>명칭 변경 + 4축 metric (확장성·차별화·상업 가능성·팀 실행력) — §7.8 제안</td></tr>
+    <tr><td>B4</td><td>가이드 수준</td><td>풀 패키지 (자료 + 템플릿 + MCP 스킬).</td></tr>
+    <tr><td>C1</td><td>모집 분담</td><td>L1: 5~10팀 / L2: ~100팀 / L3: 1,400~1,890명. BD 주도.</td></tr>
+    <tr><td>C2</td><td>토큰 정책</td><td>Verse8 $20K + 협찬 + case-by-case 추가. Claude subscription 별도 X.</td></tr>
+    <tr><td>C3</td><td>랜딩 페이지 제작</td><td>정헌님 + Claude 바이브 코딩 자체 제작.</td></tr>
+    <tr><td>D1</td><td>예산 캡</td><td>~$100,000 이내.</td></tr>
+  </table>
+
+  <h3>9.2 추가 컨펌 (모두 처리 완료)</h3>
+  <ul>
+    <li>§7.4 퍼블리셔급 지원 매핑 — 전문가 1팀 자동 + 추가 2~3팀 선별, 최대 4팀. <strong>OK</strong>.</li>
+    <li>§7.7 IP 활용도 — 단일 축 "메이플다움" 10점, 5인 평균. <strong>OK</strong>.</li>
+    <li>§7.8 잠재력 트랙 — 명칭 + 4축 metric (확장성·차별화·상업·실행력). <strong>OK</strong>.</li>
+  </ul>
+
+  <h3>9.3 후속(5/15 이후) 결정 항목</h3>
+  <ul>
+    <li>MapleStory Passport를 어느 모멘텀에서 메인 메시지로 끌어올지.</li>
+    <li>퍼블리셔급 지원 추가 2~3팀 선정 기준 (7월 시상 이후 NXPC 내부 평가 프로세스).</li>
+  </ul>
+</section>
+
+<section id="landing">
+  <h2>10. 랜딩 페이지 명세 <span class="tag partial">제작 시작 준비</span></h2>
+
+  <h3>10.1 페이지의 역할 · 제작 방식</h3>
+  <ul>
+    <li>2026-05-15 게시 — VIBE IP 비전과 바이브잼 직속 증거를 동시에 노출하는 모객·어나운스 채널.</li>
+    <li>제작 방식: <strong>정헌님 + Claude 바이브 코딩 자체 제작</strong>. "VIBE IP를 발표하는 페이지가 자체적으로 바이브 코딩으로 만들어졌다"는 사실 자체가 메시지의 강한 증거.</li>
+    <li>파일 분리 예정: <code>Gamejam_2026/landing.html</code> (별도 빌드).</li>
+  </ul>
+
+  <h3>10.2 메시지 위계</h3>
+  <ol>
+    <li><strong>헤드라인:</strong> VIBE IP 비전 — IP 재정의 (1단계: 핵심 경험 스킬화)</li>
+    <li><strong>서브 헤드라인:</strong> 바이브잼 — 비전의 첫 번째 가시화 사례, 한 달 안에 결과물 공개</li>
+    <li><strong>차별 메시지:</strong> "단순 상금이 아니라 퍼블리셔급 지원으로 출시까지 — 넥슨의 자회사 NXPC가 전적으로 지원"</li>
+  </ol>
+
+  <h3>10.3 콘텐츠 블록 (작성 가이드)</h3>
+  <ol>
+    <li><strong>VIBE IP 비전 요약</strong> — 대창작의 시대 + IP 재정의 본체</li>
+    <li><strong>바이브잼 개요</strong> — 무엇을, 왜, 누구와 (Verse8 협업)</li>
+    <li><strong>일정·타임라인</strong> — §6.1 마일스톤</li>
+    <li><strong>3트랙 + 상금</strong> — 전문가 1×$20K / 대중성 2×$5K / 잠재력 10×$2K = $50K</li>
+    <li><strong>심사 기준</strong> — IP 활용도 3축 + 트랙별 평가 metric (§7.7·§7.8 발췌)</li>
+    <li><strong>퍼블리셔급 지원 패키지</strong> — §7.4 4가지 지원 항목 + "최대 4팀" 명시
+      <ul>
+        <li>BM 기획 지원 / 개발 지원 / Co-marketing / NXPC 명의 퍼블리싱</li>
+      </ul>
+    </li>
+    <li><strong>참가 방법</strong> — Verse8 가입·작업 흐름, 토큰 정책</li>
+    <li><strong>발표 일정·커뮤니케이션 채널</strong></li>
+    <li><strong>FAQ</strong></li>
+  </ol>
+
+  <h3>10.4 미정·작업 항목</h3>
+  <ul>
+    <li>페이지 디자인 컨셉 (NXPC·MSU 브랜드 가이드 정합성)</li>
+    <li>카피 톤 (한국어·영어 버전 분리 여부)</li>
+    <li>비주얼 자산 (헤더·바이브잼 키비주얼)</li>
+    <li>도메인·호스팅</li>
+  </ul>
+</section>
+
+<section id="raw">
+  <h2>11. 원시 메모 <span class="tag open">없음</span></h2>
+  <div class="placeholder">현재 비어 있음.</div>
+</section>
+
+<footer class="doc-footer">
+  본 문서는 정헌님 구술을 실시간으로 누적·재배치하기 위한 작업 산출물이다.
+</footer>
+
+</body>
+</html>

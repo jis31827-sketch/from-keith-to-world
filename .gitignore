@@ -1,0 +1,11 @@
+# OS / editor junk
+Thumbs.db
+.DS_Store
+desktop.ini
+*.swp
+*.swo
+
+# Backup files
+*.bak
+*.orig
+*~
