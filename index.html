@@ -3557,6 +3557,167 @@
   @media (max-width: 767px) {
     .share-toast { bottom: 96px; }
   }
+
+  /* === SHARE MODAL — clipboard-copy confirmation dialog === */
+  .share-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .share-modal[hidden] { display: none; }
+  .share-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 15, 26, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: share-modal-backdrop-in 0.2s ease-out;
+  }
+  @keyframes share-modal-backdrop-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  .share-modal__card {
+    position: relative;
+    z-index: 1;
+    background: #FFFFFF;
+    border-radius: 24px;
+    box-shadow:
+      0 24px 80px rgba(0, 0, 0, 0.35),
+      0 8px 24px rgba(0, 0, 0, 0.15);
+    max-width: 440px;
+    width: 100%;
+    overflow: hidden;
+    animation: share-modal-card-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes share-modal-card-pop {
+    from { opacity: 0; transform: scale(0.92) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .share-modal__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 2;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(26, 31, 54, 0.08);
+    color: rgba(26, 31, 54, 0.6);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    padding: 0;
+  }
+  .share-modal__close:hover {
+    background: rgba(26, 31, 54, 0.06);
+    color: #1A1F36;
+  }
+  .share-modal__visual {
+    width: 100%;
+    height: 220px;
+    background: linear-gradient(135deg,
+      rgba(178, 102, 255, 0.15),
+      rgba(233, 30, 99, 0.15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .share-modal__visual img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  .share-modal__content {
+    padding: 28px 32px 32px;
+    text-align: center;
+    font-family: 'NexonLv2', 'KlavikaNX', "Pretendard", -apple-system, system-ui, sans-serif;
+  }
+  html[lang="en"] .share-modal__content {
+    font-family: "Pretendard", 'KlavikaNX', 'NexonLv2', -apple-system, system-ui, sans-serif;
+  }
+  .share-modal__check {
+    display: inline-flex;
+    margin-bottom: 16px;
+    animation: share-modal-check 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+  }
+  @keyframes share-modal-check {
+    from { opacity: 0; transform: scale(0); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .share-modal__title {
+    font-size: clamp(20px, 1.8vw, 24px);
+    font-weight: 800;
+    color: #1A1F36;
+    margin: 0 0 8px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .share-modal__message {
+    font-size: clamp(14px, 1.2vw, 16px);
+    color: rgba(26, 31, 54, 0.7);
+    margin: 0 0 24px;
+    line-height: 1.55;
+  }
+  .share-modal__confirm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 32px;
+    background: linear-gradient(135deg, #E91E63, #B83280);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow:
+      0 6px 20px rgba(233, 30, 99, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    min-width: 120px;
+  }
+  .share-modal__confirm:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 10px 28px rgba(233, 30, 99, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.30);
+  }
+  .share-modal__confirm:active { transform: translateY(0); }
+  .share-modal__confirm:focus-visible {
+    outline: 2px solid #FFFFFF;
+    outline-offset: 3px;
+  }
+
+  @media (max-width: 767px) {
+    .share-modal { padding: 16px; }
+    .share-modal__card { max-width: calc(100% - 32px); }
+    .share-modal__visual { height: 180px; }
+    .share-modal__content { padding: 24px 24px 28px; }
+    .share-modal__title { font-size: 20px; }
+  }
+  @media (max-width: 359px) {
+    .share-modal__confirm { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .share-modal__backdrop,
+    .share-modal__card,
+    .share-modal__check {
+      animation: share-modal-backdrop-in 0.2s ease-out;
+    }
+    .share-modal__card { transform: none !important; }
+    .share-modal__check { transform: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -3699,7 +3860,7 @@
         <span class="arrow">→</span>
         <span class="live-badge" aria-hidden="true">LIVE</span>
       </a>
-      <button class="btn btn-secondary btn-share" type="button" aria-label="Share with Friends">
+      <button class="btn btn-secondary btn-share" type="button" aria-label="Share with Friends" data-share-trigger>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M16 6l-4-4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -4572,43 +4733,128 @@
     io.observe(cli);
   })();
 
-  /* === Share button (navigator.share with clipboard fallback + toast) === */
+  /* === Share button → clipboard copy + confirmation modal === */
   (function() {
-    const buttons = document.querySelectorAll('.btn-share, .sticky-cta__share');
-    if (!buttons.length) return;
-    function showToast(msg) {
-      let toast = document.querySelector('.share-toast');
-      if (!toast) {
-        toast = document.createElement('div');
-        toast.className = 'share-toast';
-        toast.setAttribute('role', 'status');
-        document.body.appendChild(toast);
+    const triggers = document.querySelectorAll('[data-share-trigger]');
+    const modal = document.getElementById('shareModal');
+    if (!triggers.length || !modal) return;
+
+    const confirmBtn = modal.querySelector('.share-modal__confirm');
+    const titleEl = modal.querySelector('#shareModalTitle');
+    const messageEl = modal.querySelector('#shareModalMessage');
+    let lastFocused = null;
+
+    // Cache the original i18n title/message HTML so we can restore them
+    // when the modal is reopened after a failed copy.
+    const originalTitleHTML = titleEl.innerHTML;
+    const originalMessageHTML = messageEl.innerHTML;
+
+    async function copyToClipboard(text) {
+      // Modern Clipboard API (requires secure context)
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (err) { /* fall through to legacy */ }
       }
-      toast.textContent = msg;
-      requestAnimationFrame(function() { toast.classList.add('visible'); });
-      clearTimeout(toast._timer);
-      toast._timer = setTimeout(function() { toast.classList.remove('visible'); }, 2200);
+      // Legacy execCommand fallback for older browsers / http://
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        textarea.style.left = '-9999px';
+        textarea.setAttribute('readonly', '');
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        return ok;
+      } catch (err) {
+        return false;
+      }
     }
-    function handle(e) {
+
+    function openModal(copySuccess) {
+      // Restore i18n content first (in case a previous failure replaced it)
+      titleEl.innerHTML = originalTitleHTML;
+      messageEl.innerHTML = originalMessageHTML;
+
+      if (!copySuccess) {
+        // Overwrite with manual-copy fallback messaging (plain text — i18n
+        // spans replaced; acceptable since this is an edge-case error state).
+        const url = window.location.href;
+        titleEl.textContent = 'Could not copy automatically';
+        messageEl.textContent = 'Copy this URL manually: ' + url;
+      }
+
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      // Defer focus until next frame so the element is visible & focusable
+      requestAnimationFrame(function() {
+        if (confirmBtn) confirmBtn.focus();
+      });
+    }
+
+    function closeModal() {
+      modal.hidden = true;
+      document.body.style.overflow = '';
+      if (lastFocused && typeof lastFocused.focus === 'function') {
+        lastFocused.focus();
+      }
+    }
+
+    async function handleShareClick(e) {
       e.preventDefault();
-      const data = {
-        title: 'Vibe Jam — MapleStory IP Game Jam',
-        text: 'Three weeks of building, $60,000 in prizes, VIBE coded with MapleStory IP.',
-        url: window.location.href
-      };
-      if (navigator.share) {
-        navigator.share(data).catch(function() {});
-      } else if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(window.location.href).then(function() {
-          showToast('Link copied!');
-        }, function() {
-          showToast(window.location.href);
-        });
-      } else {
-        showToast(window.location.href);
-      }
+      lastFocused = e.currentTarget;
+      const success = await copyToClipboard(window.location.href);
+      openModal(success);
     }
-    buttons.forEach(function(b) { b.addEventListener('click', handle); });
+
+    triggers.forEach(function(btn) {
+      btn.addEventListener('click', handleShareClick);
+    });
+
+    // Dismiss handlers — backdrop, X button, Confirm button all share
+    // the data-modal-dismiss attribute.
+    modal.querySelectorAll('[data-modal-dismiss]').forEach(function(el) {
+      el.addEventListener('click', function(ev) {
+        ev.preventDefault();
+        closeModal();
+      });
+    });
+
+    // Escape key while modal is open
+    document.addEventListener('keydown', function(ev) {
+      if (modal.hidden) return;
+      if (ev.key === 'Escape') {
+        ev.preventDefault();
+        closeModal();
+      }
+    });
+
+    // Focus trap: Tab cycles only between focusable elements inside the modal
+    modal.addEventListener('keydown', function(ev) {
+      if (ev.key !== 'Tab') return;
+      const focusable = modal.querySelectorAll(
+        'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (ev.shiftKey) {
+        if (document.activeElement === first) {
+          ev.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          ev.preventDefault();
+          first.focus();
+        }
+      }
+    });
   })();
 </script>
 
@@ -4619,7 +4865,7 @@
     <span class="t-en">Start Building Now</span>
     <span class="t-ko">지금 빌드 시작</span>
   </a>
-  <button class="sticky-cta__share" type="button" aria-label="Share Vibe Jam">
+  <button class="sticky-cta__share" type="button" aria-label="Share Vibe Jam" data-share-trigger>
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M16 6l-4-4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -4629,6 +4875,57 @@
     <span class="t-ko">공유</span>
   </button>
 </aside>
+
+<!-- SHARE MODAL — appears after clipboard-copy on Share button click -->
+<div class="share-modal"
+     id="shareModal"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="shareModalTitle"
+     aria-describedby="shareModalMessage"
+     hidden>
+  <div class="share-modal__backdrop" data-modal-dismiss></div>
+  <div class="share-modal__card" role="document">
+    <button class="share-modal__close"
+            type="button"
+            aria-label="Close"
+            data-modal-dismiss>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+
+    <div class="share-modal__visual">
+      <img src="assets/illustrations/share-modal.png" alt="" aria-hidden="true" />
+    </div>
+
+    <div class="share-modal__content">
+      <div class="share-modal__check" aria-hidden="true">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" fill="#7ED957"/>
+          <path d="M7 12.5l3.5 3.5L17 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <h3 id="shareModalTitle" class="share-modal__title" data-i18n-title>
+        <span class="t-en">Link copied!</span>
+        <span class="t-ko">페이지 링크가 복사되었습니다.</span>
+      </h3>
+
+      <p id="shareModalMessage" class="share-modal__message" data-i18n-message>
+        <span class="t-en">Pass it along to other builders.</span>
+        <span class="t-ko">다른 빌더한테 전달해보세요.</span>
+      </p>
+
+      <button class="share-modal__confirm"
+              type="button"
+              data-modal-dismiss>
+        <span class="t-en">Got it</span>
+        <span class="t-ko">확인</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
