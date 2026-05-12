@@ -2451,22 +2451,33 @@
 
   /* === PRIZE SCOREBOARD === */
   .prize-scoreboard {
+    /* CSS gradient kept as graceful fallback when WebGL2 isn't supported. */
     background:
-      radial-gradient(ellipse 60% 80% at 50% 50%, #1A1F36 0%, #0F0F1A 80%),
-      #0F0F1A;
+      radial-gradient(ellipse 70% 90% at 55% 70%, #1A0E3D 0%, #050214 78%),
+      #050214;
     padding: clamp(40px, 6vh, 60px) clamp(24px, 4vw, 80px) 0;
     color: #FFFFFF;
     position: relative;
     overflow: hidden;
+    /* CRITICAL: establish a local stacking context so the negative
+       z-index canvas paints AFTER this section's CSS background. Without
+       this, position:relative alone doesn't create a stacking context,
+       so the canvas at z-index:-1 escapes to the body context and gets
+       painted BEFORE (i.e., behind) this section's bg gradient — making
+       all WebGL output invisible. */
+    isolation: isolate;
   }
-  .prize-scoreboard::before {
-    content: "";
+  /* WebGL2 starfield canvas — sits behind in-flow content (planet image)
+     but in front of the section's CSS gradient fallback. z-index:-1 puts
+     it in painting step 2, before in-flow planet (step 3). */
+  .prize-scoreboard__bg {
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.04) 1px, transparent 1.5px);
-    background-size: 16px 16px;
+    width: 100%;
+    height: 100%;
+    display: block;
     pointer-events: none;
-    opacity: 0.6;
+    z-index: -1;
   }
   .prize-scoreboard__container {
     position: relative;
@@ -2588,21 +2599,76 @@
     .prize-scoreboard__cards { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
   }
 
-  /* Winners-announced line */
-  .prize-pool__announce {
-    margin-top: clamp(10px, 1.5vh, 18px);
+  /* Compact horizontal timeline replacing the old single-line announce */
+  .prize-timeline {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    font-family: 'KlavikaNX', 'NexonLv2', sans-serif;
-    font-size: clamp(14px, 1.2vw, 17px);
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.75);
+    justify-content: center;
+    gap: clamp(16px, 2vw, 28px);
+    margin: clamp(32px, 5vh, 48px) auto 0;
+    padding: 18px clamp(24px, 3vw, 36px);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .prize-timeline__node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 160px;
     text-align: center;
   }
-  .prize-pool__announce svg {
-    color: rgba(255, 217, 61, 0.85);
+  .prize-timeline__dates {
+    font-family: 'Orbitron', 'JetBrains Mono', monospace;
+    font-size: clamp(15px, 1.3vw, 18px);
+    font-weight: 800;
+    color: #FFD93D;
+    letter-spacing: 0.04em;
+    text-shadow: 0 0 12px rgba(255, 217, 61, 0.40);
+    line-height: 1;
+  }
+  .prize-timeline__label {
+    font-family: 'KlavikaNX', 'NexonLv2', sans-serif;
+    font-size: clamp(11px, 0.95vw, 13px);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .prize-timeline__connector {
+    display: inline-flex;
+    align-items: center;
     flex-shrink: 0;
+  }
+  /* Winners node — pink emphasis to signal "outcome" */
+  .prize-timeline__node--reveal .prize-timeline__dates {
+    color: #FF6B9D;
+    text-shadow: 0 0 14px rgba(255, 107, 157, 0.50);
+  }
+  .prize-timeline__node--reveal .prize-timeline__label {
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 700;
+  }
+  @media (max-width: 767px) {
+    .prize-timeline {
+      gap: 12px;
+      padding: 14px 20px;
+    }
+    .prize-timeline__node { min-width: 130px; }
+    .prize-timeline__dates { font-size: 14px; }
+    .prize-timeline__label { font-size: 10px; }
+  }
+  @media (max-width: 419px) {
+    .prize-timeline {
+      flex-direction: column;
+      gap: 10px;
+      border-radius: 20px;
+      padding: 16px 24px;
+    }
+    .prize-timeline__connector svg { transform: rotate(90deg); }
   }
 
   /* Planet illustration anchoring section bottom — cropped to top half */
@@ -3018,6 +3084,33 @@
     border-color: rgba(26, 31, 54, 0.4);
   }
 
+  /* Highlight variant — used for the genre featured by the comparison slider */
+  .genre-tag--highlight {
+    color: #FFFFFF;
+    background: linear-gradient(135deg, #E91E63 0%, #B83280 100%);
+    border: 1.5px solid transparent;
+    font-weight: 700;
+    box-shadow:
+      0 4px 16px rgba(233, 30, 99, 0.35),
+      0 0 0 3px rgba(233, 30, 99, 0.12);
+    transform: scale(1.05);
+    position: relative;
+    animation: genre-tag-highlight-pulse 2.4s ease-in-out infinite;
+  }
+  .genre-tag--highlight:hover {
+    background: linear-gradient(135deg, #E91E63 0%, #B83280 100%);
+  }
+  @keyframes genre-tag-highlight-pulse {
+    0%, 100% {
+      box-shadow: 0 4px 16px rgba(233, 30, 99, 0.35),
+                  0 0 0 3px rgba(233, 30, 99, 0.12);
+    }
+    50% {
+      box-shadow: 0 6px 24px rgba(233, 30, 99, 0.50),
+                  0 0 0 6px rgba(233, 30, 99, 0.08);
+    }
+  }
+
   @media (max-width: 1279px) {
     .genre-tags { gap: 10px; }
   }
@@ -3032,6 +3125,178 @@
   @media (prefers-reduced-motion: reduce) {
     .genre-tag { transition: none; }
     .genre-tag:hover { transform: none; }
+    .genre-tag--highlight { animation: none; }
+  }
+
+  /* === IP COMPARE SUB-SECTION (subtitle + lead + slider) === */
+  .ip-compare {
+    max-width: 1200px;
+    margin: clamp(80px, 12vh, 120px) auto 0;
+    padding: 0 clamp(16px, 2vw, 32px);
+  }
+  .ip-compare__subtitle {
+    font-size: clamp(28px, 2.6vw, 40px);
+    font-weight: 800;
+    color: #1A1F36;
+    text-align: center;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    max-width: 880px;
+    margin: 0 auto 16px;
+  }
+  .ip-compare__subtitle .accent {
+    background: linear-gradient(135deg, #E91E63 0%, #B266FF 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    font-weight: 800;
+  }
+  .ip-compare__lead {
+    font-size: clamp(15px, 1.3vw, 18px);
+    font-weight: 500;
+    color: rgba(26, 31, 54, 0.7);
+    text-align: center;
+    line-height: 1.6;
+    max-width: 720px;
+    margin: 0 auto clamp(32px, 5vh, 48px);
+  }
+  .ip-compare__tags {
+    margin-top: 0;
+    margin-bottom: clamp(40px, 6vh, 64px);
+  }
+
+  /* === BEFORE/AFTER COMPARISON SLIDER === */
+  .compare-slider {
+    margin-top: clamp(40px, 6vh, 64px);
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .compare-slider__frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1672 / 941;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow:
+      0 20px 60px rgba(26, 31, 54, 0.18),
+      0 8px 24px rgba(26, 31, 54, 0.10);
+    background: #0F0F1A;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: ew-resize;
+    touch-action: pan-y;
+  }
+  .compare-slider__base {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+  .compare-slider__top {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    /* clip-path inset is updated by JS — default 50/50 split */
+    clip-path: inset(0 50% 0 0);
+    pointer-events: none;
+  }
+  .compare-slider__top img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+  .compare-slider__divider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 4px;
+    background: #FFFFFF;
+    transform: translateX(-50%);
+    box-shadow:
+      0 0 12px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(0, 0, 0, 0.10);
+    z-index: 2;
+    cursor: ew-resize;
+    outline: none;
+  }
+  .compare-slider__divider:focus-visible {
+    box-shadow:
+      0 0 0 3px rgba(233, 30, 99, 0.50),
+      0 0 12px rgba(0, 0, 0, 0.4);
+  }
+  .compare-slider__handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #E91E63, #B83280);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 8px 24px rgba(233, 30, 99, 0.50),
+      0 0 0 4px rgba(255, 255, 255, 0.90),
+      inset 0 1px 0 rgba(255, 255, 255, 0.30);
+    cursor: grab;
+    z-index: 3;
+    transition: transform 0.12s ease;
+  }
+  .compare-slider__divider.is-dragging .compare-slider__handle,
+  .compare-slider__divider:active .compare-slider__handle {
+    cursor: grabbing;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+  /* Corner labels — left = neutral (no IP), right = pink (with IP) */
+  .compare-slider__label {
+    position: absolute;
+    top: 16px;
+    z-index: 2;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-family: 'KlavikaNX', 'NexonLv2', "Pretendard", -apple-system, system-ui, sans-serif;
+    font-size: clamp(12px, 1vw, 14px);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .compare-slider__label--left {
+    left: 16px;
+    background: rgba(0, 0, 0, 0.55);
+    color: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+  }
+  .compare-slider__label--right {
+    right: 16px;
+    background: rgba(233, 30, 99, 0.85);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.30);
+  }
+  @media (max-width: 767px) {
+    .ip-compare { margin-top: clamp(60px, 9vh, 90px); }
+    .ip-compare__subtitle { font-size: clamp(22px, 6vw, 28px); }
+    .compare-slider__handle { width: 44px; height: 44px; }
+    .compare-slider__label { font-size: 10px; padding: 4px 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .compare-slider__handle { transition: none; }
   }
 
   /* 2-column demo area (recruiter + CLI) */
@@ -3901,6 +4166,7 @@
 
 <!-- PRIZE SCOREBOARD -->
 <section class="prize-scoreboard" aria-label="Prize pool details">
+  <canvas id="prizePoolBg" class="prize-scoreboard__bg" aria-hidden="true"></canvas>
   <div class="prize-scoreboard__container">
     <div class="prize-scoreboard__header">
       <div class="prize-scoreboard__live">
@@ -3936,17 +4202,27 @@
         <div class="prize-card__detail"><span class="t-en">For ideas with strong promise</span><span class="t-ko">잠재력 있는 아이디어</span></div>
       </div>
     </div>
-    <div class="prize-pool__announce">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-        <line x1="16" y1="2" x2="16" y2="6"/>
-        <line x1="8" y1="2" x2="8" y2="6"/>
-        <line x1="3" y1="10" x2="21" y2="10"/>
-      </svg>
-      <span>
-        <span class="t-en">Winners announced on July 15, 2026</span>
-        <span class="t-ko">수상작 발표: 2026년 7월 15일</span>
-      </span>
+    <div class="prize-timeline" aria-label="Key dates">
+      <div class="prize-timeline__node">
+        <div class="prize-timeline__dates">JUN 9 &mdash; JUN 30</div>
+        <div class="prize-timeline__label">
+          <span class="t-en">Submissions Open</span>
+          <span class="t-ko">출품 기간</span>
+        </div>
+      </div>
+      <div class="prize-timeline__connector" aria-hidden="true">
+        <svg viewBox="0 0 24 8" width="48" height="8">
+          <path d="M0 4 L24 4" stroke="rgba(255,217,61,0.4)" stroke-width="2" stroke-dasharray="4 3" fill="none"/>
+          <path d="M18 1 L24 4 L18 7" stroke="rgba(255,217,61,0.6)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="prize-timeline__node prize-timeline__node--reveal">
+        <div class="prize-timeline__dates">JUL 15</div>
+        <div class="prize-timeline__label">
+          <span class="t-en">Winners Announced</span>
+          <span class="t-ko">수상작 발표</span>
+        </div>
+      </div>
     </div>
   </div>
   <img src="assets/images/planet_top.png" alt="" aria-hidden="true" class="prize-pool__planet">
@@ -4135,10 +4411,36 @@
         <span class="t-en">Got an idea? <em>Stop reading. Start building.</em></span>
         <span class="t-ko">아이디어가 있나요? <em>그만 읽고, 빌드 시작하세요.</em></span>
       </p>
-      <div class="genre-tags" aria-label="Game genres welcomed in Vibe Jam">
+      <p class="idea-persistence__microcopy">
+        <span class="t-en">No application. No interview. Just an idea.</span>
+        <span class="t-ko">지원서 없음. 인터뷰 없음. 아이디어만 있으면 됩니다.</span>
+      </p>
+      <div class="button-group idea-persistence__button-wrap">
+        <a class="btn btn-primary btn-build btn-build--xl" href="#apply" aria-label="Start Building Now">
+          <span class="t-en">Start Building</span>
+          <span class="t-ko">지금 빌드</span>
+          <span class="arrow">→</span>
+          <span class="live-badge" aria-hidden="true">LIVE</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- IP value proposition: subtitle + relocated hashtags (with #deck-builders highlighted) + before/after slider -->
+    <div class="ip-compare">
+      <h3 class="ip-compare__subtitle">
+        <span class="t-en">Choose your genre. The <span class="accent">Maple feel</span> comes built in.</span>
+        <span class="t-ko">장르는 자유롭게. <span class="accent">메이플 감성</span>은 기본 탑재입니다.</span>
+      </h3>
+
+      <p class="ip-compare__lead">
+        <span class="t-en">Whatever you build, MapleStory IP arrives pre-packaged as skills &mdash; characters, animations, world systems, sound. You bring the idea, we bring the polish.</span>
+        <span class="t-ko">무엇을 만들든, MapleStory IP가 스킬로 패키징되어 제공됩니다 &mdash; 캐릭터, 애니메이션, 월드 시스템, 사운드까지. 아이디어는 당신, 폴리시는 우리.</span>
+      </p>
+
+      <div class="ip-compare__tags genre-tags" aria-label="Game genres welcomed in Vibe Jam">
         <span class="genre-tag genre-tag--pink">#survival</span>
         <span class="genre-tag genre-tag--cyan">#collection</span>
-        <span class="genre-tag genre-tag--purple">#deck-builders</span>
+        <span class="genre-tag genre-tag--highlight">#deck-builders</span>
         <span class="genre-tag genre-tag--green">#combat</span>
         <span class="genre-tag genre-tag--yellow">#defense</span>
         <span class="genre-tag genre-tag--pink">#platformer</span>
@@ -4155,17 +4457,54 @@
           <span class="t-ko">+ 그 외 무엇이든</span>
         </span>
       </div>
-      <p class="idea-persistence__microcopy">
-        <span class="t-en">No application. No interview. Just an idea.</span>
-        <span class="t-ko">지원서 없음. 인터뷰 없음. 아이디어만 있으면 됩니다.</span>
-      </p>
-      <div class="button-group idea-persistence__button-wrap">
-        <a class="btn btn-primary btn-build btn-build--xl" href="#apply" aria-label="Start Building Now">
-          <span class="t-en">Start Building</span>
-          <span class="t-ko">지금 빌드</span>
-          <span class="arrow">→</span>
-          <span class="live-badge" aria-hidden="true">LIVE</span>
-        </a>
+
+      <div class="compare-slider"
+           id="ipCompareSlider"
+           role="region"
+           aria-label="Before and after MapleStory IP comparison">
+        <div class="compare-slider__frame">
+          <!-- BASE LAYER: WITH IP (always full visible) -->
+          <img src="assets/illustrations/compare-with-ip.png"
+               alt="Same game built with MapleStory IP"
+               class="compare-slider__base"
+               draggable="false" />
+
+          <!-- TOP LAYER: WITHOUT IP (clipped to reveal left portion) -->
+          <div class="compare-slider__top">
+            <img src="assets/illustrations/compare-no-ip.png"
+                 alt="Same game built without MapleStory IP"
+                 draggable="false" />
+          </div>
+
+          <!-- DIVIDER LINE + DRAG HANDLE -->
+          <div class="compare-slider__divider"
+               role="slider"
+               aria-label="Drag to compare with and without MapleStory IP"
+               aria-valuemin="0"
+               aria-valuemax="100"
+               aria-valuenow="50"
+               tabindex="0">
+            <div class="compare-slider__handle" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M8 6l-4 6 4 6M16 6l4 6-4 6"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- CORNER LABELS -->
+          <div class="compare-slider__label compare-slider__label--left">
+            <span class="t-en">Without IP</span>
+            <span class="t-ko">IP 없음</span>
+          </div>
+          <div class="compare-slider__label compare-slider__label--right">
+            <span class="t-en">With MapleStory IP</span>
+            <span class="t-ko">MapleStory IP 적용</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -4344,8 +4683,11 @@
     });
   })();
 
-  /* === Sticky CTA visibility (hides while hero in view, shows after) === */
-  (function() {
+  /* === Sticky CTA visibility (hides while hero in view, shows after) ===
+     Deferred to DOMContentLoaded because <aside class="sticky-cta"> appears
+     later in the document than this <script> block — without the wait,
+     querySelector returns null and the observer never attaches. */
+  function initStickyCTAObserver() {
     const hero = document.querySelector('section.hero');
     const sticky = document.querySelector('.sticky-cta');
     if (!hero || !sticky || !('IntersectionObserver' in window)) return;
@@ -4356,7 +4698,12 @@
       });
     }, { threshold: 0.05 });
     io.observe(hero);
-  })();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStickyCTAObserver);
+  } else {
+    initStickyCTAObserver();
+  }
 
   /* === Count-up animations on scoreboard scroll-into-view === */
   (function() {
@@ -4733,8 +5080,11 @@
     io.observe(cli);
   })();
 
-  /* === Share button → clipboard copy + confirmation modal === */
-  (function() {
+  /* === Share button → clipboard copy + confirmation modal ===
+     Wrapped in DOMContentLoaded because the modal HTML appears after this
+     script block in the document, so the modal isn't in the DOM yet when
+     this inline script runs synchronously. */
+  function initShareModal() {
     const triggers = document.querySelectorAll('[data-share-trigger]');
     const modal = document.getElementById('shareModal');
     if (!triggers.length || !modal) return;
@@ -4855,7 +5205,383 @@
         }
       }
     });
-  })();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initShareModal);
+  } else {
+    initShareModal();
+  }
+
+  /* === Prize Pool background — WebGL2 procedural starfield/nebula ===
+     Vanilla WebGL2 + GLSL ES 3.00, no libraries. Renders a deep-space
+     gradient + fbm nebula clouds + 3 layers of twinkling procedural stars
+     + a signature cyan diffraction-spike star. CSS gradient on the section
+     remains as graceful fallback when WebGL2 is unavailable. */
+  function initPrizePoolBg() {
+    const canvas = document.getElementById('prizePoolBg');
+    if (!canvas) return;
+    const gl = canvas.getContext('webgl2', {
+      antialias: false,
+      alpha: false,
+      premultipliedAlpha: false,
+      powerPreference: 'low-power'
+    });
+    if (!gl) return;
+
+    const VS = `#version 300 es
+in vec2 a_position;
+void main() {
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+
+    const FS = `#version 300 es
+precision highp float;
+
+uniform vec2 u_resolution;
+uniform float u_time;
+out vec4 fragColor;
+
+float hash21(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+
+// Small crisp twinkling stars — samples 3x3 cell neighborhood so the
+// halo of any star extends smoothly past its own cell's boundary,
+// eliminating the visible square-frame clipping artifact.
+float staticStars(vec2 uv, float gridY, float density, float seed, float aspect) {
+  vec2 gridUV = vec2(uv.x * gridY * aspect, uv.y * gridY);
+  vec2 baseCell = floor(gridUV);
+  vec2 localBase = fract(gridUV);
+
+  float total = 0.0;
+
+  // Check current cell + 8 neighbors. Any star whose halo reaches this
+  // pixel — from any of the 9 cells — gets summed in.
+  for (int oy = -1; oy <= 1; oy++) {
+    for (int ox = -1; ox <= 1; ox++) {
+      vec2 cellIdx = baseCell + vec2(float(ox), float(oy));
+      float h = hash21(cellIdx + seed);
+      if (h < 1.0 - density) continue;
+
+      vec2 jitter = vec2(hash21(cellIdx + seed + 1.1), hash21(cellIdx + seed + 2.2));
+      vec2 starInCell = 0.25 + jitter * 0.5;
+
+      // Distance from current pixel to this neighbor's star, in tile units
+      vec2 d = localBase - vec2(float(ox), float(oy)) - starInCell;
+      float d2 = dot(d, d);
+
+      float sizeRand = pow(h, 3.0);
+      float coreCoef = 300.0 - sizeRand * 250.0;
+      float haloCoef = 25.0 - sizeRand * 18.0;
+
+      float core = exp(-d2 * coreCoef);
+      float halo = exp(-d2 * haloCoef) * 0.20;
+
+      float twinkle = 0.55 + 0.45 * sin(u_time * (0.5 + h * 2.5) + h * 31.4);
+
+      total += (core + halo) * twinkle;
+    }
+  }
+  return total;
+}
+
+// Warp starfield with SIZE CAP — stars don't explode into giant blobs
+// as they approach the viewer. Forward motion via z-projection.
+float warpStars(vec2 cuv, float speed, float seed) {
+  float total = 0.0;
+  const int N = 10;  // fewer slots so fewer big near-stars at any time
+  for (int i = 0; i < N; i++) {
+    float fi = float(i);
+    float phase = fract(u_time * speed + fi / float(N));
+    float z = mix(1.0, 0.08, phase);  // z floor 0.08 limits max size
+
+    vec2 starXY = vec2(
+      hash21(vec2(fi, seed)),
+      hash21(vec2(fi + 0.5, seed))
+    ) - 0.5;
+    starXY *= 1.4;
+
+    vec2 projPos = starXY / z;
+    vec2 d = cuv - projPos;
+    float d2 = dot(d, d);
+
+    // Star size capped at 0.025 cuv units even when z is small
+    float baseSize = 0.003 + 0.006 * hash21(vec2(fi + 1.3, seed));
+    float size = min(baseSize / z, 0.025);
+
+    float core = exp(-d2 / (size * size));
+    float halo = exp(-d2 / (size * size * 8.0)) * 0.25;
+
+    float fade = smoothstep(0.0, 0.08, phase) * (1.0 - smoothstep(0.85, 1.0, phase));
+
+    total += (core + halo) * fade;
+  }
+  return total;
+}
+
+float spikedStar(vec2 uv, vec2 pos, float size, float spikeLen, float aspect) {
+  vec2 d = (uv - pos) * vec2(aspect, 1.0);
+  float r2 = dot(d, d);
+  float core = exp(-r2 / (size * size));
+  float halo = exp(-r2 / (size * size * 50.0)) * 0.45;
+  float vSpike = exp(-(d.y * d.y) / (spikeLen * spikeLen * 0.35))
+               * exp(-(d.x * d.x) / (size * size * 0.30));
+  float hSpike = exp(-(d.x * d.x) / (spikeLen * spikeLen * 0.35))
+               * exp(-(d.y * d.y) / (size * size * 0.30));
+  return core + halo + (vSpike + hSpike) * 0.55;
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+  float aspect = u_resolution.x / u_resolution.y;
+
+  // Dark purple background with subtle bloom
+  vec3 bg = vec3(0.020, 0.014, 0.085);
+  vec2 glowOff = (uv - vec2(0.55, 0.62)) * vec2(aspect, 1.0);
+  bg += vec3(0.30, 0.12, 0.55) * exp(-length(glowOff) * 1.5) * 0.65;
+  vec2 cd = (uv - 0.5) * 2.0;
+  bg *= clamp(1.0 - dot(cd, cd) * 0.20, 0.55, 1.0);
+
+  vec2 cuv = (uv - 0.5) * vec2(aspect, 1.0);
+
+  float stars = 0.0;
+  // Dense small stars (fine grain) — 30% reduced density
+  stars += staticStars(uv, 40.0, 0.12, 7.0,  aspect) * 0.75;
+  // Medium occasional stars
+  stars += staticStars(uv, 20.0, 0.07, 23.0, aspect) * 0.95;
+  // Rare large twinkling stars
+  stars += staticStars(uv, 10.0, 0.04, 41.0, aspect) * 1.15;
+  // Forward-motion warp stars (subtle, fewer)
+  stars += warpStars(cuv, 0.04, 53.0) * 0.55;
+  stars += warpStars(cuv, 0.07, 71.0) * 0.45;
+
+  vec3 starColor = vec3(1.0, 0.94, 0.82);
+
+  vec3 sigColor = vec3(0.55, 1.0, 0.85);
+  float sig = spikedStar(uv, vec2(0.93, 0.10), 0.006, 0.06, aspect);
+
+  float acc1 = spikedStar(uv, vec2(0.16, 0.86), 0.004, 0.035, aspect);
+  vec3 acc1Color = vec3(1.0, 0.85, 0.5);
+
+  float acc2 = spikedStar(uv, vec2(0.05, 0.92), 0.0025, 0.022, aspect);
+  vec3 acc2Color = vec3(1.0, 0.95, 0.75);
+
+  vec3 col = bg
+           + starColor * stars
+           + sigColor * sig
+           + acc1Color * acc1
+           + acc2Color * acc2;
+
+  fragColor = vec4(col, 1.0);
+}`;
+
+    function compile(type, source) {
+      const sh = gl.createShader(type);
+      gl.shaderSource(sh, source);
+      gl.compileShader(sh);
+      if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+        // Silently fail (CSS gradient fallback remains visible)
+        console.warn('Prize pool shader compile failed:', gl.getShaderInfoLog(sh));
+        gl.deleteShader(sh);
+        return null;
+      }
+      return sh;
+    }
+
+    const vs = compile(gl.VERTEX_SHADER, VS);
+    const fs = compile(gl.FRAGMENT_SHADER, FS);
+    if (!vs || !fs) return;
+
+    const program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.warn('Prize pool program link failed:', gl.getProgramInfoLog(program));
+      return;
+    }
+
+    // Fullscreen triangle (covers viewport with 3 vertices)
+    const vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 3, -1, -1, 3]),
+      gl.STATIC_DRAW
+    );
+    const posLoc = gl.getAttribLocation(program, 'a_position');
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+    const uResLoc = gl.getUniformLocation(program, 'u_resolution');
+    const uTimeLoc = gl.getUniformLocation(program, 'u_time');
+
+    gl.useProgram(program);
+    gl.bindVertexArray(vao);
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.max(1, Math.floor(rect.width * dpr));
+      const h = Math.max(1, Math.floor(rect.height * dpr));
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+        gl.viewport(0, 0, w, h);
+      }
+    }
+
+    function render(time) {
+      resize();
+      gl.uniform2f(uResLoc, canvas.width, canvas.height);
+      gl.uniform1f(uTimeLoc, time * 0.001);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+
+    const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let isVisible = true;
+    let rafId = 0;
+
+    function loop(t) {
+      if (!isVisible) { rafId = 0; return; }
+      render(t);
+      rafId = requestAnimationFrame(loop);
+    }
+
+    // Re-render on container size change (counter animation, viewport resize)
+    if ('ResizeObserver' in window) {
+      const ro = new ResizeObserver(function() {
+        render(performance.now());
+      });
+      ro.observe(canvas);
+    }
+    window.addEventListener('resize', function() { render(performance.now()); });
+
+    if (REDUCED) {
+      // Static snapshot — no animation loop
+      render(5000);
+      return;
+    }
+
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          const wasVisible = isVisible;
+          isVisible = entry.isIntersecting;
+          if (isVisible && !wasVisible && !rafId) {
+            rafId = requestAnimationFrame(loop);
+          }
+        });
+      }, { threshold: 0 });
+      io.observe(canvas);
+    }
+    rafId = requestAnimationFrame(loop);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPrizePoolBg);
+  } else {
+    initPrizePoolBg();
+  }
+
+  /* === Before/after IP comparison slider (drag + click + keyboard) === */
+  function initCompareSlider() {
+    const slider = document.getElementById('ipCompareSlider');
+    if (!slider) return;
+    const frame = slider.querySelector('.compare-slider__frame');
+    const topLayer = slider.querySelector('.compare-slider__top');
+    const divider = slider.querySelector('.compare-slider__divider');
+    if (!frame || !topLayer || !divider) return;
+
+    let isDragging = false;
+
+    function setPosition(percent) {
+      percent = Math.max(0, Math.min(100, percent));
+      // clip-path inset(0 (100-percent)% 0 0) reveals the LEFT portion of
+      // the top "no IP" layer up to the slider position; the base "with IP"
+      // shows through on the right.
+      topLayer.style.clipPath = 'inset(0 ' + (100 - percent) + '% 0 0)';
+      divider.style.left = percent + '%';
+      divider.setAttribute('aria-valuenow', String(Math.round(percent)));
+    }
+
+    function getPercentFromEvent(e) {
+      const rect = frame.getBoundingClientRect();
+      const clientX = e.touches && e.touches.length
+        ? e.touches[0].clientX
+        : e.clientX;
+      if (typeof clientX !== 'number') return 50;
+      return ((clientX - rect.left) / rect.width) * 100;
+    }
+
+    // Mouse drag — start
+    divider.addEventListener('mousedown', function(e) {
+      isDragging = true;
+      divider.classList.add('is-dragging');
+      e.preventDefault();
+    });
+    // Mouse move (document-wide so drag continues outside slider bounds)
+    document.addEventListener('mousemove', function(e) {
+      if (!isDragging) return;
+      setPosition(getPercentFromEvent(e));
+    });
+    document.addEventListener('mouseup', function() {
+      if (!isDragging) return;
+      isDragging = false;
+      divider.classList.remove('is-dragging');
+    });
+
+    // Touch drag
+    divider.addEventListener('touchstart', function(e) {
+      isDragging = true;
+      divider.classList.add('is-dragging');
+    }, { passive: true });
+    document.addEventListener('touchmove', function(e) {
+      if (!isDragging) return;
+      setPosition(getPercentFromEvent(e));
+      e.preventDefault();
+    }, { passive: false });
+    document.addEventListener('touchend', function() {
+      if (!isDragging) return;
+      isDragging = false;
+      divider.classList.remove('is-dragging');
+    });
+
+    // Click on frame jumps the slider to the click position (unless the
+    // click landed on the divider/handle itself — drag handles that).
+    frame.addEventListener('click', function(e) {
+      if (e.target === divider || divider.contains(e.target)) return;
+      setPosition(getPercentFromEvent(e));
+    });
+
+    // Keyboard accessibility
+    divider.addEventListener('keydown', function(e) {
+      const current = parseInt(divider.getAttribute('aria-valuenow'), 10) || 50;
+      let next = current;
+      if (e.key === 'ArrowLeft')  next = current - 2;
+      if (e.key === 'ArrowRight') next = current + 2;
+      if (e.key === 'PageDown')   next = current - 10;
+      if (e.key === 'PageUp')     next = current + 10;
+      if (e.key === 'Home')       next = 0;
+      if (e.key === 'End')        next = 100;
+      if (next !== current) {
+        setPosition(next);
+        e.preventDefault();
+      }
+    });
+
+    // Initialize at 50%
+    setPosition(50);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCompareSlider);
+  } else {
+    initCompareSlider();
+  }
 </script>
 
 <!-- Sticky right-side CTA panel (hidden while hero in view) -->
@@ -4913,8 +5639,8 @@
       </h3>
 
       <p id="shareModalMessage" class="share-modal__message" data-i18n-message>
-        <span class="t-en">Pass it along to other builders.</span>
-        <span class="t-ko">다른 빌더한테 전달해보세요.</span>
+        <span class="t-en">Send invitation to other builders.</span>
+        <span class="t-ko">다른 빌더에게 초대장을 보내세요.</span>
       </p>
 
       <button class="share-modal__confirm"
