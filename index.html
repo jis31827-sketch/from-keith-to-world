@@ -1334,9 +1334,13 @@
     text-shadow: 0 1px 2px rgba(15, 20, 50, 0.35);
   }
   .hero-headline .headline-prize {
-    color: #8632FB;
+    color: #FDD835;
     font-size: 1.15em;
-    text-shadow: 0 0 16px rgba(134, 50, 251, 0.7), 0 2px 4px rgba(15, 20, 50, 0.7);
+    text-shadow:
+      0 0 1px rgba(15, 20, 50, 0.95),
+      0 0 16px rgba(253, 216, 53, 0.7),
+      0 2px 4px rgba(15, 20, 50, 0.85),
+      0 4px 14px rgba(15, 20, 50, 0.65);
     white-space: nowrap;
   }
 
@@ -2244,47 +2248,49 @@
   }
 
   /* 5-color rotation */
+  /* Genre tags — tuned for the dark animated background (brighter text,
+     stronger backgrounds and borders so chips stay legible against motion) */
   .genre-tag--pink {
-    color: #8632FB;
-    border-color: rgba(134, 50, 251, 0.30);
-    background: rgba(134, 50, 251, 0.08);
+    color: #D8BCFF;
+    border-color: rgba(216, 188, 255, 0.55);
+    background: rgba(134, 50, 251, 0.20);
   }
-  .genre-tag--pink:hover  { background: rgba(134, 50, 251, 0.14); }
+  .genre-tag--pink:hover  { background: rgba(134, 50, 251, 0.30); }
   .genre-tag--cyan {
-    color: #0093C4;
-    border-color: rgba(0, 147, 196, 0.30);
-    background: rgba(0, 147, 196, 0.08);
+    color: #6EFFE8;
+    border-color: rgba(110, 255, 232, 0.55);
+    background: rgba(67, 255, 226, 0.15);
   }
-  .genre-tag--cyan:hover  { background: rgba(0, 147, 196, 0.14); }
+  .genre-tag--cyan:hover  { background: rgba(67, 255, 226, 0.22); }
   .genre-tag--purple {
-    color: #5611B7;
-    border-color: rgba(86, 17, 183, 0.30);
-    background: rgba(86, 17, 183, 0.08);
+    color: #BD8FFF;
+    border-color: rgba(189, 143, 255, 0.55);
+    background: rgba(86, 17, 183, 0.22);
   }
-  .genre-tag--purple:hover { background: rgba(86, 17, 183, 0.14); }
+  .genre-tag--purple:hover { background: rgba(86, 17, 183, 0.32); }
   .genre-tag--green {
-    color: #059669;
-    border-color: rgba(5, 150, 105, 0.30);
-    background: rgba(5, 150, 105, 0.08);
+    color: #6EE7B7;
+    border-color: rgba(110, 231, 183, 0.55);
+    background: rgba(16, 185, 129, 0.18);
   }
-  .genre-tag--green:hover { background: rgba(5, 150, 105, 0.14); }
+  .genre-tag--green:hover { background: rgba(16, 185, 129, 0.26); }
   .genre-tag--yellow {
-    color: #C49000;
-    border-color: rgba(253, 216, 53, 0.50);
-    background: rgba(253, 216, 53, 0.15);
+    color: #FFEB3B;
+    border-color: rgba(253, 216, 53, 0.65);
+    background: rgba(253, 216, 53, 0.18);
   }
-  .genre-tag--yellow:hover { background: rgba(253, 216, 53, 0.25); }
+  .genre-tag--yellow:hover { background: rgba(253, 216, 53, 0.28); }
 
   /* Closer chip: dashed border + italic signals "this list isn't exhaustive" */
   .genre-tag--more {
-    color: rgba(33, 39, 42, 0.6);
-    border: 1.5px dashed rgba(33, 39, 42, 0.25);
+    color: rgba(255, 255, 255, 0.75);
+    border: 1.5px dashed rgba(255, 255, 255, 0.4);
     background: transparent;
     font-style: italic;
   }
   .genre-tag--more:hover {
-    background: rgba(33, 39, 42, 0.04);
-    border-color: rgba(33, 39, 42, 0.4);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.6);
   }
 
   /* Highlight variant — used for the genre featured by the comparison slider */
@@ -2332,11 +2338,33 @@
   }
 
   /* === IP COMPARE SUB-SECTION (subtitle + lead + slider) === */
-  /* === IP COMPARE SECTION — light purple breather between CTA and FAQ === */
+  /* === IP COMPARE SECTION — WebGL liquid mesh background, left dungeon → right mystical ===
+     CSS gradient stays as graceful fallback for prefers-reduced-motion
+     and devices without WebGL support. */
   .ip-compare-section {
-    background: #F3EAFF;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: linear-gradient(90deg,
+      #1A0B2E 0%,
+      #3D1F5C 35%,
+      #5D2E8C 65%,
+      #9B3FBF 100%);
     padding: clamp(56px, 9vh, 100px) clamp(24px, 4vw, 80px);
-    color: #21272A;
+    color: #FFFFFF;
+  }
+  .ip-compare-section__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    display: block;
+  }
+  .ip-compare-section__content {
+    position: relative;
+    z-index: 1;
   }
   .ip-compare__inner {
     max-width: 1200px;
@@ -2346,19 +2374,38 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 clamp(16px, 2vw, 32px);
+    text-align: center;
+  }
+  .ip-compare__eyebrow {
+    display: inline-block;
+    font-family: var(--font-roboto);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #EC3BD1;
+    background: rgba(236, 59, 209, 0.18);
+    border: 1px solid rgba(236, 59, 209, 0.4);
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ip-compare-section__bg { display: none; }
   }
   .ip-compare__subtitle {
     font-size: clamp(28px, 2.6vw, 40px);
     font-weight: 800;
-    color: #21272A;
+    color: #FFFFFF;
     text-align: center;
     line-height: 1.25;
     letter-spacing: -0.015em;
     max-width: 880px;
     margin: 0 auto 16px;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
   }
   .ip-compare__subtitle .accent {
-    background: linear-gradient(135deg, #8632FB 0%, #A361FF 100%);
+    background: linear-gradient(135deg, #EC3BD1 0%, #A361FF 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -2368,11 +2415,12 @@
   .ip-compare__lead {
     font-size: clamp(15px, 1.3vw, 18px);
     font-weight: 500;
-    color: rgba(33, 39, 42, 0.7);
+    color: rgba(255, 255, 255, 0.80);
     text-align: center;
     line-height: 1.6;
     max-width: 720px;
     margin: 0 auto clamp(32px, 5vh, 48px);
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
   }
   .ip-compare__tags {
     margin-top: 0;
@@ -2838,96 +2886,285 @@
     .cli-typing-dots::after { animation: none; content: '...'; }
   }
 
-  /* === STICKY RIGHT-SIDE CTA PANEL === */
-  .sticky-cta {
+  /* Anchor scroll offset for the sticky nav.top — keeps section
+     headings (and marquee anchors) from being hidden under the GNB
+     on smooth-scroll. */
+  #prize-pool,
+  #shipping-to-millions,
+  #idea-persistence,
+  #faq,
+  #prize-marquee,
+  #action-marquee {
+    scroll-margin-top: 80px;
+  }
+
+  /* === STICKY RIGHT-SIDE NAVIGATION PANEL — TOC + CTA buttons.
+     Hidden while hero is in view, fades in after. On mobile collapses
+     to a bottom bar with only the two CTAs (the TOC is desktop-only). */
+  .sticky-panel {
     position: fixed;
     right: clamp(16px, 2vw, 32px);
     top: 50%;
     z-index: 100;
+    width: 208px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(33, 39, 42, 0.08);
+    border-radius: 18px;
+    box-shadow:
+      0 12px 40px rgba(33, 39, 42, 0.12),
+      0 4px 12px rgba(33, 39, 42, 0.06);
+    padding: 18px 12px;
     display: flex;
     flex-direction: column;
     gap: 12px;
     opacity: 0;
-    transform: translateY(-50%) translateX(40px);
+    transform: translateY(-50%) translateX(20px);
     pointer-events: none;
     transition: opacity 0.3s ease, transform 0.3s ease;
+    font-family: var(--font-roboto);
   }
-  .sticky-cta.visible {
+  .sticky-panel.visible {
     opacity: 1;
     transform: translateY(-50%) translateX(0);
     pointer-events: auto;
   }
-  .sticky-cta__primary {
-    position: relative;
+  .sticky-panel__header {
+    padding: 4px 4px 8px;
+    border-bottom: 1px solid rgba(33, 39, 42, 0.06);
+    margin-bottom: 4px;
+  }
+  .sticky-panel__label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(33, 39, 42, 0.5);
+  }
+  .sticky-panel__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sticky-panel__link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 6px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    cursor: pointer;
+    color: var(--text-icon-primary);
+  }
+  .sticky-panel__link:hover {
+    background: rgba(134, 50, 251, 0.06);
+  }
+  .sticky-panel__link:focus-visible {
+    outline: 2px solid #8632FB;
+    outline-offset: 2px;
+  }
+  .sticky-panel__num {
+    font-family: var(--font-roboto-mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(33, 39, 42, 0.35);
+    min-width: 22px;
+    transition: color 0.15s ease;
+  }
+  .sticky-panel__name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-icon-primary);
+    flex: 1;
+    transition: color 0.15s ease;
+  }
+  .sticky-panel__link:hover .sticky-panel__num {
+    color: #8632FB;
+  }
+  .sticky-panel__link--active {
+    background: linear-gradient(135deg,
+      rgba(134, 50, 251, 0.12),
+      rgba(163, 97, 255, 0.08));
+  }
+  .sticky-panel__link--active .sticky-panel__num,
+  .sticky-panel__link--active .sticky-panel__name {
+    color: #8632FB;
+  }
+  .sticky-panel__link--active .sticky-panel__name {
+    font-weight: 700;
+  }
+  .sticky-panel__divider {
+    height: 1px;
+    background: rgba(33, 39, 42, 0.08);
+    margin: 8px 0;
+  }
+  .sticky-panel__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sticky-panel__cta {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    background: linear-gradient(135deg, #8632FB 0%, #6D20D9 100%);
-    color: #FFFFFF;
-    padding: 14px 24px;
-    border-radius: 999px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13px;
     font-weight: 700;
-    font-size: 14px;
     text-decoration: none;
-    box-shadow:
-      0 8px 24px rgba(134, 50, 251, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-    white-space: nowrap;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+    position: relative;
     font-family: var(--font-roboto);
+    white-space: nowrap;
   }
-  .sticky-cta__primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(134, 50, 251, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  .sticky-panel__cta--primary {
+    background: linear-gradient(135deg, #8632FB, #6D20D9);
+    color: #FFFFFF;
+    box-shadow:
+      0 4px 16px rgba(134, 50, 251, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
   }
-  .sticky-cta__primary .live-pulse {
-    width: 8px;
-    height: 8px;
+  .sticky-panel__cta--primary:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      0 8px 24px rgba(134, 50, 251, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.30);
+  }
+  .sticky-panel__cta--primary .live-pulse {
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: #FA4D56;
     box-shadow: 0 0 8px rgba(250, 77, 86, 0.8);
     animation: live-dot-blink 1.2s ease-in-out infinite;
     flex-shrink: 0;
   }
-  .sticky-cta__share {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.95);
-    color: #21272A;
+  .sticky-panel__cta--secondary {
+    background: #FFFFFF;
+    color: var(--text-icon-primary);
     border: 1px solid rgba(33, 39, 42, 0.12);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    padding: 14px 24px;
-    border-radius: 999px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(33, 39, 42, 0.1);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-    font-family: var(--font-roboto);
-    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(33, 39, 42, 0.06);
   }
-  .sticky-cta__share:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(33, 39, 42, 0.15);
+  .sticky-panel__cta--secondary:hover {
+    border-color: rgba(33, 39, 42, 0.25);
+    background: rgba(33, 39, 42, 0.02);
+  }
+  .sticky-panel__cta:focus-visible {
+    outline: 2px solid #8632FB;
+    outline-offset: 2px;
   }
 
+  /* Tablet: slightly narrower panel */
+  @media (max-width: 1279px) {
+    .sticky-panel { width: 188px; right: 16px; }
+    .sticky-panel__name { font-size: 13px; }
+  }
+  /* Mobile: collapse to bottom bar, CTAs only (TOC hidden) */
   @media (max-width: 767px) {
-    .sticky-cta {
+    .sticky-panel {
+      top: auto;
+      bottom: 16px;
       right: 16px;
       left: 16px;
-      bottom: 16px;
-      top: auto;
+      width: auto;
       transform: translateY(40px);
       flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 14px;
     }
-    .sticky-cta.visible { transform: translateY(0); }
-    .sticky-cta__primary { flex: 1 1 65%; justify-content: center; }
-    .sticky-cta__share   { flex: 1 1 35%; justify-content: center; }
-    .prize-marquee { height: 48px; }
-    .prize-marquee__item { font-size: 14px; }
+    .sticky-panel.visible { transform: translateY(0); }
+    .sticky-panel__header,
+    .sticky-panel__nav,
+    .sticky-panel__divider { display: none; }
+    .sticky-panel__actions {
+      flex-direction: row;
+      gap: 8px;
+      flex: 1;
+    }
+    .sticky-panel__cta--primary { flex: 1 1 65%; }
+    .sticky-panel__cta--secondary { flex: 1 1 35%; }
+  }
+
+  /* === FLOATING TOP BUTTON — bottom-right circular, 1s smooth scroll to top.
+     Visibility mirrors the sticky panel: hidden while hero is in view. */
+  .scroll-top {
+    position: fixed;
+    bottom: clamp(20px, 2.5vw, 32px);
+    right: clamp(20px, 2.5vw, 36px);
+    z-index: 99;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(33, 39, 42, 0.10);
+    color: var(--text-icon-primary);
+    cursor: pointer;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    box-shadow:
+      0 8px 24px rgba(33, 39, 42, 0.14),
+      0 2px 8px rgba(33, 39, 42, 0.06);
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease,
+      background-color 0.15s ease,
+      box-shadow 0.15s ease,
+      border-color 0.15s ease;
+    font-family: var(--font-roboto);
+  }
+  .scroll-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .scroll-top:hover {
+    background: #FFFFFF;
+    border-color: rgba(33, 39, 42, 0.20);
+    box-shadow:
+      0 12px 32px rgba(33, 39, 42, 0.18),
+      0 4px 12px rgba(33, 39, 42, 0.10);
+    transform: translateY(-2px);
+  }
+  .scroll-top:focus-visible {
+    outline: 2px solid #8632FB;
+    outline-offset: 3px;
+  }
+  .scroll-top svg { display: block; }
+  .scroll-top__label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(33, 39, 42, 0.55);
+    margin-top: 2px;
+    line-height: 1;
+  }
+  /* Mobile: sit above the bottom-anchored sticky-panel bar */
+  @media (max-width: 767px) {
+    .scroll-top {
+      bottom: 84px;
+      right: 16px;
+      width: 44px;
+      height: 44px;
+    }
+    .scroll-top__label { display: none; }
+    .scroll-top svg { width: 18px; height: 18px; }
   }
 
   /* === SHARE TOAST === */
@@ -3257,8 +3494,10 @@
   </div>
 </section>
 
-<!-- MARQUEE PRIZE TICKER — dominant $60K total + 3 component subs -->
-<section class="prize-marquee" aria-label="Prize pool breakdown">
+<!-- MARQUEE PRIZE TICKER — dominant $60K total + 3 component subs.
+     Acts as the anchor target for the Prize Pool nav link so the marquee
+     lands flush under the GNB on smooth scroll. -->
+<section class="prize-marquee" id="prize-marquee" aria-label="Prize pool breakdown">
   <div class="prize-marquee__track">
     <span class="marquee-set">
       <span class="marquee-total">$60,000 TOTAL PRIZE POOL</span>
@@ -3284,7 +3523,7 @@
 </section>
 
 <!-- PRIZE SCOREBOARD -->
-<section class="prize-scoreboard" aria-label="Prize pool details">
+<section class="prize-scoreboard" id="prize-pool" aria-label="Prize pool details">
   <canvas id="prizePoolBg" class="prize-scoreboard__bg" aria-hidden="true"></canvas>
   <div class="prize-scoreboard__container">
     <div class="prize-scoreboard__header">
@@ -3363,7 +3602,7 @@
 </section>
 
 <!-- SHIPPING TO MILLIONS — post-jam support for selected teams -->
-<section class="shipping" id="shipping" aria-label="Post-jam support">
+<section class="shipping" id="shipping-to-millions" aria-label="Post-jam support">
   <div class="shipping__container">
     <div class="shipping__header">
       <p class="shipping__subhead">
@@ -3475,8 +3714,10 @@
   </div>
 </section>
 
-<!-- ACTION MARQUEE — section break + opening reminder, flush between Shipping and Idea+Persistence -->
-<section class="action-marquee" aria-label="Vibe Jam opening reminder">
+<!-- ACTION MARQUEE — section break + opening reminder, flush between Shipping and Idea+Persistence.
+     Acts as the anchor target for the Open to All nav link so the marquee
+     lands flush under the GNB on smooth scroll. -->
+<section class="action-marquee" id="action-marquee" aria-label="Vibe Jam opening reminder">
   <div class="action-marquee__track">
     <span class="action-marquee__item action-marquee__item--primary">⚡ OPENS JUNE 1, 2026</span>
     <span class="action-marquee__sep" aria-hidden="true">◆</span>
@@ -3494,7 +3735,7 @@
 </section>
 
 <!-- IDEA + PERSISTENCE WANTED — entry-level reassurance (light breather section) -->
-<section class="idea-persistence" aria-label="Who this is for">
+<section class="idea-persistence" id="idea-persistence" aria-label="Who this is for">
   <div class="idea-persistence__container">
     <div class="idea-persistence__header">
       <span class="idea-persistence__eyebrow">
@@ -3574,15 +3815,18 @@
   </div>
 </section>
 
-<!-- IP COMPARE — genre showcase + before/after slider on a light-purple breather background -->
+<!-- IP COMPARE — genre showcase + before/after slider with WebGL liquid mesh background -->
 <section class="ip-compare-section" aria-label="Genre and MapleStory IP showcase">
-  <div class="ip-compare__inner">
-    <!-- IP value proposition: subtitle + relocated hashtags (with #deck-builders highlighted) + before/after slider -->
-    <div class="ip-compare">
-      <h3 class="ip-compare__subtitle">
-        <span class="t-en">Choose your genre. The <span class="accent">Maple feel</span> comes built in.</span>
-        <span class="t-ko">장르는 자유롭게. <span class="accent">메이플 감성</span>은 기본 탑재입니다.</span>
-      </h3>
+  <canvas class="ip-compare-section__bg" id="ipCompareBg" aria-hidden="true"></canvas>
+  <div class="ip-compare-section__content">
+    <div class="ip-compare__inner">
+      <!-- IP value proposition: subtitle + relocated hashtags (with #deck-builders highlighted) + before/after slider -->
+      <div class="ip-compare">
+        <span class="ip-compare__eyebrow">BUILT-IN POLISH</span>
+        <h3 class="ip-compare__subtitle">
+          <span class="t-en">Choose your genre. The <span class="accent">Maple feel</span> comes built in.</span>
+          <span class="t-ko">장르는 자유롭게. <span class="accent">메이플 감성</span>은 기본 탑재입니다.</span>
+        </h3>
 
       <p class="ip-compare__lead">
         <span class="t-en">Whatever you build, MapleStory IP arrives pre-packaged as skills &mdash; characters, animations, world systems, sound. You bring the idea, we bring the polish.</span>
@@ -3659,6 +3903,7 @@
         </div>
       </div>
     </div>
+  </div>
   </div>
 </section>
 
@@ -3781,26 +4026,139 @@
     });
   })();
 
-  /* === Sticky CTA visibility (hides while hero in view, shows after) ===
-     Deferred to DOMContentLoaded because <aside class="sticky-cta"> appears
-     later in the document than this <script> block — without the wait,
-     querySelector returns null and the observer never attaches. */
-  function initStickyCTAObserver() {
+  /* === Sticky navigation panel — visibility, scroll-spy, smooth scroll ===
+     Deferred to DOMContentLoaded because <aside class="sticky-panel"> appears
+     later in the document than this <script> block. */
+  function initStickyPanel() {
     const hero = document.querySelector('section.hero');
-    const sticky = document.querySelector('.sticky-cta');
-    if (!hero || !sticky || !('IntersectionObserver' in window)) return;
-    const io = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) sticky.classList.remove('visible');
-        else sticky.classList.add('visible');
+    const panel = document.querySelector('.sticky-panel');
+    if (!panel || !('IntersectionObserver' in window)) return;
+
+    // Visibility: trigger as soon as the hero is more than half scrolled.
+    // rootMargin '-50% 0px 0px 0px' shrinks the observation area to the
+    // bottom half of the viewport, so the hero stops "intersecting" the
+    // moment its bottom edge crosses the viewport's vertical midpoint —
+    // which is roughly the point where ~50% of the hero has scrolled past.
+    if (hero) {
+      const visibilityIO = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) panel.classList.remove('visible');
+          else panel.classList.add('visible');
+        });
+      }, { threshold: 0, rootMargin: '-50% 0px 0px 0px' });
+      visibilityIO.observe(hero);
+    }
+
+    const links = Array.prototype.slice.call(panel.querySelectorAll('.sticky-panel__link'));
+    const sectionIds = links.map(function(l) { return l.dataset.section; });
+    const sections = sectionIds
+      .map(function(id) { return document.getElementById(id); })
+      .filter(Boolean);
+
+    // Smooth scroll on link click. data-scroll-target wins over data-section
+    // so the click can land on a marquee anchor while the scroll-spy still
+    // tracks the underlying content section.
+    links.forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        const targetId = link.dataset.scrollTarget || link.dataset.section;
+        const target = document.getElementById(targetId);
+        if (!target) return;
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
-    }, { threshold: 0.05 });
-    io.observe(hero);
+    });
+
+    function setActive(id) {
+      links.forEach(function(link) {
+        const isActive = link.dataset.section === id;
+        link.classList.toggle('sticky-panel__link--active', isActive);
+        if (isActive) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    }
+
+    // Scroll-spy: section is active when its top half crosses viewport center
+    if (sections.length) {
+      const spyIO = new IntersectionObserver(function(entries) {
+        // Pick the section closest to the viewport center among intersecting ones
+        let best = null;
+        let bestRatio = 0;
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting && entry.intersectionRatio > bestRatio) {
+            bestRatio = entry.intersectionRatio;
+            best = entry.target;
+          }
+        });
+        if (best) setActive(best.id);
+      }, {
+        rootMargin: '-30% 0px -50% 0px',
+        threshold: [0, 0.25, 0.5, 0.75, 1]
+      });
+      sections.forEach(function(s) { spyIO.observe(s); });
+    }
   }
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initStickyCTAObserver);
+    document.addEventListener('DOMContentLoaded', initStickyPanel);
   } else {
-    initStickyCTAObserver();
+    initStickyPanel();
+  }
+
+  /* === Floating Top button — 1s eased smooth scroll to top.
+     window.scrollTo({behavior:'smooth'}) does not accept a duration; a
+     RAF loop with easeInOutCubic lets us land exactly on 1s regardless of
+     scroll distance. Visibility mirrors the sticky-panel pattern. */
+  function initScrollTop() {
+    const btn = document.querySelector('.scroll-top');
+    if (!btn) return;
+
+    const hero = document.querySelector('section.hero');
+    if (hero && 'IntersectionObserver' in window) {
+      // Mirrors the sticky-panel visibility trigger: fires once the hero
+      // has been scrolled past its midpoint, so the Top button and the
+      // sidebar appear together.
+      const io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) btn.classList.remove('visible');
+          else btn.classList.add('visible');
+        });
+      }, { threshold: 0, rootMargin: '-50% 0px 0px 0px' });
+      io.observe(hero);
+    }
+
+    const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    btn.addEventListener('click', function() {
+      const startY = window.pageYOffset || document.documentElement.scrollTop;
+      if (startY === 0) return;
+
+      // Reduced motion or no rAF: jump instantly
+      if (REDUCED || !('requestAnimationFrame' in window)) {
+        window.scrollTo(0, 0);
+        return;
+      }
+
+      const duration = 1000;
+      const startTime = performance.now();
+
+      function easeInOutCubic(t) {
+        return t < 0.5
+          ? 4 * t * t * t
+          : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+
+      function step(now) {
+        const elapsed = now - startTime;
+        const t = Math.min(elapsed / duration, 1);
+        window.scrollTo(0, Math.round(startY * (1 - easeInOutCubic(t))));
+        if (t < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initScrollTop);
+  } else {
+    initScrollTop();
   }
 
   /* === Count-up animations on scoreboard scroll-into-view === */
@@ -4640,6 +4998,236 @@ void main() {
     initPrizePoolBg();
   }
 
+  /* === IP Compare section — WebGL 1.0 liquid mesh background.
+     Two color zones (left dungeon / right mystical) blended at center,
+     driven by multi-octave value noise + sine offsets. Slow, ambient,
+     paused when section is off-screen. CSS gradient on the section
+     remains as graceful fallback when WebGL is unavailable or the user
+     prefers reduced motion. */
+  function initIPCompareBg() {
+    const canvas = document.getElementById('ipCompareBg');
+    if (!canvas) return;
+
+    const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (REDUCED) {
+      canvas.style.display = 'none';
+      return;
+    }
+
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) {
+      canvas.style.display = 'none';
+      return;
+    }
+
+    const VS = [
+      'attribute vec2 a_position;',
+      'void main() {',
+      '  gl_Position = vec4(a_position, 0.0, 1.0);',
+      '}'
+    ].join('\n');
+
+    const FS = [
+      'precision highp float;',
+      '',
+      'uniform vec2 u_resolution;',
+      'uniform float u_time;',
+      '',
+      'vec2 hash2(vec2 p) {',
+      '  p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));',
+      '  return fract(sin(p) * 43758.5453) * 2.0 - 1.0;',
+      '}',
+      '',
+      'float noise(vec2 p) {',
+      '  vec2 i = floor(p);',
+      '  vec2 f = fract(p);',
+      '  vec2 u = f * f * (3.0 - 2.0 * f);',
+      '  float a = dot(hash2(i),                  f - vec2(0.0, 0.0));',
+      '  float b = dot(hash2(i + vec2(1.0, 0.0)), f - vec2(1.0, 0.0));',
+      '  float c = dot(hash2(i + vec2(0.0, 1.0)), f - vec2(0.0, 1.0));',
+      '  float d = dot(hash2(i + vec2(1.0, 1.0)), f - vec2(1.0, 1.0));',
+      '  return mix(mix(a, b, u.x), mix(c, d, u.x), u.y) * 0.5 + 0.5;',
+      '}',
+      '',
+      '// Multi-octave noise. Amplitudes 1.0 / 0.5 / 0.25 (total 1.75)',
+      '// normalized to 0..1 so the result drives full color contrast.',
+      'float fbm(vec2 p) {',
+      '  float v = 0.0;',
+      '  float a = 1.0;',
+      '  for (int i = 0; i < 3; i++) {',
+      '    v += a * noise(p);',
+      '    p *= 2.0;',
+      '    a *= 0.5;',
+      '  }',
+      '  return v / 1.75;',
+      '}',
+      '',
+      'void main() {',
+      '  vec2 uv = gl_FragCoord.xy / u_resolution.xy;',
+      '  float aspect = u_resolution.x / u_resolution.y;',
+      '  vec2 cuv = vec2(uv.x * aspect, uv.y);',
+      '',
+      '  // PASS 1 — Domain warp. Shift the sampling coordinates by noise',
+      '  // so the resulting pattern flows like liquid rather than reading',
+      '  // as static fog. Signed offset keeps the warp centered.',
+      '  vec2 warpIn = cuv * 1.5 + u_time * 0.08;',
+      '  vec2 warpedUV = cuv + vec2(',
+      '    noise(warpIn) - 0.5,',
+      '    noise(warpIn + 100.0) - 0.5',
+      '  ) * 0.6;',
+      '',
+      '  // PASS 2 — Main pattern sampled at warped coordinates.',
+      '  // Frequency 2.5 gives large readable swirls (not tiny grain).',
+      '  float mainNoise = fbm(warpedUV * 2.5 + u_time * 0.05);',
+      '',
+      '  // Left zone — dungeon: near-black indigo to deep dungeon purple,',
+      '  // with occasional warm wine shadow where noise peaks.',
+      '  vec3 leftDark = vec3(0.082, 0.027, 0.121); // #15071F',
+      '  vec3 leftMid  = vec3(0.290, 0.102, 0.431); // #4A1A6E',
+      '  vec3 leftWine = vec3(0.353, 0.102, 0.180); // #5A1A2E',
+      '  vec3 leftColor = mix(leftDark, leftMid, mainNoise);',
+      '  float wineGlow = smoothstep(0.75, 0.95, mainNoise);',
+      '  leftColor = mix(leftColor, leftWine, wineGlow * 0.30);',
+      '',
+      '  // Right zone — mystical: mid purple to vibrant magenta-purple,',
+      '  // with bright pink sparkle accents where noise peaks.',
+      '  vec3 rightDeep   = vec3(0.365, 0.180, 0.549); // #5D2E8C',
+      '  vec3 rightBright = vec3(0.769, 0.310, 0.890); // #C44FE3',
+      '  vec3 rightPink   = vec3(0.925, 0.231, 0.819); // #EC3BD1',
+      '  vec3 rightColor = mix(rightDeep, rightBright, mainNoise);',
+      '  float pinkGlow = smoothstep(0.70, 0.90, mainNoise);',
+      '  rightColor = mix(rightColor, rightPink, pinkGlow * 0.40);',
+      '',
+      '  // Smooth zone blend — wider center band (0.35..0.65) so the',
+      '  // narrative transition lines up with the comparison slider.',
+      '  float zone = smoothstep(0.35, 0.65, uv.x);',
+      '  vec3 color = mix(leftColor, rightColor, zone);',
+      '',
+      '  // Brightness pulses — independent low-frequency noise layer',
+      '  // adds large soft bright patches and shadow dips drifting',
+      '  // across the screen on a much slower clock.',
+      '  float pulse = noise(cuv * 0.8 + u_time * 0.03 + vec2(50.0, -50.0));',
+      '  color *= 1.0 + smoothstep(0.50, 0.80, pulse) * 0.40;',
+      '  color *= 1.0 - (1.0 - smoothstep(0.20, 0.50, pulse)) * 0.25;',
+      '',
+      '  // Stronger vignette — corners settle to ~30% of center brightness.',
+      '  float vig = smoothstep(1.40, 0.20, length(uv - 0.5) * 1.2);',
+      '  color *= vig;',
+      '',
+      '  // Fine film grain (~2.5%) to prevent banding on smooth gradients.',
+      '  float grain = (fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) * 0.025;',
+      '  color += vec3(grain);',
+      '',
+      '  gl_FragColor = vec4(color, 1.0);',
+      '}'
+    ].join('\n');
+
+    function compile(type, source) {
+      const sh = gl.createShader(type);
+      gl.shaderSource(sh, source);
+      gl.compileShader(sh);
+      if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+        console.warn('IP compare shader compile failed:', gl.getShaderInfoLog(sh));
+        gl.deleteShader(sh);
+        return null;
+      }
+      return sh;
+    }
+
+    const vs = compile(gl.VERTEX_SHADER, VS);
+    const fs = compile(gl.FRAGMENT_SHADER, FS);
+    if (!vs || !fs) { canvas.style.display = 'none'; return; }
+
+    const program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.warn('IP compare program link failed:', gl.getProgramInfoLog(program));
+      canvas.style.display = 'none';
+      return;
+    }
+
+    // Fullscreen quad covering the viewport as 2 triangles
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([
+        -1, -1,  1, -1,  -1, 1,
+        -1,  1,  1, -1,   1, 1
+      ]),
+      gl.STATIC_DRAW
+    );
+    const posLoc = gl.getAttribLocation(program, 'a_position');
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+    const uResLoc = gl.getUniformLocation(program, 'u_resolution');
+    const uTimeLoc = gl.getUniformLocation(program, 'u_time');
+
+    gl.useProgram(program);
+
+    // dpr capped at 2.0 — effect is soft, no benefit beyond that
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+    const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.max(1, Math.floor(rect.width * dpr));
+      const h = Math.max(1, Math.floor(rect.height * dpr));
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+        gl.viewport(0, 0, w, h);
+      }
+    }
+
+    let startTime = performance.now();
+    let isVisible = true;
+    let rafId = 0;
+
+    function render(now) {
+      resize();
+      gl.uniform2f(uResLoc, canvas.width, canvas.height);
+      gl.uniform1f(uTimeLoc, (now - startTime) * 0.001);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+
+    function loop(now) {
+      if (!isVisible) { rafId = 0; return; }
+      render(now);
+      rafId = requestAnimationFrame(loop);
+    }
+
+    // Debounced resize on viewport changes
+    let resizeTimer = 0;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function() { render(performance.now()); }, 100);
+    });
+
+    // Pause when the section is off-screen (battery + perf)
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          const wasVisible = isVisible;
+          isVisible = entry.isIntersecting;
+          if (isVisible && !wasVisible && !rafId) {
+            rafId = requestAnimationFrame(loop);
+          }
+        });
+      }, { threshold: 0 });
+      io.observe(canvas);
+    }
+    rafId = requestAnimationFrame(loop);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initIPCompareBg);
+  } else {
+    initIPCompareBg();
+  }
+
   /* === Before/after IP comparison slider (drag + click + keyboard) === */
   function initCompareSlider() {
     const slider = document.getElementById('ipCompareSlider');
@@ -4737,22 +5325,57 @@ void main() {
 </script>
 
 <!-- Sticky right-side CTA panel (hidden while hero in view) -->
-<aside class="sticky-cta" aria-label="Quick actions">
-  <a href="#apply" class="sticky-cta__primary">
-    <span class="live-pulse" aria-hidden="true"></span>
-    <span class="t-en">Start Building Now</span>
-    <span class="t-ko">지금 빌드 시작</span>
-  </a>
-  <button class="sticky-cta__share" type="button" aria-label="Share Vibe Jam" data-share-trigger>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M16 6l-4-4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M12 2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-    <span class="t-en">Share</span>
-    <span class="t-ko">공유</span>
-  </button>
+<!-- Sticky right-side navigation panel — TOC + Build Now/Share CTAs.
+     Replaces the previous floating button group. Hidden while hero is in
+     viewport, shown after. On mobile the TOC collapses and only the CTAs
+     remain as a bottom bar. -->
+<aside class="sticky-panel" aria-label="Page navigation">
+  <div class="sticky-panel__header">
+    <span class="sticky-panel__label">Jump to</span>
+  </div>
+
+  <nav class="sticky-panel__nav">
+    <a href="#prize-marquee" class="sticky-panel__link" data-section="prize-pool" data-scroll-target="prize-marquee">
+      <span class="sticky-panel__num">01</span>
+      <span class="sticky-panel__name">Prize Pool</span>
+    </a>
+    <a href="#shipping-to-millions" class="sticky-panel__link" data-section="shipping-to-millions">
+      <span class="sticky-panel__num">02</span>
+      <span class="sticky-panel__name">Winners' Stack</span>
+    </a>
+    <a href="#action-marquee" class="sticky-panel__link" data-section="idea-persistence" data-scroll-target="action-marquee">
+      <span class="sticky-panel__num">03</span>
+      <span class="sticky-panel__name">Open to All</span>
+    </a>
+    <a href="#faq" class="sticky-panel__link" data-section="faq">
+      <span class="sticky-panel__num">04</span>
+      <span class="sticky-panel__name">FAQ</span>
+    </a>
+  </nav>
+
+  <div class="sticky-panel__divider" aria-hidden="true"></div>
+
+  <div class="sticky-panel__actions">
+    <a href="#apply" class="sticky-panel__cta sticky-panel__cta--primary">
+      <span class="live-pulse" aria-hidden="true"></span>
+      Build Now
+    </a>
+    <button class="sticky-panel__cta sticky-panel__cta--secondary" type="button" aria-label="Share Vibe Jam" data-share-trigger>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Share
+    </button>
+  </div>
 </aside>
+
+<!-- Floating Top button — circular bottom-right, custom 1s smooth scroll to top -->
+<button class="scroll-top" type="button" aria-label="Scroll to top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <span class="scroll-top__label">Top</span>
+</button>
 
 <!-- SHARE MODAL — appears after clipboard-copy on Share button click -->
 <div class="share-modal"
