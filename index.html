@@ -247,8 +247,17 @@
   html, body { margin: 0; padding: 0; }
   /* Force the page scrollbar to always be present so that any height
      fluctuation (CLI animation, image loads, etc.) cannot toggle the
-     scrollbar and shift right-aligned content horizontally. */
-  html { overflow-y: scroll; }
+     scrollbar and shift right-aligned content horizontally.
+     scroll-snap-type: proximity gives the sidebar anchor points a
+     gentle magnet feel — the page snaps when scrolling pauses near an
+     anchor, but fast scrolls pass straight through. */
+  html {
+    overflow-y: scroll;
+    scroll-snap-type: y proximity;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-snap-type: none; }
+  }
   body {
     font-family: var(--font-roboto);
     background: var(--bg-base); color: var(--text);
@@ -275,7 +284,12 @@
     padding: 14px 28px;
   }
   nav.top .inner {
-    max-width: var(--max); margin: 0 auto;
+    /* Full-width bar — left cluster (bento + MSU logo) flush left,
+       right cluster (Build Now) flush right. The 28px padding on
+       nav.top already provides edge breathing room. */
+    max-width: none;
+    margin: 0;
+    width: 100%;
     display: flex; justify-content: space-between; align-items: center; gap: 20px;
   }
   nav.top .brand {
@@ -346,7 +360,7 @@
     margin: 0 12px 0 8px;
     text-decoration: none;
   }
-  nav.top .gnb-msu-logo img { height: 28px; width: auto; display: block; }
+  nav.top .gnb-msu-logo img { height: 40px; width: auto; display: block; }
   nav.top .gnb-divider {
     display: inline-block;
     width: 1px; height: 24px;
@@ -479,14 +493,14 @@
 
   /* Tablet */
   @media (max-width: 1279px) {
-    nav.top .gnb-msu-logo img { height: 26px; }
+    nav.top .gnb-msu-logo img { height: 36px; }
     .bento-dropdown { width: 340px; }
   }
 
   /* Mobile — sheet-style dropdown with backdrop */
   @media (max-width: 767px) {
     nav.top .gnb-msu-logo { margin: 0 8px 0 4px; }
-    nav.top .gnb-msu-logo img { height: 22px; }
+    nav.top .gnb-msu-logo img { height: 30px; }
     nav.top .gnb-divider { margin: 0 10px; height: 20px; }
     nav.top .gnb-bento { margin-right: 4px; width: 36px; height: 36px; padding: 6px; }
     .bento-dropdown {
@@ -1274,6 +1288,14 @@
   footer.site .partners img { height: 28px; opacity: 0.9; }
   footer.site .partners .x { color: rgba(255,255,255,0.4); font-size: 16px; font-weight: 300; font-family: var(--font-roboto); }
   footer.site .made { margin-top: 18px; font-size: 12px; color: rgba(255,255,255,0.4); }
+  footer.site .copyright {
+    margin-top: 12px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.35);
+  }
   footer.site a { color: var(--orange); text-decoration: none; }
 
   @media (max-width: 900px) {
@@ -2897,6 +2919,15 @@
   #action-marquee {
     scroll-margin-top: 80px;
   }
+  /* Scroll-snap targets — only the four sidebar anchor points snap so
+     the page reads as four discrete "moments" while still allowing
+     free scrolling within each section. */
+  #prize-marquee,
+  #shipping-to-millions,
+  #action-marquee,
+  #faq {
+    scroll-snap-align: start;
+  }
 
   /* === STICKY RIGHT-SIDE NAVIGATION PANEL — TOC + CTA buttons.
      Hidden while hero is in view, fades in after. On mobile collapses
@@ -3949,20 +3980,7 @@
 <!-- FOOTER -->
 <footer class="site">
   <div class="inner">
-    <div class="partners">
-      <img src="assets/nexpace_h_alt.svg" alt="NEXPACE" style="filter: brightness(0) invert(1);">
-      <span class="x">×</span>
-      <img src="assets/msu_h_inv.svg" alt="MapleStory Universe">
-    </div>
-    <div>VIBEJAM (VIBE IP Gamejam) 2026 · NEXPACE × MapleStory Universe</div>
-    <div style="margin-top: 8px;">
-      <span class="t-en">Contact: </span><span class="t-ko">문의: </span>
-      <a href="mailto:[operations email]">[operations email]</a>
-    </div>
-    <div class="made">
-      <span class="t-en">This page was built with vibe coding by NEXPACE and Claude.</span>
-      <span class="t-ko">이 페이지는 NEXPACE와 Claude가 바이브 코딩으로 직접 제작했습니다.</span>
-    </div>
+    <div class="copyright">&copy; NEXPACE. All Rights Reserved</div>
   </div>
 </footer>
 
