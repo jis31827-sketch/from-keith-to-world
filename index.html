@@ -645,16 +645,18 @@
     position: absolute;
     inset: -110%;
     background:
-      radial-gradient(circle at center, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 45%),
-      radial-gradient(circle at 28% 28%, rgba(120, 220, 255, 0.85) 0%, rgba(120, 220, 255, 0) 55%),
-      radial-gradient(circle at 72% 72%, rgba(255, 150, 220, 0.85) 0%, rgba(255, 150, 220, 0) 55%),
-      radial-gradient(circle at 50% 18%, rgba(253, 216, 53, 0.65) 0%, rgba(253, 216, 53, 0) 45%),
-      radial-gradient(circle at 50% 82%, rgba(163, 97, 255, 0.6) 0%, rgba(163, 97, 255, 0) 50%);
+      radial-gradient(circle at center, rgba(255, 255, 255, 0.80) 0%, rgba(255, 255, 255, 0) 75%),
+      radial-gradient(circle at 28% 28%, rgba(120, 220, 255, 0.65) 0%, rgba(120, 220, 255, 0) 80%),
+      radial-gradient(circle at 72% 72%, rgba(255, 150, 220, 0.65) 0%, rgba(255, 150, 220, 0) 80%),
+      radial-gradient(circle at 50% 18%, rgba(253, 216, 53, 0.50) 0%, rgba(253, 216, 53, 0) 75%),
+      radial-gradient(circle at 50% 82%, rgba(163, 97, 255, 0.45) 0%, rgba(163, 97, 255, 0) 80%);
     z-index: 0;
     pointer-events: none;
-    border-radius: 50%;
-    filter: blur(1px);
-    animation: sparkle-shimmer 2.2s ease-in-out infinite;
+    /* border-radius removed — radial gradients already fall to alpha 0
+       well before the bounding box edge, so the previous circle clip was
+       creating a visible disk perimeter that pulsed with the scale. */
+    filter: blur(10px);
+    animation: sparkle-shimmer 3.2s ease-in-out infinite;
   }
   /* Rotating ray burst — second layer that spins for shimmer movement */
   .logo-hero .logo-sparkle::after {
@@ -680,12 +682,12 @@
     pointer-events: none;
     border-radius: 50%;
     mix-blend-mode: screen;
-    filter: blur(4px);
+    filter: blur(8px);
     animation: sparkle-rotate 9s linear infinite;
   }
   @keyframes sparkle-shimmer {
-    0%, 100% { opacity: 0.55; transform: scale(0.88); }
-    50%      { opacity: 1;    transform: scale(1.25); }
+    0%, 100% { opacity: 0.55; transform: scale(0.98); }
+    50%      { opacity: 1;    transform: scale(1.04); }
   }
   @keyframes sparkle-rotate {
     from { transform: rotate(0deg); }
@@ -2597,6 +2599,60 @@
     margin: 0;
   }
 
+  /* Reveal animation — recruiter starts hidden "behind" the CLI window,
+     which itself sits shifted left toward the section center.
+     - .is-revealing kicks off a slow 5s transition at the PHASE 2 line,
+       so the cat creeps out from behind the CLI like it's been waiting
+       for you the whole time. Pure deadpan comedy timing.
+     - .is-revealed (added at "It's your turn") locks in the end state
+       with transition: none, so re-entry / CLI restart doesn't replay
+       the slow creep — the cat stays put. */
+  .idea-persistence__demo-area .recruiter {
+    opacity: 0;
+    transform: translateX(80px);
+    position: relative;
+    z-index: 1;
+  }
+  .idea-persistence__demo-area .cli-demo {
+    transform: translateX(-30%);
+    z-index: 2;
+  }
+  .idea-persistence__demo-area.is-revealing .recruiter {
+    opacity: 1;
+    transform: translateX(0);
+    transition:
+      opacity 5s cubic-bezier(0.33, 1, 0.68, 1),
+      transform 5s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+  .idea-persistence__demo-area.is-revealing .cli-demo {
+    transform: translateX(0);
+    transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+  .idea-persistence__demo-area.is-revealed .recruiter,
+  .idea-persistence__demo-area.is-revealed .cli-demo {
+    opacity: 1;
+    transform: translateX(0);
+    transition: none;
+  }
+  /* Tablet/mobile fall back to vertical stack — show both immediately,
+     directional reveal doesn't read well on stacked layouts. */
+  @media (max-width: 1023px) {
+    .idea-persistence__demo-area .recruiter,
+    .idea-persistence__demo-area .cli-demo {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .idea-persistence__demo-area .recruiter,
+    .idea-persistence__demo-area .cli-demo {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
   /* Recruiter column */
   .recruiter {
     display: flex;
@@ -4401,10 +4457,17 @@
       appendLine(CHECK + ' Deck-builder template loaded.');
       await wait(1000, t);
 
-      // [t=14.5] PHASE 2 marker
+      // [t=14.5] PHASE 2 marker — also the moment the recruiter cat begins
+      // its slow 5-second creep out from behind the CLI. is-revealing wins
+      // unless is-revealed is already set (re-entry case), so first-timers
+      // get the deadpan reveal and returners see the cat already in place.
       appendLine(RULE);
       appendLine('<span class="cli-phase">PHASE 2 — Game Design</span>');
       appendLine(RULE);
+      const demoAreaReveal = document.querySelector('.idea-persistence__demo-area');
+      if (demoAreaReveal && !demoAreaReveal.classList.contains('is-revealed')) {
+        demoAreaReveal.classList.add('is-revealing');
+      }
       await wait(500, t);
 
       // [t=15.0] question
@@ -4480,6 +4543,17 @@
       appendLine('<span class="cli-ready">✨ Ready to build? Your prototype is live.</span>');
       appendLine('<span class="cli-call">It\'s your turn.</span>');
       appendLine(RULE);
+
+      // Lock the recruiter section into its final visible state. The slow
+      // 5s reveal started at PHASE 2 has nearly or fully completed by now;
+      // is-revealed snaps everything to opacity 1 / translateX(0) with
+      // transition: none, so CLI restarts on re-entry never replay the
+      // creep — the cat is already there waiting.
+      const demoArea = document.querySelector('.idea-persistence__demo-area');
+      if (demoArea) {
+        demoArea.classList.remove('is-revealing');
+        demoArea.classList.add('is-revealed');
+      }
       // No further lines; animation ends here and stays frozen.
     }
 
@@ -4504,6 +4578,11 @@
         '<div class="cli-line is-instant"><span class="cli-call">It\'s your turn.</span></div>',
         '<div class="cli-line is-instant"><span class="cli-rule">─────────────────────────────────────────────</span></div>'
       ].join('');
+      // Reduced-motion users see the final state immediately; reveal the
+      // recruiter immediately too (the @media rule above also forces this
+      // via CSS, but adding the class keeps state consistent).
+      const demoArea = document.querySelector('.idea-persistence__demo-area');
+      if (demoArea) demoArea.classList.add('is-revealed');
     }
 
     // Hover/focus pause (does not affect restart-on-entry behavior)
