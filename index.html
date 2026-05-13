@@ -81,7 +81,11 @@
   body {
     font-family: 'NexonLv2', 'KlavikaNX', "Pretendard", -apple-system, system-ui, sans-serif;
     background: var(--bg-base); color: var(--text);
-    line-height: 1.65; font-size: 15px; -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    line-height: 1.65; font-size: 15px; -webkit-font-smoothing: antialiased;
+    /* overflow-x: clip (not hidden) — clip prevents horizontal scroll
+       without making body a scroll container, which would break the
+       sticky behavior of nav.top above. */
+    overflow-x: clip;
   }
   html[lang="en"] body { font-family: 'KlavikaNX', 'NexonLv2', system-ui, sans-serif; }
   a { color: inherit; }
@@ -2595,8 +2599,70 @@
   }
   .prize-card__multiplier { margin-top: 8px; }
   .prize-card__name { margin-top: 14px; }
-  @media (max-width: 900px) {
-    .prize-scoreboard__cards { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+
+  /* Mobile/tablet: horizontal scroll-snap carousel of cards */
+  @media (max-width: 1023px) {
+    .prize-scoreboard__cards {
+      display: flex;
+      grid-template-columns: none;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scroll-padding: 0 12vw;
+      gap: 16px;
+      padding: 4px 12vw 16px;
+      max-width: none;
+      margin: 0;
+      /* Hide native scrollbar but keep scroll functionality */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .prize-scoreboard__cards::-webkit-scrollbar {
+      display: none;
+    }
+    .prize-card {
+      flex: 0 0 76vw;
+      max-width: 360px;
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
+    }
+  }
+
+  /* Pagination dots — only visible on mobile/tablet */
+  .prize-cards-dots {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .prize-cards-dots__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: width 0.25s ease, background-color 0.25s ease, border-radius 0.25s ease;
+  }
+  .prize-cards-dots__dot:hover {
+    background: rgba(255, 255, 255, 0.40);
+  }
+  .prize-cards-dots__dot--active {
+    background: #FFD93D;
+    width: 24px;
+    border-radius: 999px;
+  }
+  .prize-cards-dots__dot:focus-visible {
+    outline: 2px solid #FFD93D;
+    outline-offset: 3px;
+  }
+  @media (max-width: 1023px) {
+    .prize-cards-dots { display: flex; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .prize-cards-dots__dot { transition: none; }
   }
 
   /* Compact horizontal timeline replacing the old single-line announce */
@@ -4007,10 +4073,6 @@
         <img src="assets/brand/MSU_horizontal.svg" alt="MapleStory Universe">
       </a>
     </div>
-    <div class="center">
-      <a href="#shipping"><span class="t-en">Shipping</span><span class="t-ko">지원</span></a>
-      <a href="#faq">FAQ</a>
-    </div>
     <div class="right">
       <div class="lang-switch">
         <button data-lang="en" class="active">EN</button>
@@ -4201,6 +4263,11 @@
         <div class="prize-card__name"><span class="t-en">Rising Stars</span><span class="t-ko">라이징 스타</span></div>
         <div class="prize-card__detail"><span class="t-en">For ideas with strong promise</span><span class="t-ko">잠재력 있는 아이디어</span></div>
       </div>
+    </div>
+    <div class="prize-cards-dots" role="tablist" aria-label="Prize card navigation">
+      <button type="button" class="prize-cards-dots__dot" data-index="0" aria-label="Show Best Game card"></button>
+      <button type="button" class="prize-cards-dots__dot" data-index="1" aria-label="Show Most Played card"></button>
+      <button type="button" class="prize-cards-dots__dot" data-index="2" aria-label="Show Rising Stars card"></button>
     </div>
     <div class="prize-timeline" aria-label="Key dates">
       <div class="prize-timeline__node">
@@ -5211,6 +5278,60 @@
   } else {
     initShareModal();
   }
+
+  /* === Prize cards carousel — sync pagination dots to scroll position
+     (mobile/tablet only; desktop shows 3-up grid with no scroll). === */
+  (function() {
+    const cards = document.querySelector('.prize-scoreboard__cards');
+    const dotsRow = document.querySelector('.prize-cards-dots');
+    if (!cards || !dotsRow) return;
+    const dots = Array.from(dotsRow.querySelectorAll('.prize-cards-dots__dot'));
+    const cardEls = Array.from(cards.querySelectorAll('.prize-card'));
+    if (!dots.length || !cardEls.length) return;
+
+    function updateDots() {
+      // Desktop layout has no scroll — clear active highlight to avoid
+      // a stale dot showing if user resizes back to mobile.
+      if (window.innerWidth >= 1024) {
+        dots.forEach(function(d) { d.classList.remove('prize-cards-dots__dot--active'); });
+        return;
+      }
+      const viewportCenter = cards.scrollLeft + cards.clientWidth / 2;
+      let closestIndex = 0;
+      let closestDistance = Infinity;
+      cardEls.forEach(function(card, i) {
+        const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+        const distance = Math.abs(cardCenter - viewportCenter);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = i;
+        }
+      });
+      dots.forEach(function(d, i) {
+        d.classList.toggle('prize-cards-dots__dot--active', i === closestIndex);
+      });
+    }
+
+    cards.addEventListener('scroll', updateDots, { passive: true });
+    window.addEventListener('resize', updateDots);
+
+    // Tap/click a dot to jump to that card
+    dots.forEach(function(dot, i) {
+      dot.addEventListener('click', function() {
+        if (window.innerWidth >= 1024) return;
+        const target = cardEls[i];
+        if (!target) return;
+        target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      });
+    });
+
+    // Initial sync (in case page loads with mid-scroll position cached)
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateDots);
+    } else {
+      updateDots();
+    }
+  })();
 
   /* === Prize Pool background — WebGL2 procedural starfield/nebula ===
      Vanilla WebGL2 + GLSL ES 3.00, no libraries. Renders a deep-space
