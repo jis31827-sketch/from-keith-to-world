@@ -248,15 +248,22 @@
   /* Force the page scrollbar to always be present so that any height
      fluctuation (CLI animation, image loads, etc.) cannot toggle the
      scrollbar and shift right-aligned content horizontally.
-     scroll-snap-type: proximity gives the sidebar anchor points a
-     gentle magnet feel — the page snaps when scrolling pauses near an
-     anchor, but fast scrolls pass straight through. */
+     scroll-behavior: smooth softens every browser-driven scroll
+     (anchor jumps, scroll-snap "settle" motion) so snap points glide
+     instead of clicking into place.
+     scroll-snap-type: proximity stays for the gentle magnet feel,
+     but is only applied to the two thin marquee anchors below so the
+     larger Shipping and FAQ sections scroll freely without pull. */
   html {
     overflow-y: scroll;
     scroll-snap-type: y proximity;
+    scroll-behavior: smooth;
   }
   @media (prefers-reduced-motion: reduce) {
-    html { scroll-snap-type: none; }
+    html {
+      scroll-snap-type: none;
+      scroll-behavior: auto;
+    }
   }
   body {
     font-family: var(--font-roboto);
@@ -526,14 +533,20 @@
        width keeps shrinking, but height stays at 800px so overlay
        elements always have enough vertical space. */
     aspect-ratio: 2.4 / 1;
-    min-height: 800px;
+    min-height: 960px; /* +80px vs v3 — accommodates the v4 +18% Vibe Camp + full CTA stack with 40px+ clearance */
     max-height: 90vh;
     overflow: hidden;
     background-color: var(--bg-page);
-    background-image: url('assets/images/hero-banner.png');
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
+    background-image:
+      radial-gradient(
+        ellipse at 50% 45%,
+        rgba(10, 10, 26, 0.60) 0%,
+        rgba(10, 10, 26, 0) 65%
+      ),
+      url('assets/images/hero-banner.png');
+    background-size: auto, cover;
+    background-position: center center, center center;
+    background-repeat: no-repeat, no-repeat;
   }
   /* Subtle side vignette — fades to transparent by ~18% from each edge */
   section.hero::before {
@@ -557,18 +570,29 @@
     z-index: 1;
   }
   /* Bottom soft fade into page background — top is hard edge against nav */
-  section.hero::after {
-    content: "";
+  /* Hero bottom fade (linear-gradient to --bg-page) removed per user
+     request — the hero now butts cleanly into the next section without
+     a soft transition band. ::before (side vignette) is kept. */
+
+  /* WebGL aurora overlay. Sits above the hero background image and the
+     side vignette ::before (z-index 1), below the hero-stack content
+     (z-index 2+). mix-blend-mode: screen keeps it additive — it adds
+     light to the busy galaxy bg without darkening or replacing pixels,
+     which is how real auroras read against a night sky. opacity caps
+     the overall intensity so it never dominates the wordmark. */
+  .hero-aurora-bg {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      to bottom,
-      transparent 0%,
-      transparent 90%,
-      var(--bg-page) 100%
-    );
+    width: 100%;
+    height: 100%;
     pointer-events: none;
     z-index: 1;
+    opacity: 0.90;
+    mix-blend-mode: screen;
+    display: block;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-aurora-bg { opacity: 0.60; }
   }
 
   .logo {
@@ -622,12 +646,21 @@
     paint-order: stroke;
     vector-effect: non-scaling-stroke;
   }
+  /* "Vibe Camp" is 9 chars vs the old "Vıbe / Jam" splits — drop the
+     font-size so the wordmark fits within the SVG viewBox without
+     overflowing past the MapleStory image above it. */
+  .logo-svg .logo-line--camp {
+    font-size: 128px;
+  }
+  /* MSU sparkle sits where the dot of "ı" in "Vıbe Camp" would be —
+     stylized dot replacement, slightly larger than a typical font dot
+     so it reads as the wordmark's signature accent. */
   .logo-hero .logo-sparkle {
     position: absolute;
-    width: 6.2%;
-    left: 44%;
-    top: 20%;
-    transform: translate(-25%, -90%);
+    width: 7%;
+    left: 27%;
+    top: 56%;
+    transform: translate(-50%, -50%);
     pointer-events: none;
     display: block;
     line-height: 0;
@@ -640,54 +673,64 @@
     z-index: 1;
   }
   /* Shimmering glow behind MSU sparkle — wider spread, brighter colors, faster pulse */
+  /* Shimmering glow — tighter spread (no longer covers Vibe Camp /
+     MapleStory Universe), irregular asymmetric bright spots, multiple
+     overlapping rotation cycles so the light feels like sun reflection
+     wobbling rather than a uniform pulsing halo. */
   .logo-hero .logo-sparkle::before {
     content: "";
     position: absolute;
-    inset: -110%;
+    inset: -55%;
     background:
-      radial-gradient(circle at center, rgba(255, 255, 255, 0.80) 0%, rgba(255, 255, 255, 0) 75%),
-      radial-gradient(circle at 28% 28%, rgba(120, 220, 255, 0.65) 0%, rgba(120, 220, 255, 0) 80%),
-      radial-gradient(circle at 72% 72%, rgba(255, 150, 220, 0.65) 0%, rgba(255, 150, 220, 0) 80%),
-      radial-gradient(circle at 50% 18%, rgba(253, 216, 53, 0.50) 0%, rgba(253, 216, 53, 0) 75%),
-      radial-gradient(circle at 50% 82%, rgba(163, 97, 255, 0.45) 0%, rgba(163, 97, 255, 0) 80%);
+      radial-gradient(ellipse 30% 40% at 22% 28%, rgba(255, 255, 255, 0.55), transparent 75%),
+      radial-gradient(ellipse 25% 30% at 78% 22%, rgba(120, 220, 255, 0.45), transparent 75%),
+      radial-gradient(ellipse 32% 24% at 28% 78%, rgba(253, 216, 53, 0.42), transparent 75%),
+      radial-gradient(ellipse 26% 30% at 76% 70%, rgba(255, 150, 220, 0.45), transparent 75%);
     z-index: 0;
     pointer-events: none;
-    /* border-radius removed — radial gradients already fall to alpha 0
-       well before the bounding box edge, so the previous circle clip was
-       creating a visible disk perimeter that pulsed with the scale. */
-    filter: blur(10px);
-    animation: sparkle-shimmer 3.2s ease-in-out infinite;
+    filter: blur(7px);
+    animation: sparkle-shimmer 3.6s ease-in-out infinite;
   }
-  /* Rotating ray burst — second layer that spins for shimmer movement */
+  /* Irregular ray spikes — sparse narrow rays at varying angles drift
+     slowly to mimic shimmering sun glints rather than a clean ray burst. */
   .logo-hero .logo-sparkle::after {
     content: "";
     position: absolute;
-    inset: -80%;
+    inset: -45%;
     background:
-      conic-gradient(from 0deg,
-        rgba(255, 255, 255, 0) 0deg,
-        rgba(255, 255, 255, 0.35) 20deg,
-        rgba(255, 255, 255, 0) 40deg,
-        rgba(255, 255, 255, 0) 80deg,
-        rgba(253, 216, 53, 0.4) 100deg,
-        rgba(255, 255, 255, 0) 120deg,
-        rgba(255, 255, 255, 0) 200deg,
-        rgba(120, 220, 255, 0.35) 220deg,
-        rgba(255, 255, 255, 0) 240deg,
-        rgba(255, 255, 255, 0) 300deg,
-        rgba(255, 150, 220, 0.35) 320deg,
-        rgba(255, 255, 255, 0) 340deg
+      conic-gradient(from 12deg,
+        transparent 0deg,
+        rgba(255, 255, 255, 0.35) 4deg,
+        transparent 12deg,
+        transparent 68deg,
+        rgba(253, 216, 53, 0.30) 74deg,
+        transparent 82deg,
+        transparent 138deg,
+        rgba(120, 220, 255, 0.32) 146deg,
+        transparent 154deg,
+        transparent 212deg,
+        rgba(255, 255, 255, 0.26) 220deg,
+        transparent 230deg,
+        transparent 282deg,
+        rgba(255, 150, 220, 0.30) 290deg,
+        transparent 298deg,
+        transparent 360deg
       );
     z-index: 0;
     pointer-events: none;
     border-radius: 50%;
     mix-blend-mode: screen;
-    filter: blur(8px);
-    animation: sparkle-rotate 9s linear infinite;
+    filter: blur(3px);
+    animation: sparkle-rotate 13s linear infinite;
   }
+  /* Asymmetric shimmer — opacity AND tiny rotation wobble so each
+     pulse looks slightly different, like light catching on water. */
   @keyframes sparkle-shimmer {
-    0%, 100% { opacity: 0.55; transform: scale(0.98); }
-    50%      { opacity: 1;    transform: scale(1.04); }
+    0%   { opacity: 0.65; transform: scale(0.94) rotate(0deg); }
+    27%  { opacity: 0.92; transform: scale(1.05) rotate(5deg); }
+    52%  { opacity: 0.75; transform: scale(0.97) rotate(-3deg); }
+    78%  { opacity: 1;    transform: scale(1.02) rotate(3deg); }
+    100% { opacity: 0.65; transform: scale(0.94) rotate(0deg); }
   }
   @keyframes sparkle-rotate {
     from { transform: rotate(0deg); }
@@ -915,6 +958,505 @@
       gap: 12px;
     }
     .button-group .btn { width: 100%; justify-content: center; }
+  }
+
+  /* === PRE-LAUNCH HERO v3 (Jun 1 — Jun 7) ===
+     Big brand wordmark stack (MapleStory image at the top of the hero, no
+     backing band — diffuse drop-shadow + atmospheric cyan glow integrate
+     it into the sky scene; Vibe Camp wordmark below, rendered as HTML
+     with the MSU sparkle locked inside the "i" glyph span) → countdown →
+     prominent date display → CTA row (disabled Build Now + Share). */
+  .hero-stack--prelaunch {
+    gap: 0;
+    /* Combined-wordmark revision: padding-top reduced ~35% (280 → 180px
+       max) so the lego wordmark sits higher in the hero and the Build
+       Now CTA below it stays comfortably above the hero fold. The whole
+       stack (wordmark + countdown + info + CTA) shifts up together. */
+    padding: clamp(55px, 8.5vw, 122px) 24px clamp(48px, 6vh, 60px);
+    justify-content: flex-start;
+  }
+  .hero-stack--prelaunch > * + * { margin-top: 0; }
+
+  /* ---------- 1. Brand stack ---------- */
+  .hero-brand {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px; /* spec: 24-32px gap so the two wordmarks read as a single brand statement */
+    width: clamp(414px, 69vw, 828px); /* +15% on Vibe Camp wordmark */
+  }
+
+  /* MapleStory wordmark — massive environmental typography. Sits HIGH in
+     the hero (top edge ~40-60px below the GNB), with width 195vw so it
+     overflows both viewport edges (clipped by .hero's overflow: hidden).
+     Sharp + 40% opacity. The foreground content stack (Vibe Camp through
+     CTA) lives below this and gets pushed down by the .hero-stack's
+     top padding. */
+  .hero-brand__maple {
+    position: absolute;
+    /* Top lowered to sit just above the Vibe Camp wordmark (Vibe Camp
+       lives under the .hero-stack--prelaunch padding-top, which scales
+       with vw, so this top also uses vw to track that movement).
+       Increased from the previous clamp so the smaller MapleStory
+       wordmark's bottom edge still reaches near Vibe Camp's top edge. */
+    top: clamp(100px, 16vw, 220px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 26%; /* -35% from previous 40% — now clearly smaller than Vibe Camp */
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.90;
+    /* Drop-shadow detaches the white wordmark from the hero background
+       (sky-tone middle band would otherwise wash it out). The PNG's
+       baked-in multi-color inner outline already gives the wordmark
+       its depth/visual weight, so no additional CSS layering. */
+    filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.55));
+  }
+
+  /* Vibe Camp wordmark — self-contained PNG with embedded gradient,
+     3D bevel, and its own integrated "i" dot. The wrapper still owns
+     the atmospheric drop-shadow + the slide-up mount animation. No
+     text-stroke, no background-clip, no sparkle overlay — the image
+     handles all visual treatment internally. */
+
+  /* ============================================================
+     Combined wordmark — single PNG with both MapleStory + Vibe Camp
+     + sparkle baked in. Replaces the earlier 3-layer maple stack +
+     vibecamp image + WebGL sparkle overlay. PNG natural dims 677x529
+     (aspect ~1.28:1). The classes below this comment (hero-brand__maple,
+     hero-brand__vibecamp*, hero-brand__sparkle-*) are no longer
+     referenced by markup but retained for easy rollback if needed.
+     ============================================================ */
+  .hero-brand__combined {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    max-width: 540px;
+    height: auto;
+    margin: 0 auto;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+    /* Soft atmospheric drop-shadow — separates the wordmark from the
+       busy galaxy background without flattening the baked 3D bevel. */
+    filter:
+      drop-shadow(0 4px 14px rgba(0, 0, 0, 0.45))
+      drop-shadow(0 14px 36px rgba(15, 20, 50, 0.35));
+    /* Fade + slide-up mount, matching the prior hero brand entrance. */
+    opacity: 0;
+    animation: hero-combined-in 0.8s cubic-bezier(0.33, 1, 0.68, 1) 0.3s forwards;
+  }
+  @keyframes hero-combined-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-brand__combined {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @media (max-width: 1279px) {
+    .hero-brand__combined { max-width: 460px; }
+  }
+  @media (max-width: 767px) {
+    .hero-brand__combined { max-width: 360px; }
+  }
+
+  .hero-brand__vibecamp {
+    position: relative;
+    z-index: 2; /* sits in front of the MapleStory watermark */
+    width: 100%;
+    text-align: center;
+    line-height: 0;
+    opacity: 0;
+    /* 4-layer drop-shadow stack — separates the wordmark from the
+       background even when sky tones run close to the wordmark colors:
+       Layer 1: tight near-black contour (1px) — sharp silhouette edge
+       Layer 2: close contact shadow (3px) — grounds the letters
+       Layer 3: mid atmospheric (10px navy) — soft halo
+       Layer 4: far atmospheric (24px navy) — ambient depth */
+    filter:
+      drop-shadow(0 0 1px rgba(0, 0, 0, 0.65))
+      drop-shadow(0 2px 6px rgba(0, 0, 0, 0.50))
+      drop-shadow(0 8px 20px rgba(15, 20, 50, 0.55))
+      drop-shadow(0 16px 40px rgba(15, 20, 50, 0.40));
+    animation: hero-vibecamp-in 0.8s cubic-bezier(0.33, 1, 0.68, 1) 0.3s forwards;
+  }
+  /* Animation ends at translateY(20%) — 20% of element's own height
+     (image height) — visually shifting the wordmark + sparkle downward
+     into the hero's center band WITHOUT affecting flex layout (Building
+     label, countdown, info, CTA below all stay where they were). */
+  @keyframes hero-vibecamp-in {
+    from { opacity: 0; transform: translateY(calc(20% + 6px)); }
+    to   { opacity: 1; transform: translateY(20%); }
+  }
+  .hero-brand__vibecamp-img {
+    display: block;
+    width: 100%;
+    max-width: 828px;   /* matches .hero-brand max-width (+15% from 720px) */
+    height: auto;
+    margin: 0 auto;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* ---------- MSU Sparkle overlay on the image's "i" dot ----------
+     The wordmark PNG has its own colored "i" dot. We overlay the MSU
+     sparkle (WebGL diffraction-star canvas + SVG symbol) ON TOP of
+     that dot to claim it as the MSU brand mark.
+
+     Positioning: percentages are relative to .hero-brand__vibecamp
+     (width: 100% of .hero-brand). Since the image fills the container
+     (both width: 100%, both same max-width), percentages map 1:1 to
+     the image's natural coordinates.
+
+     Calibrated via alpha-channel inspection of the 1612x461 PNG:
+     - "i" dot center is at approximately (x=23.5%, y=12%) of the image.
+     - User-requested offset: shifted left by 1.2x SVG icon size
+       (1.2 * 4.2% = ~5%), so final left is 18.5%.
+     - The wrap is sized 30% wide (square via aspect-ratio) — gives the
+       WebGL diffraction spikes + glow PLENTY of room to extend beyond
+       the dot. The canvas always fills the wrap (100%), so this is the
+       primary lever for "make the sparkle effect bigger."
+     - The SVG icon is 14% of the wrap. Wrap 30% * icon 14% = 4.2% of
+       image — same absolute icon size as before, so the visible MSU
+       sparkle artwork stays anchored to the "i" dot while the canvas
+       behind it doubled+ in render area. */
+  .hero-brand__sparkle-wrap {
+    position: absolute;
+    left: 18.5%; /* 23.5% - 1.2x icon size (~5%) */
+    top: 12%;
+    transform: translate(-50%, -50%);
+    width: 30%;
+    aspect-ratio: 1 / 1;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .hero-brand__sparkle-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    z-index: 0;
+  }
+  .hero-brand__sparkle-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 14%;
+    height: 14%;
+    transform: translate(-50%, -50%);
+    display: block;
+    z-index: 2;
+  }
+
+  /* ---------- 2. Countdown block ---------- */
+  .hero-countdown-block {
+    position: relative;
+    z-index: 2;
+    margin-top: 32px; /* tightened from 40 to recover vertical room for the CTA row */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .hero-countdown-label {
+    margin: 0 0 12px;
+    font-family: var(--font-roboto);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.70);
+    text-shadow: 0 1px 2px rgba(15, 20, 50, 0.45);
+  }
+  .hero-countdown {
+    display: inline-flex;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .hero-countdown__box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .hero-countdown__num {
+    font-family: var(--font-roboto-mono);
+    font-feature-settings: "tnum" 1;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    font-size: 56px;
+    line-height: 1;
+    color: #FFFFFF;
+    text-shadow: 0 2px 10px rgba(15, 20, 50, 0.55);
+  }
+  .hero-countdown__label {
+    margin-top: 8px;
+    font-family: var(--font-roboto);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.20em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .hero-countdown__sep {
+    align-self: center;
+    color: rgba(255, 255, 255, 0.30);
+    font-family: var(--font-roboto-mono);
+    font-weight: 700;
+    font-size: 56px;
+    line-height: 1;
+  }
+  .hero-countdown__live {
+    font-family: var(--font-sofia-sans-condensed);
+    font-weight: var(--fw-point-bold);
+    font-size: clamp(32px, 4vw, 56px);
+    color: #FDD835;
+    text-shadow:
+      0 0 18px rgba(253, 216, 53, 0.55),
+      0 2px 8px rgba(15, 20, 50, 0.7);
+    letter-spacing: var(--ls-point-heading);
+    text-align: center;
+    padding: 12px 24px;
+  }
+
+  /* ---------- 3. Prominent date display ---------- */
+  .hero-info {
+    position: relative;
+    z-index: 2;
+    margin-top: 25px; /* tightened from 32 */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .hero-info__date {
+    margin: 0;
+    font-family: var(--font-roboto);
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    color: #FFFFFF;
+    text-shadow:
+      0 1px 2px rgba(15, 20, 50, 0.55),
+      0 4px 14px rgba(15, 20, 50, 0.40);
+  }
+  .hero-info__sub {
+    margin: 0;
+    /* Dark glass chip — pill shape that shrinks to text width. The chip
+       itself provides the contrast against bright bg, so text-shadow is
+       reduced to a thin contour only (chip carries the legibility lift). */
+    display: inline-block;
+    align-self: center;
+    max-width: 100%;
+    padding: 7px 16px;
+    background: rgba(15, 20, 50, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 2px 10px rgba(15, 20, 50, 0.35);
+    /* Typography */
+    font-family: var(--font-roboto);
+    font-weight: 600;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.95);
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  }
+
+  /* ---------- 4. CTA row (disabled Build Now + Share) ---------- */
+  .hero-cta {
+    position: relative;
+    z-index: 2;
+    margin-top: 32px; /* tightened from 40 */
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 16px;
+  }
+  .hero-build {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .hero-build__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2px;
+    background: rgba(123, 79, 255, 0.35);
+    color: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 12px;
+    padding: 10px 28px;
+    font-family: var(--font-roboto);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    cursor: not-allowed;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 6px 18px rgba(15, 20, 50, 0.25);
+    animation: hero-build-waiting 3s ease-in-out infinite;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease,
+      border-color 0.3s ease;
+  }
+  .hero-build__btn-main {
+    line-height: 1.15;
+  }
+  /* Tiny meta line inside the disabled button — communicates "opens
+     June 8" without a separate subtext element below. JS sets [hidden]
+     when the button activates on June 8, leaving just "Build Now". */
+  .hero-build__btn-meta {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    line-height: 1;
+  }
+  .hero-build__btn-meta[hidden] { display: none; }
+  @keyframes hero-build-waiting {
+    0%, 100% { border-color: rgba(255, 255, 255, 0.10); }
+    50%      { border-color: rgba(255, 255, 255, 0.25); }
+  }
+  /* Active state — JS adds this class when Date.now() >= target */
+  .hero-build__btn--active {
+    background: #7B4FFF;
+    color: #FFFFFF;
+    border-color: rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    animation: none;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      background-color 0.3s ease;
+  }
+  .hero-build__btn--active:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(123, 79, 255, 0.45);
+  }
+  .hero-build__btn:focus-visible {
+    outline: 2px solid #FFFFFF;
+    outline-offset: 3px;
+  }
+  .hero-build__subtext {
+    margin: 6px 0 0;
+    /* No chip — minimal UPPERCASE label tone. Single short token
+       ("JUNE 8") with strong silhouette shadow handles legibility
+       without adding visual weight next to the disabled CTA. */
+    align-self: center;
+    font-family: var(--font-roboto);
+    font-weight: 700;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.75),
+      0 2px 8px rgba(15, 20, 50, 0.55);
+  }
+  .hero-share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #0A0A1A;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-family: var(--font-roboto);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 6px 18px rgba(15, 20, 50, 0.30);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  }
+  .hero-share-btn:hover {
+    transform: translateY(-2px);
+    background: #FFFFFF;
+    box-shadow: 0 10px 24px rgba(15, 20, 50, 0.35);
+  }
+  .hero-share-btn:focus-visible {
+    outline: 2px solid #FFFFFF;
+    outline-offset: 3px;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1279px) {
+    .hero-stack--prelaunch { padding: clamp(55px, 10vw, 115px) 24px 56px; }
+    .hero-brand { width: clamp(368px, 80vw, 690px); gap: 24px; } /* +15% */
+    .hero-brand__vibecamp-img { max-width: 690px; }
+    .hero-countdown__box { width: 100px; height: 88px; }
+    .hero-countdown__num { font-size: 44px; }
+    .hero-countdown__sep { font-size: 44px; }
+    .hero-info__date { font-size: 24px; }
+  }
+  @media (max-width: 767px) {
+    .hero-stack--prelaunch { padding: clamp(44px, 11vw, 77px) 16px 48px; }
+    .hero-brand { width: 92vw; max-width: 529px; gap: 18px; } /* +15% */
+    .hero-brand__vibecamp-img { max-width: 529px; }
+    .hero-countdown-block { margin-top: 28px; }
+    .hero-countdown { gap: 6px; }
+    .hero-countdown__box { width: 68px; height: 76px; border-radius: 12px; }
+    .hero-countdown__num { font-size: 32px; }
+    .hero-countdown__sep { font-size: 32px; }
+    .hero-countdown__label { font-size: 9px; letter-spacing: 0.16em; margin-top: 6px; }
+    .hero-countdown-label { font-size: 11px; }
+    .hero-info { margin-top: 24px; gap: 12px; }
+    .hero-info__date { font-size: 20px; }
+    .hero-info__sub {
+      font-size: 11px;
+      padding: 6px 12px;
+      white-space: normal; /* allow wrap on narrow viewports — full text won't fit in nowrap pill */
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+    .hero-cta { margin-top: 28px; flex-wrap: wrap; gap: 12px; }
+    .hero-build__btn,
+    .hero-share-btn { padding: 12px 22px; font-size: 13px; }
+  }
+
+  /* ---------- Reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-brand__vibecamp {
+      animation: none;
+      opacity: 1;
+      /* Keep the 20% downward shift even with reduced motion —
+         it's a layout position, not an animation. */
+      transform: translateY(20%);
+    }
+    /* MapleStory watermark has no animation and a deliberate 0.40 opacity —
+       skip it here so reduced-motion doesn't accidentally make it opaque. */
+    /* Sparkle WebGL canvas — reduced-motion handled inside the JS init
+       (single static frame, RAF loop never starts). */
+    .hero-build__btn { animation: none; }
   }
 
   /* === BUTTONS === */
@@ -1251,19 +1793,67 @@
   .step-card h3 { margin: 0 0 10px; font-size: 18px; font-weight: 800; }
   .step-card p { margin: 0; color: var(--text-soft); font-size: 14px; line-height: 1.6; }
 
-  /* === FAQ === */
+  /* === FAQ === Native <details>/<summary> elements — folded by default,
+     click to expand. Native semantics give keyboard / screen-reader
+     support for free; no JS needed. */
   .faq-wrap { margin-top: 30px; }
-  .faq-item { background: var(--bg-card); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 12px; padding: 22px 26px; }
-  .faq-item .q { font-weight: 700; font-size: 15px; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 10px; }
-  .faq-item .q::before {
-    content: "Q"; flex-shrink: 0;
-    width: 24px; height: 24px;
-    background: var(--orange); color: #fff;
-    border-radius: 6px; font-weight: 800; font-size: 13px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-roboto);
+  .faq-item {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    padding: 0; /* padding moved to summary + .a so the click target is the whole header row */
+    overflow: hidden;
   }
-  .faq-item .a { color: var(--text-soft); font-size: 14px; line-height: 1.65; padding-left: 34px; }
+  .faq-item .q {
+    font-weight: 700;
+    font-size: 15px;
+    padding: 22px 26px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    list-style: none; /* Firefox default disclosure marker */
+    user-select: none;
+  }
+  /* Webkit / Chromium default marker */
+  .faq-item .q::-webkit-details-marker { display: none; }
+  /* Q badge removed per spec — question number + text now sit flush
+     to the left edge (governed by .q's own padding). */
+  /* Toggle icon on the right — plus when closed, minus when open */
+  .faq-item .q::after {
+    content: "+";
+    margin-left: auto;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--orange);
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: transform 0.18s ease;
+  }
+  .faq-item[open] .q::after {
+    content: "−"; /* unicode minus, not hyphen */
+  }
+  .faq-item .q:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .faq-item[open] .q {
+    border-bottom: 1px solid var(--line);
+  }
+  .faq-item .a {
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.65;
+    padding: 18px 26px 22px 26px; /* symmetric horizontal padding after Q badge removal */
+  }
+  .faq-item .a a {
+    color: var(--orange);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .faq-item .a a:hover { opacity: 0.85; }
+  .faq-item .a strong { color: var(--text); font-weight: 700; }
+  .faq-item .a em { font-style: italic; color: rgba(255, 255, 255, 0.78); }
 
   /* === FINAL CTA === */
   section.final-cta {
@@ -1335,8 +1925,15 @@
     .prize-marquee__track { animation: none !important; }
   }
 
-  /* === HERO BADGE === */
+  /* === HERO BADGE — absolute-pinned near hero top so it reads as an
+     eyebrow chip rather than crowding the wordmark. Gradient + sheen
+     give it more presence than the previous flat purple pill. */
   .hero-badge {
+    position: absolute;
+    top: clamp(16px, 4vh, 48px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1346,16 +1943,45 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: #FFFFFF;
-    background: #8632FB;
-    border: 1.5px solid rgba(255, 255, 255, 0.7);
-    padding: 7px 16px;
+    background: linear-gradient(135deg, #6D20D9 0%, #8632FB 45%, #A361FF 100%);
+    border: 1.5px solid rgba(255, 255, 255, 0.65);
+    padding: 8px 18px;
     border-radius: 999px;
-    margin-bottom: 16px;
     box-shadow:
-      0 6px 20px rgba(134, 50, 251, 0.55),
-      0 0 0 1px rgba(15, 20, 50, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25);
-    text-shadow: 0 1px 2px rgba(15, 20, 50, 0.35);
+      0 10px 28px rgba(134, 50, 251, 0.55),
+      0 0 0 1px rgba(15, 20, 50, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.40),
+      inset 0 -1px 0 rgba(15, 20, 50, 0.18);
+    text-shadow: 0 1px 2px rgba(15, 20, 50, 0.45);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  /* Sheen sweep — slow diagonal highlight slips across every ~6s */
+  .hero-badge::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(105deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.0) 35%,
+      rgba(255, 255, 255, 0.45) 50%,
+      rgba(255, 255, 255, 0.0) 65%,
+      transparent 100%);
+    animation: hero-badge-sheen 6s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+  }
+  @keyframes hero-badge-sheen {
+    0%, 70%, 100% { transform: translateX(0); opacity: 0; }
+    78% { opacity: 1; }
+    92% { transform: translateX(440%); opacity: 1; }
+    93% { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-badge::before { animation: none; }
   }
   .hero-headline .headline-prize {
     color: #FDD835;
@@ -1395,7 +2021,7 @@
     position: relative;
     overflow: visible;
   }
-  /* Scaled-up variant for the Idea + Persistence section CTA */
+  /* Scaled-up variant for the Idea + Action section CTA */
   .button-group .btn-build--xl {
     padding: 20px 48px;
     font-size: clamp(18px, 1.5vw, 22px);
@@ -1414,6 +2040,42 @@
   @media (prefers-reduced-motion: reduce) {
     .button-group .btn-build--xl { animation: none; }
   }
+  /* Pre-launch waiting state — mirrors hero-build__btn pattern. JS strips
+     this modifier at the June 8 target so the button becomes the normal
+     active btn-primary CTA. Specificity override (.btn.btn-primary...) so
+     no !important is needed against the default btn-primary purple. */
+  .btn.btn-primary.btn-build--waiting {
+    background: rgba(123, 79, 255, 0.35);
+    color: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: 0 6px 18px rgba(15, 20, 50, 0.25);
+    cursor: not-allowed;
+    animation: btn-build-waiting 3s ease-in-out infinite;
+  }
+  .btn.btn-primary.btn-build--waiting:hover {
+    transform: none;
+    box-shadow: 0 6px 18px rgba(15, 20, 50, 0.25);
+  }
+  @keyframes btn-build-waiting {
+    0%, 100% { border-color: rgba(255, 255, 255, 0.10); }
+    50%      { border-color: rgba(255, 255, 255, 0.25); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .btn.btn-primary.btn-build--waiting { animation: none; }
+  }
+  /* "Opens June 8, 2026" subtext below the disabled build button. JS sets
+     hidden=true once the button activates. */
+  .btn-build__subtext {
+    margin: 12px 0 0;
+    font-family: var(--font-roboto);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.50);
+    text-align: center;
+  }
+  .btn-build__subtext[hidden] { display: none; }
   .live-badge {
     position: absolute;
     top: -8px;
@@ -1525,7 +2187,7 @@
     padding: 0 12px;
   }
 
-  /* === ACTION MARQUEE — section break between Shipping and Idea+Persistence.
+  /* === ACTION MARQUEE — section break between Shipping and Idea+Action.
      Deep purple gradient — slightly lighter than the Shipping section's
      bottom (#1A1530) so the band reads as a distinct moment. */
   .action-marquee {
@@ -1649,7 +2311,7 @@
   }
   .prize-scoreboard__container {
     position: relative;
-    max-width: 1200px;
+    max-width: 1500px; /* widened from 1200px so 5-card row has room to breathe */
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -1685,13 +2347,13 @@
   .prize-scoreboard__total .currency { font-size: 60%; }
   .prize-scoreboard__cards {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
+    grid-template-columns: repeat(5, 1fr); /* 5 categories on desktop */
+    gap: 16px; /* tightened from 24px to fit 5 cards comfortably */
     width: 100%;
   }
   .prize-card {
     position: relative;
-    padding: 32px 24px;
+    padding: 28px 16px; /* 18 → 16 horizontal — gain a few px of content width per card */
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
@@ -1711,9 +2373,24 @@
     transform: translateY(-4px);
     box-shadow: 0 16px 40px rgba(253, 216, 53, 0.15);
   }
-  .prize-card--best::before      { background: #FDD835; }
-  .prize-card--community::before { background: #8632FB; }
-  .prize-card--potential::before { background: #11CDF2; }
+  /* 5-card color band — each category gets a distinct top accent. */
+  .prize-card--time::before     { background: #FDD835; } /* gold — premium engagement tier */
+  .prize-card--camp::before     { background: #8632FB; } /* MSU purple — creative remix tier */
+  .prize-card--summon::before   { background: #EC4899; } /* pink — viral/social tier */
+  .prize-card--traffic::before  { background: #11CDF2; } /* cyan — volume tier */
+  .prize-card--campers::before  { background: #5EEAD4; } /* teal — community-wide tier */
+
+  /* Selection policy line — sits below dots, above timeline. Small,
+     low-emphasis so it reads as fine print, not a headline. */
+  .prize-policy {
+    text-align: center;
+    font-family: var(--font-roboto);
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.50);
+    letter-spacing: 0.01em;
+    margin: 12px 0 0;
+  }
   .prize-card__amount {
     font-family: var(--font-sofia-sans-condensed);
     font-size: clamp(40px, 5vw, 64px);
@@ -1726,31 +2403,40 @@
     font-size: clamp(14px, 1.2vw, 18px);
     font-weight: 700;
     color: rgba(255, 255, 255, 0.7);
-    margin-top: 4px;
+    margin-top: 8px;
     font-family: var(--font-roboto);
   }
+  /* Main title (headline) — largest, brightest, heaviest. Clearly
+     the name of the prize tier. */
   .prize-card__name {
-    font-size: clamp(16px, 1.4vw, 20px);
-    font-weight: 700;
+    font-size: clamp(18px, 1.5vw, 22px);
+    font-weight: 800;
     color: #FFFFFF;
-    margin-top: 12px;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    margin-top: 16px;
   }
+  /* Subtitle (eyebrow label) — uppercase + tracked, mid-tone muted.
+     Deliberately a different typographic CLASS from the headline above
+     (label vs headline) so the two never read as the same hierarchy
+     level — solves the "main and sub feel too similar" problem. */
   .prize-card__line1 {
-    font-size: clamp(13px, 1.1vw, 15px);
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.85);
-    margin-top: 8px;
-    line-height: 1.4;
+    font-size: clamp(10px, 0.82vw, 12px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    color: rgba(255, 255, 255, 0.65);
+    margin-top: 14px;
+    line-height: 1.35;
   }
+  /* Body description — small, faintest. Supporting detail line. */
   .prize-card__line2 {
     font-size: clamp(11px, 0.95vw, 13px);
     font-weight: 500;
     color: rgba(255, 255, 255, 0.55);
-    margin-top: 4px;
+    margin-top: 6px;
     line-height: 1.45;
   }
-  .prize-card__multiplier { margin-top: 8px; }
-  .prize-card__name { margin-top: 14px; }
 
   /* Mobile/tablet: horizontal scroll-snap carousel of cards */
   @media (max-width: 1023px) {
@@ -1881,6 +2567,12 @@
     color: #A361FF;
     text-shadow: 0 0 12px rgba(163, 97, 255, 0.40);
   }
+  /* Anti-Abuse Review — warm violet/magenta, visually between purple
+     (judging) and pink (reveal) */
+  .prize-timeline__node--abuse .prize-timeline__dates {
+    color: #C547E8;
+    text-shadow: 0 0 12px rgba(197, 71, 232, 0.45);
+  }
   /* Winners node — pink celebratory tone */
   .prize-timeline__node--reveal .prize-timeline__dates {
     color: #EC3BD1;
@@ -1892,23 +2584,35 @@
   }
   @media (max-width: 1023px) {
     .prize-timeline {
-      gap: 12px;
+      gap: 10px;
       padding: 14px 20px;
     }
-    .prize-timeline__node { min-width: 120px; }
-    .prize-timeline__dates { font-size: 14px; }
-    .prize-timeline__node--sprint .prize-timeline__dates { font-size: 15px; }
+    .prize-timeline__node { min-width: 110px; }
+    .prize-timeline__dates { font-size: 13px; }
+    .prize-timeline__node--sprint .prize-timeline__dates { font-size: 14px; }
     .prize-timeline__label { font-size: 10px; }
   }
-  @media (max-width: 767px) {
+  /* Mid viewports (< ~900px container) — fall back to 2x2 grid of
+     phases. Arrows hidden in this layout because they wouldn't read
+     cleanly between rows. */
+  @media (max-width: 899px) {
     .prize-timeline {
-      flex-direction: column;
-      gap: 10px;
-      border-radius: 20px;
-      padding: 16px 24px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px 24px;
+      max-width: 560px;
+      padding: 18px 24px;
+      border-radius: 24px;
     }
-    .prize-timeline__connector svg { transform: rotate(90deg); }
-    .prize-timeline__node { min-width: 0; width: 100%; }
+    .prize-timeline__connector { display: none; }
+    .prize-timeline__node { min-width: 0; }
+  }
+  @media (max-width: 479px) {
+    .prize-timeline {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      max-width: none;
+    }
   }
 
   /* Planet illustration anchoring section bottom — cropped to top half.
@@ -2115,26 +2819,26 @@
   }
 
   /* === IDEA + PERSISTENCE WANTED — light breather section === */
-  .idea-persistence {
+  .idea-action {
     background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFC 60%, #F7F8F9 100%);
     color: #21272A;
     padding: clamp(28px, 4vh, 56px) clamp(24px, 4vw, 80px) clamp(48px, 7vh, 80px);
     position: relative;
   }
-  .idea-persistence__container {
+  .idea-action__container {
     max-width: 1200px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: clamp(32px, 5vh, 56px);
   }
-  .idea-persistence__header {
+  .idea-action__header {
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
-  .idea-persistence__eyebrow {
+  .idea-action__eyebrow {
     font-family: var(--font-roboto);
     font-size: 11px;
     font-weight: 700;
@@ -2143,7 +2847,7 @@
     color: #8632FB;
     margin-bottom: 12px;
   }
-  .idea-persistence__title {
+  .idea-action__title {
     font-size: clamp(34px, 4vw, 60px);
     font-weight: 800;
     line-height: 1.15;
@@ -2151,7 +2855,7 @@
     color: #21272A;
     letter-spacing: -0.02em;
   }
-  .idea-persistence__subtitle {
+  .idea-action__subtitle {
     font-size: clamp(17px, 1.5vw, 22px);
     font-weight: 500;
     color: rgba(33, 39, 42, 0.7);
@@ -2160,7 +2864,7 @@
     line-height: 1.5;
   }
 
-  .idea-persistence__pillars {
+  .idea-action__pillars {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: clamp(20px, 2vw, 32px);
@@ -2208,14 +2912,14 @@
     margin: 0;
   }
 
-  .idea-persistence__cta {
+  .idea-action__cta {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 14px;
     margin-top: 0;
   }
-  .idea-persistence__call {
+  .idea-action__call {
     font-size: clamp(24px, 2.4vw, 38px);
     font-weight: 800;
     color: #21272A;
@@ -2224,14 +2928,21 @@
     letter-spacing: -0.015em;
     line-height: 1.2;
   }
-  .idea-persistence__call em {
+  .idea-action__call em {
     font-style: normal;
     color: #8632FB;
   }
-  .idea-persistence__button-wrap {
+  .idea-action__button-wrap {
+    /* Override .button-group defaults (row-flex) with column-flex so
+       the disabled CTA button and the "Opens June 8, 2026" subtext
+       stack vertically and both center-align. Without flex-direction
+       column the row layout pushed the subtext beside the button. */
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
+    gap: 12px;
   }
-  .idea-persistence__microcopy {
+  .idea-action__microcopy {
     font-size: clamp(13px, 1.1vw, 15px);
     font-weight: 500;
     color: rgba(33, 39, 42, 0.55);
@@ -2584,7 +3295,7 @@
   }
 
   /* 2-column demo area (recruiter + CLI) */
-  .idea-persistence__demo-area {
+  .idea-action__demo-area {
     display: grid;
     grid-template-columns: 38fr 62fr;
     gap: clamp(32px, 4vw, 64px);
@@ -2594,7 +3305,7 @@
     width: 100%;
   }
   /* CLI window narrows from 880 → 720 to fit the right column */
-  .idea-persistence__demo-area .cli-demo {
+  .idea-action__demo-area .cli-demo {
     max-width: 720px;
     margin: 0;
   }
@@ -2607,29 +3318,29 @@
      - .is-revealed (added at "It's your turn") locks in the end state
        with transition: none, so re-entry / CLI restart doesn't replay
        the slow creep — the cat stays put. */
-  .idea-persistence__demo-area .recruiter {
+  .idea-action__demo-area .recruiter {
     opacity: 0;
     transform: translateX(80px);
     position: relative;
     z-index: 1;
   }
-  .idea-persistence__demo-area .cli-demo {
+  .idea-action__demo-area .cli-demo {
     transform: translateX(-30%);
     z-index: 2;
   }
-  .idea-persistence__demo-area.is-revealing .recruiter {
+  .idea-action__demo-area.is-revealing .recruiter {
     opacity: 1;
     transform: translateX(0);
     transition:
       opacity 5s cubic-bezier(0.33, 1, 0.68, 1),
       transform 5s cubic-bezier(0.33, 1, 0.68, 1);
   }
-  .idea-persistence__demo-area.is-revealing .cli-demo {
+  .idea-action__demo-area.is-revealing .cli-demo {
     transform: translateX(0);
     transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
   }
-  .idea-persistence__demo-area.is-revealed .recruiter,
-  .idea-persistence__demo-area.is-revealed .cli-demo {
+  .idea-action__demo-area.is-revealed .recruiter,
+  .idea-action__demo-area.is-revealed .cli-demo {
     opacity: 1;
     transform: translateX(0);
     transition: none;
@@ -2637,16 +3348,16 @@
   /* Tablet/mobile fall back to vertical stack — show both immediately,
      directional reveal doesn't read well on stacked layouts. */
   @media (max-width: 1023px) {
-    .idea-persistence__demo-area .recruiter,
-    .idea-persistence__demo-area .cli-demo {
+    .idea-action__demo-area .recruiter,
+    .idea-action__demo-area .cli-demo {
       opacity: 1;
       transform: none;
       transition: none;
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .idea-persistence__demo-area .recruiter,
-    .idea-persistence__demo-area .cli-demo {
+    .idea-action__demo-area .recruiter,
+    .idea-action__demo-area .cli-demo {
       opacity: 1;
       transform: none;
       transition: none;
@@ -2736,14 +3447,14 @@
   }
 
   @media (max-width: 1023px) {
-    .idea-persistence__pillars { grid-template-columns: 1fr; gap: 16px; max-width: 540px; margin: 0 auto; }
-    .idea-persistence__demo-area {
+    .idea-action__pillars { grid-template-columns: 1fr; gap: 16px; max-width: 540px; margin: 0 auto; }
+    .idea-action__demo-area {
       grid-template-columns: 1fr;
       gap: clamp(28px, 4vh, 48px);
     }
     .recruiter__character { max-width: 240px; }
     .recruiter__big       { font-size: clamp(48px, 14vw, 80px); }
-    .idea-persistence__demo-area .cli-demo { max-width: 100%; margin: 0 auto; }
+    .idea-action__demo-area .cli-demo { max-width: 100%; margin: 0 auto; }
   }
 
   /* === CLI DEMO WINDOW — replaces 3 pillar cards === */
@@ -2969,18 +3680,24 @@
      on smooth-scroll. */
   #prize-pool,
   #shipping-to-millions,
-  #idea-persistence,
+  #idea-action,
+  #ip-compare,
   #faq,
   #prize-marquee,
   #action-marquee {
     scroll-margin-top: 80px;
   }
-  /* Scroll-snap targets — only the four sidebar anchor points snap so
-     the page reads as four discrete "moments" while still allowing
-     free scrolling within each section. */
+  /* Scroll-snap targets — every distinct section gets a gentle magnet
+     so each "moment" reads as its own stop. Combined with
+     scroll-behavior: smooth and proximity mode, the pull is a glide
+     rather than a click. Marquees double as snap anchors for the
+     sections that follow them (prize-marquee leads into Total Prize
+     Pool, action-marquee leads into Idea + Action) so they cover
+     those views; shipping, ip-compare, and FAQ get their own snap. */
   #prize-marquee,
   #shipping-to-millions,
   #action-marquee,
+  #ip-compare,
   #faq {
     scroll-snap-align: start;
   }
@@ -3137,6 +3854,25 @@
     border: 1px solid rgba(33, 39, 42, 0.12);
     box-shadow: 0 2px 8px rgba(33, 39, 42, 0.06);
   }
+  /* Pre-launch waiting state — mirrors the hero / idea-action pattern.
+     Applied with --primary base; specificity-stacked so the muted purple
+     overrides the active gradient. JS strips this modifier at the June 8
+     target, leaving the bright primary CTA. */
+  .sticky-panel__cta.sticky-panel__cta--primary.sticky-panel__cta--waiting {
+    background: rgba(123, 79, 255, 0.35);
+    color: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 2px 8px rgba(15, 20, 50, 0.20);
+    cursor: not-allowed;
+    animation: btn-build-waiting 3s ease-in-out infinite;
+  }
+  .sticky-panel__cta.sticky-panel__cta--primary.sticky-panel__cta--waiting:hover {
+    transform: none;
+    box-shadow: 0 2px 8px rgba(15, 20, 50, 0.20);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sticky-panel__cta.sticky-panel__cta--primary.sticky-panel__cta--waiting { animation: none; }
+  }
   .sticky-panel__cta--secondary:hover {
     border-color: rgba(33, 39, 42, 0.25);
     background: rgba(33, 39, 42, 0.02);
@@ -3175,8 +3911,13 @@
       gap: 8px;
       flex: 1;
     }
-    .sticky-panel__cta--primary { flex: 1 1 65%; }
-    .sticky-panel__cta--secondary { flex: 1 1 35%; }
+    /* Both CTAs share the bottom bar — Start Building (primary) gets
+       a larger share (1.6) so it reads as the dominant action, with
+       Share (secondary) filling the rest. Previously only --secondary
+       had flex: 1, making Share take the full width while Build
+       collapsed to its content size. */
+    .sticky-panel__cta--primary { flex: 1.6; }
+    .sticky-panel__cta--secondary { flex: 1; }
   }
 
   /* === FLOATING TOP BUTTON — bottom-right circular, 1s smooth scroll to top.
@@ -3463,7 +4204,7 @@
       </a>
     </div>
     <div class="right">
-      <a class="cta-btn" href="#apply">Build Now →</a>
+      <!-- Pre-launch: no CTAs in the GNB until June 8 -->
     </div>
   </div>
 
@@ -3524,58 +4265,72 @@
 </nav>
 
 <!-- HERO -->
-<section class="hero">
-  <div class="hero-stack">
-    <div class="hero-badge">
-      <span class="t-en">GLOBAL CREATOR RECRUITMENT</span>
-      <span class="t-ko">글로벌 크리에이터 모집</span>
+<section class="hero" id="hero">
+  <!-- WebGL aurora overlay — sits above the hero bg image + side vignette
+       but BELOW the wordmark / countdown / CTA stack. Three soft aurora
+       sources (bottom-left, top-right, behind the center wordmark). -->
+  <canvas class="hero-aurora-bg" id="heroAuroraBg" aria-hidden="true"></canvas>
+  <div class="hero-stack hero-stack--prelaunch">
+
+    <!-- Combined MapleStory + Vibe Camp wordmark — single PNG with both
+         brand marks, the lego 3D treatment, and the V-sparkle all baked
+         in. Replaces the previous 3-layer MapleStory stack + Vibe Camp
+         image + WebGL sparkle overlay. -->
+    <div class="hero-brand" role="img" aria-label="MapleStory Vibe Camp">
+      <img class="hero-brand__combined"
+           src="assets/brand/MSVC_wordmark.png"
+           alt="MapleStory Vibe Camp"
+           decoding="async">
     </div>
-    <div class="logo logo-hero" role="img" aria-label="Vibe Jam">
-      <svg class="logo-svg" viewBox="0 0 700 390" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-        <defs>
-          <linearGradient id="vibe-jam-gradient" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stop-color="#43FFE2" />
-            <stop offset="50%" stop-color="#5611B7" />
-            <stop offset="100%" stop-color="#8632FB" />
-          </linearGradient>
-          <path id="arch-vibe" d="M 50,175 Q 350,165 650,175" fill="none" />
-          <path id="arch-jam" d="M 50,323 Q 350,313 650,323" fill="none" />
-        </defs>
-        <text class="logo-line">
-          <textPath href="#arch-vibe" startOffset="50%" text-anchor="middle">Vıbe</textPath>
-        </text>
-        <text class="logo-line">
-          <textPath href="#arch-jam" startOffset="50%" text-anchor="middle">Jam</textPath>
-        </text>
-      </svg>
-      <span class="logo-sparkle" aria-hidden="true">
-        <img src="assets/brand/MSU_symbol.svg" alt="">
-      </span>
+
+    <!-- 2. Countdown label + 4-box live timer -->
+    <div class="hero-countdown-block">
+      <p class="hero-countdown-label">Building opens in</p>
+      <div class="hero-countdown" id="heroCountdown" aria-label="Time until building opens" aria-live="polite">
+        <div class="hero-countdown__box">
+          <span class="hero-countdown__num" data-unit="days">00</span>
+          <span class="hero-countdown__label">DAYS</span>
+        </div>
+        <span class="hero-countdown__sep" aria-hidden="true">:</span>
+        <div class="hero-countdown__box">
+          <span class="hero-countdown__num" data-unit="hours">00</span>
+          <span class="hero-countdown__label">HOURS</span>
+        </div>
+        <span class="hero-countdown__sep" aria-hidden="true">:</span>
+        <div class="hero-countdown__box">
+          <span class="hero-countdown__num" data-unit="mins">00</span>
+          <span class="hero-countdown__label">MINS</span>
+        </div>
+        <span class="hero-countdown__sep" aria-hidden="true">:</span>
+        <div class="hero-countdown__box">
+          <span class="hero-countdown__num" data-unit="secs">00</span>
+          <span class="hero-countdown__label">SECS</span>
+        </div>
+      </div>
     </div>
-    <div class="hero-date" aria-label="Builder activity window">
-      JUN 01 — JUN 22, 2026
+
+    <!-- 3. Prominent date display (replaces the $60K hook in the hero — full
+         prize breakdown lives in the Prize Pool section below). -->
+    <div class="hero-info">
+      <p class="hero-info__date">June 8 &ndash; June 29, 2026</p>
+      <p class="hero-info__sub">Three weeks of building&nbsp;&nbsp;&middot;&nbsp;&nbsp;Winners announced July 22</p>
     </div>
-    <div class="hero-text-group">
-      <h1 class="hero-headline">
-        <span class="t-en">Three Weeks of Building, <span class="headline-prize">$60,000</span> in prizes,<br>Vibe Coded with MapleStory IP</span>
-        <span class="t-ko">3주간의 빌드, <span class="headline-prize">$60,000</span> 상금,<br>MapleStory IP로 Vibe 코딩</span>
-      </h1>
-    </div>
-    <div class="button-group">
-      <a class="btn btn-primary btn-build" href="#apply" aria-label="Build Now">
-        <span class="t-en">Build Now</span>
-        <span class="t-ko">지금 빌드</span>
-        <span class="arrow">→</span>
-        <span class="live-badge" aria-hidden="true">LIVE</span>
-      </a>
-      <button class="btn btn-secondary btn-share" type="button" aria-label="Share with Friends" data-share-trigger>
+
+    <!-- 4. CTA row: disabled Build Now (auto-activates June 8) + Share with Friends -->
+    <div class="hero-cta">
+      <div class="hero-build">
+        <button class="hero-build__btn" type="button" disabled
+                aria-label="Start Building — opens June 8, 2026"
+                title="Building opens June 8, 2026">
+          <span class="hero-build__btn-main">Start Building</span>
+          <span class="hero-build__btn-meta">June 8</span>
+        </button>
+      </div>
+      <button class="hero-share-btn" type="button" aria-label="Share" data-share-trigger>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M16 6l-4-4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M12 2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span class="t-en">Share with Friends</span>
-        <span class="t-ko">친구에게 공유</span>
+        Share
       </button>
     </div>
   </div>
@@ -3589,21 +4344,29 @@
     <span class="marquee-set">
       <span class="marquee-total">$60,000 TOTAL PRIZE POOL</span>
       <span class="marquee-op">=</span>
-      <span class="marquee-sub">$20,000 BEST GAME</span>
+      <span class="marquee-sub">$3,000 × 5 TIME-TRAPPER</span>
       <span class="marquee-op">+</span>
-      <span class="marquee-sub">$5,000 × 4 COMMUNITY PICK</span>
+      <span class="marquee-sub">$2,000 × 2 ULTIMATE CAMPSITE</span>
       <span class="marquee-op">+</span>
-      <span class="marquee-sub">$2,000 × 10 RISING STARS</span>
+      <span class="marquee-sub">$2,000 × 1 SUMMONER</span>
+      <span class="marquee-op">+</span>
+      <span class="marquee-sub">$500 × 50 TOP TRAFFIC</span>
+      <span class="marquee-op">+</span>
+      <span class="marquee-sub">$50 × ALL CAMPERS</span>
     </span>
     <span class="marquee-divider">◆</span>
     <span class="marquee-set" aria-hidden="true">
       <span class="marquee-total">$60,000 TOTAL PRIZE POOL</span>
       <span class="marquee-op">=</span>
-      <span class="marquee-sub">$20,000 BEST GAME</span>
+      <span class="marquee-sub">$3,000 × 5 TIME-TRAPPER</span>
       <span class="marquee-op">+</span>
-      <span class="marquee-sub">$5,000 × 4 COMMUNITY PICK</span>
+      <span class="marquee-sub">$2,000 × 2 ULTIMATE CAMPSITE</span>
       <span class="marquee-op">+</span>
-      <span class="marquee-sub">$2,000 × 10 RISING STARS</span>
+      <span class="marquee-sub">$2,000 × 1 SUMMONER</span>
+      <span class="marquee-op">+</span>
+      <span class="marquee-sub">$500 × 50 TOP TRAFFIC</span>
+      <span class="marquee-op">+</span>
+      <span class="marquee-sub">$50 × ALL CAMPERS</span>
     </span>
     <span class="marquee-divider" aria-hidden="true">◆</span>
   </div>
@@ -3621,46 +4384,53 @@
       <span class="count">0</span>
     </div>
     <div class="prize-scoreboard__cards">
-      <div class="prize-card prize-card--best">
-        <div class="prize-card__amount" data-target="20000">$0</div>
-        <div class="prize-card__multiplier">× 1 team</div>
-        <div class="prize-card__name">Best Game</div>
-        <div class="prize-card__line1">Editorial pick by NEXPACE</div>
-        <div class="prize-card__line2">Designers, directors, market experts</div>
+      <div class="prize-card prize-card--time">
+        <div class="prize-card__amount" data-target="3000">$0</div>
+        <div class="prize-card__multiplier">× 5 teams</div>
+        <div class="prize-card__name">The Time-Trapper</div>
+        <div class="prize-card__line1">Games players can't put down</div>
+        <div class="prize-card__line2">Top 5 by playtime + community vote</div>
       </div>
-      <div class="prize-card prize-card--community">
-        <div class="prize-card__amount" data-target="5000">$0</div>
-        <div class="prize-card__multiplier">× 4 teams</div>
-        <div class="prize-card__name">Community Pick</div>
-        <div class="prize-card__line1">Loved most by players</div>
-        <div class="prize-card__line2">50% play count, 50% community vote</div>
-      </div>
-      <div class="prize-card prize-card--potential">
+      <div class="prize-card prize-card--camp">
         <div class="prize-card__amount" data-target="2000">$0</div>
-        <div class="prize-card__multiplier">× 10 teams</div>
-        <div class="prize-card__name">Rising Stars</div>
-        <div class="prize-card__line1">Strongest potential ideas</div>
-        <div class="prize-card__line2">60% panel + 20% peer + 20% community</div>
+        <div class="prize-card__multiplier">× 2 teams</div>
+        <div class="prize-card__name">The Ultimate Campsite</div>
+        <div class="prize-card__line1">Formats other builders remix</div>
+        <div class="prize-card__line2">Most-spun games across the camp</div>
+      </div>
+      <div class="prize-card prize-card--summon">
+        <div class="prize-card__amount" data-target="2000">$0</div>
+        <div class="prize-card__multiplier">× 1 team</div>
+        <div class="prize-card__name">The Summoner</div>
+        <div class="prize-card__line1">Bring the world in</div>
+        <div class="prize-card__line2">Most external players via referrals &amp; shares</div>
+      </div>
+      <div class="prize-card prize-card--traffic">
+        <div class="prize-card__amount" data-target="500">$0</div>
+        <div class="prize-card__multiplier">× 50 teams</div>
+        <div class="prize-card__name">Top Traffic Game 50</div>
+        <div class="prize-card__line1">Highest-played games</div>
+        <div class="prize-card__line2">Top 50 by total play count</div>
+      </div>
+      <div class="prize-card prize-card--campers">
+        <div class="prize-card__amount" data-target="14000">$0</div>
+        <div class="prize-card__multiplier">shared pool</div>
+        <div class="prize-card__name">The Campers</div>
+        <div class="prize-card__line1">Everyone who clears qualification</div>
+        <div class="prize-card__line2">All qualifying teams share $14,000</div>
       </div>
     </div>
     <div class="prize-cards-dots" role="tablist" aria-label="Prize card navigation">
-      <button type="button" class="prize-cards-dots__dot" data-index="0" aria-label="Show Best Game card"></button>
-      <button type="button" class="prize-cards-dots__dot" data-index="1" aria-label="Show Community Pick card"></button>
-      <button type="button" class="prize-cards-dots__dot" data-index="2" aria-label="Show Rising Stars card"></button>
+      <button type="button" class="prize-cards-dots__dot" data-index="0" aria-label="Show Time-Trapper card"></button>
+      <button type="button" class="prize-cards-dots__dot" data-index="1" aria-label="Show Ultimate Campsite card"></button>
+      <button type="button" class="prize-cards-dots__dot" data-index="2" aria-label="Show Summoner card"></button>
+      <button type="button" class="prize-cards-dots__dot" data-index="3" aria-label="Show Top Traffic card"></button>
+      <button type="button" class="prize-cards-dots__dot" data-index="4" aria-label="Show Campers card"></button>
     </div>
+    <p class="prize-policy">One team per category. Duplicate picks roll to the next-ranked team.</p>
     <div class="prize-timeline" aria-label="Key dates">
-      <div class="prize-timeline__node prize-timeline__node--prejam">
-        <div class="prize-timeline__dates">JUN 1 &mdash; JUN 7</div>
-        <div class="prize-timeline__label">Pre-Jam</div>
-      </div>
-      <div class="prize-timeline__connector" aria-hidden="true">
-        <svg viewBox="0 0 24 8" width="48" height="8">
-          <path d="M0 4 L24 4" stroke="rgba(253,216,53,0.4)" stroke-width="2" stroke-dasharray="4 3" fill="none"/>
-          <path d="M18 1 L24 4 L18 7" stroke="rgba(253,216,53,0.6)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
       <div class="prize-timeline__node prize-timeline__node--sprint">
-        <div class="prize-timeline__dates">JUN 8 &mdash; JUN 22</div>
+        <div class="prize-timeline__dates">JUN 8 &ndash; JUN 29</div>
         <div class="prize-timeline__label">Build Sprint · Submissions Open</div>
       </div>
       <div class="prize-timeline__connector" aria-hidden="true">
@@ -3670,7 +4440,7 @@
         </svg>
       </div>
       <div class="prize-timeline__node prize-timeline__node--judging">
-        <div class="prize-timeline__dates">JUN 23 &mdash; JUL 14</div>
+        <div class="prize-timeline__dates">JUN 30 &ndash; JUL 17</div>
         <div class="prize-timeline__label">Judging</div>
       </div>
       <div class="prize-timeline__connector" aria-hidden="true">
@@ -3679,8 +4449,18 @@
           <path d="M18 1 L24 4 L18 7" stroke="rgba(253,216,53,0.6)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
+      <div class="prize-timeline__node prize-timeline__node--abuse">
+        <div class="prize-timeline__dates">JUL 18 &ndash; JUL 20</div>
+        <div class="prize-timeline__label">Anti-Abuse Review</div>
+      </div>
+      <div class="prize-timeline__connector" aria-hidden="true">
+        <svg viewBox="0 0 24 8" width="48" height="8">
+          <path d="M0 4 L24 4" stroke="rgba(253,216,53,0.4)" stroke-width="2" stroke-dasharray="4 3" fill="none"/>
+          <path d="M18 1 L24 4 L18 7" stroke="rgba(253,216,53,0.6)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
       <div class="prize-timeline__node prize-timeline__node--reveal">
-        <div class="prize-timeline__dates">JUL 15</div>
+        <div class="prize-timeline__dates">JUL 22</div>
         <div class="prize-timeline__label">Winners Announced</div>
       </div>
     </div>
@@ -3801,18 +4581,18 @@
   </div>
 </section>
 
-<!-- ACTION MARQUEE — section break + opening reminder, flush between Shipping and Idea+Persistence.
+<!-- ACTION MARQUEE — section break + opening reminder, flush between Shipping and Idea+Action.
      Acts as the anchor target for the Open to All nav link so the marquee
      lands flush under the GNB on smooth scroll. -->
 <section class="action-marquee" id="action-marquee" aria-label="Vibe Jam opening reminder">
   <div class="action-marquee__track">
-    <span class="action-marquee__item action-marquee__item--primary">⚡ OPENS JUNE 1, 2026</span>
+    <span class="action-marquee__item action-marquee__item--primary">⚡ OPENS JUNE 8, 2026</span>
     <span class="action-marquee__sep" aria-hidden="true">◆</span>
     <span class="action-marquee__item">GET YOUR IDEAS READY</span>
     <span class="action-marquee__sep" aria-hidden="true">◆</span>
     <span class="action-marquee__item">START BUILDING NOW</span>
     <span class="action-marquee__sep" aria-hidden="true">◆</span>
-    <span class="action-marquee__item action-marquee__item--primary" aria-hidden="true">⚡ OPENS JUNE 1, 2026</span>
+    <span class="action-marquee__item action-marquee__item--primary" aria-hidden="true">⚡ OPENS JUNE 8, 2026</span>
     <span class="action-marquee__sep" aria-hidden="true">◆</span>
     <span class="action-marquee__item" aria-hidden="true">GET YOUR IDEAS READY</span>
     <span class="action-marquee__sep" aria-hidden="true">◆</span>
@@ -3822,25 +4602,25 @@
 </section>
 
 <!-- IDEA + PERSISTENCE WANTED — entry-level reassurance (light breather section) -->
-<section class="idea-persistence" id="idea-persistence" aria-label="Who this is for">
-  <div class="idea-persistence__container">
-    <div class="idea-persistence__header">
-      <span class="idea-persistence__eyebrow">
+<section class="idea-action" id="idea-action" aria-label="Who this is for">
+  <div class="idea-action__container">
+    <div class="idea-action__header">
+      <span class="idea-action__eyebrow">
         <span class="t-en">WHO THIS IS FOR</span>
         <span class="t-ko">누가 참가하나</span>
       </span>
-      <h2 class="idea-persistence__title">
-        <span class="t-en">Idea + Persistence Wanted.</span>
-        <span class="t-ko">아이디어 + 끈기, 그뿐.</span>
+      <h2 class="idea-action__title">
+        <span class="t-en">Idea + Action Wanted.</span>
+        <span class="t-ko">아이디어 + 실행, 그뿐.</span>
       </h2>
-      <p class="idea-persistence__subtitle">
+      <p class="idea-action__subtitle">
         <span class="t-en">You don't need to be a developer. You need an idea that says "this would be fun."</span>
         <span class="t-ko">개발자일 필요 없습니다. "이거 재밌겠다"는 아이디어 하나면 됩니다.</span>
       </p>
     </div>
 
     <!-- 2-column demo area: recruiter character on the left, CLI demo on the right -->
-    <div class="idea-persistence__demo-area">
+    <div class="idea-action__demo-area">
       <div class="recruiter">
         <img src="assets/illustrations/recruiter.png"
              alt="MSU recruiter cat pointing at you"
@@ -3883,27 +4663,28 @@
       </div>
     </div>
 
-    <div class="idea-persistence__cta">
-      <p class="idea-persistence__call">
+    <div class="idea-action__cta">
+      <p class="idea-action__call">
         <em>Write</em> it down and have it <em>built</em>.
       </p>
-      <p class="idea-persistence__microcopy">
+      <p class="idea-action__microcopy">
         All great games start with a line of fun idea. Show us yours.
       </p>
-      <div class="button-group idea-persistence__button-wrap">
-        <a class="btn btn-primary btn-build btn-build--xl" href="#apply" aria-label="Start Building Now">
+      <div class="button-group idea-action__button-wrap">
+        <button class="btn btn-primary btn-build btn-build--xl btn-build--waiting" type="button" disabled
+                aria-label="Start Building — opens June 8, 2026"
+                title="Building opens June 8, 2026">
           <span class="t-en">Start Building</span>
           <span class="t-ko">지금 빌드</span>
-          <span class="arrow">→</span>
-          <span class="live-badge" aria-hidden="true">LIVE</span>
-        </a>
+        </button>
+        <p class="btn-build__subtext">Opens June 8, 2026</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- IP COMPARE — genre showcase + before/after slider with WebGL liquid mesh background -->
-<section class="ip-compare-section" aria-label="Genre and MapleStory IP showcase">
+<section class="ip-compare-section" id="ip-compare" aria-label="Genre and MapleStory IP showcase">
   <canvas class="ip-compare-section__bg" id="ipCompareBg" aria-hidden="true"></canvas>
   <div class="ip-compare-section__content">
     <div class="ip-compare__inner">
@@ -4005,30 +4786,54 @@
     </h2>
   </div>
   <div class="inner faq-wrap" style="max-width: 820px; margin: 0 auto;">
-    <div class="faq-item">
-      <div class="q"><span class="t-en">What genre should the game be?</span><span class="t-ko">어떤 장르의 게임을 만들어야 하나요?</span></div>
-      <div class="a"><span class="t-en">Genre is open. Side-scrollers, deck-builders, turn-based — anything works. The common bonus across all tracks is whether MapleStory users recognize "this is MapleStory" while playing.</span><span class="t-ko">장르는 자유입니다. 사이드 스크롤뿐 아니라 덱빌딩 · 턴제 · 시뮬레이션 등 어떤 형식이든 가능합니다. 메이플 유저가 "이건 메이플이다"라고 인식할 수 있도록 IP 색을 살리는 것이 모든 트랙 공통 가산점입니다.</span></div>
-    </div>
-    <div class="faq-item">
-      <div class="q"><span class="t-en">I'm not a developer. Can I still join?</span><span class="t-ko">개발자가 아닌데 참가해도 되나요?</span></div>
-      <div class="a"><span class="t-en">Yes. AI vibe coding lets you build games via natural language without coding experience. This event is the proof that "ideas alone are enough."</span><span class="t-ko">네. AI 바이브 코딩은 코딩 경험이 없어도 자연어로 게임을 만들 수 있는 환경입니다. "기획만 있어도 만들 수 있다"는 명제를 직접 증명하는 자리입니다.</span></div>
-    </div>
-    <div class="faq-item">
-      <div class="q"><span class="t-en">Can one person submit multiple games?</span><span class="t-ko">한 사람이 여러 게임을 제출할 수 있나요?</span></div>
-      <div class="a"><span class="t-en">No submission limit. But every submission goes through track judging — low-quality ones naturally fall out.</span><span class="t-ko">제출 수에 별도 제한은 두지 않습니다. 다만 모든 제출은 트랙 심사를 거치며, 퀄리티가 충족되지 않은 게임은 자연스럽게 수상에서 제외됩니다.</span></div>
-    </div>
-    <div class="faq-item">
-      <div class="q"><span class="t-en">How is the prize paid?</span><span class="t-ko">상금은 어떻게 지급되나요?</span></div>
-      <div class="a"><span class="t-en">Paid in NXPC tokens. Listed USD amounts (e.g., $20,000) are converted at the time of award using the NXPC market price.</span><span class="t-ko">상금은 NXPC 토큰으로 지급됩니다. 표기 금액(예: $20,000)은 시상 시점의 NXPC 시가로 환산되어 NXPC 수량으로 입금됩니다.</span></div>
-    </div>
-    <div class="faq-item">
-      <div class="q"><span class="t-en">How is Stage 2 (publishing) decided?</span><span class="t-ko">Stage 2(퍼블리싱)는 어떻게 결정되나요?</span></div>
-      <div class="a"><span class="t-en">The Grand Prize winner gets the full package automatically. Additional 2–3 teams are selected through NEXPACE internal evaluation from the Community and Potential winners (up to 4 total).</span><span class="t-ko">전문가 트랙 우승작 1팀에는 풀 지원이 자동 제공됩니다. 추가 2~3팀은 NEXPACE 내부 평가를 거쳐 대중성 · 잠재력 트랙 수상작 중에서 선정됩니다 (총 최대 4팀).</span></div>
-    </div>
-    <div class="faq-item">
-      <div class="q"><span class="t-en">Who owns the rights to my game?</span><span class="t-ko">만든 게임의 권리는 누구에게 있나요?</span></div>
-      <div class="a"><span class="t-en">You do. Unless a separate agreement (publishing, investment) is signed with NEXPACE, the rights stay with the creator. MapleStory IP licensing terms are provided separately.</span><span class="t-ko">제작자에게 있습니다. NEXPACE와 별도 계약(퍼블리싱 · 투자 등)이 체결되지 않는 한 게임의 권리는 제작 팀에 귀속됩니다. MapleStory IP 활용 부분에 대한 라이선싱 조건은 별도 안내됩니다.</span></div>
-    </div>
+    <details class="faq-item">
+      <summary class="q">1. What is Vibe Camp?</summary>
+      <div class="a">A 3-week global game camp where you build and play games using MapleStory IP — powered by prompts. Combine Verse8's AI-powered vibe coding tools with MapleStory's full asset library (characters, monsters, backgrounds, music) and bring your idea to life.</div>
+    </details>
+    <details class="faq-item">
+      <summary class="q">2. When does it start and end?</summary>
+      <div class="a">Vibe Camp launches on <strong>June 8</strong> alongside MSU Space, with game submissions closing on <strong>June 29</strong>. After Round 1 screening and Round 2 deep review, the final winners will be announced on <strong>July 22</strong>.</div>
+    </details>
+    <details class="faq-item">
+      <summary class="q">3. I can't code — can I still join?</summary>
+      <div class="a">Yes, that's exactly the point of Vibe Camp. With vibe coding, you simply describe the game you want — <em>"I want to make a game like this"</em> — and the AI builds it with you. We'll show a live demo at our online seminar on <strong>June 11</strong>. Follow MSU on X for details.</div>
+    </details>
+    <details class="faq-item">
+      <summary class="q">4. Who can participate?</summary>
+      <div class="a">Anyone. Developer or not — if you love MapleStory and want to make a game, you're welcome. Teams can join too, but each game must be submitted under a single account, and the representative account must complete KYC if selected as a winner.</div>
+    </details>
+    <details class="faq-item">
+      <summary class="q">5. Is there an entry fee?</summary>
+      <div class="a">No, it's free. You'll need credits to build, but if you sign up for the <a href="https://msu.io/builder" target="_blank" rel="noopener noreferrer" aria-label="MSU Builder Web (opens in a new tab)">MSU Builder Web</a>, $50 in credits will be refilled daily once your balance runs out &mdash; for the entire duration of the camp.</div>
+    </details>
+    <details class="faq-item">
+      <summary class="q">6. How do I participate?</summary>
+      <div class="a">Head to Verse8 MSU Space (<a href="https://verse8.io/msu" target="_blank" rel="noopener noreferrer">verse8.io/msu</a>), sign up, build your game, then submit it through the submission page along with your game info. Once submitted, you're officially in the camp. More details on MSU X.</div>
+    </details>
+    <details class="faq-item">
+      <summary class="q">7. Do I have to sign up for MSU Builder Web?</summary>
+      <div class="a">Not mandatory, but Builder Web members receive <strong>unlimited credits</strong> throughout the camp, so we strongly recommend it.</div>
+    </details>
+    <details class="faq-item">
+      <summary class="q">8. Can one person submit multiple games?</summary>
+      <div class="a">Yes. However, a single account can only win in one category.</div>
+    </details>
+    <details class="faq-item">
+      <summary class="q">9. Can I only use MapleStory assets?</summary>
+      <div class="a">That's right. You're free to use MapleStory's designs, music, and other assets.</div>
+    </details>
+    <details class="faq-item">
+      <summary class="q">10. What tool should I use to build?</summary>
+      <div class="a">Build inside <strong>MSU Space</strong>, Verse8's MapleStory IP vibe coding environment. Available tools and guides will be released at <a href="https://docs.msu.io/" target="_blank" rel="noopener noreferrer">docs.msu.io</a> on <strong>June 8</strong>.</div>
+    </details>
+    <details class="faq-item">
+      <summary class="q">11. Is there a fixed genre?</summary>
+      <div class="a">No, any genre is welcome. Bring whatever MapleStory game idea you've been imagining.</div>
+    </details>
+    <details class="faq-item">
+      <summary class="q">12. How are prizes paid out?</summary>
+      <div class="a">Prizes are paid in $NXPC (Nexpace token), valued at the USD-equivalent amount at the time of payout.</div>
+    </details>
   </div>
 </section>
 
@@ -4134,10 +4939,16 @@
     // tracks the underlying content section.
     links.forEach(function(link) {
       link.addEventListener('click', function(e) {
+        e.preventDefault();
         const targetId = link.dataset.scrollTarget || link.dataset.section;
+        // Hero / Countdown link goes to absolute page top so the user
+        // sees the whole hero (any GNB scroll-margin offset is bypassed).
+        if (targetId === 'hero') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
         const target = document.getElementById(targetId);
         if (!target) return;
-        e.preventDefault();
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
@@ -4464,7 +5275,7 @@
       appendLine(RULE);
       appendLine('<span class="cli-phase">PHASE 2 — Game Design</span>');
       appendLine(RULE);
-      const demoAreaReveal = document.querySelector('.idea-persistence__demo-area');
+      const demoAreaReveal = document.querySelector('.idea-action__demo-area');
       if (demoAreaReveal && !demoAreaReveal.classList.contains('is-revealed')) {
         demoAreaReveal.classList.add('is-revealing');
       }
@@ -4549,7 +5360,7 @@
       // is-revealed snaps everything to opacity 1 / translateX(0) with
       // transition: none, so CLI restarts on re-entry never replay the
       // creep — the cat is already there waiting.
-      const demoArea = document.querySelector('.idea-persistence__demo-area');
+      const demoArea = document.querySelector('.idea-action__demo-area');
       if (demoArea) {
         demoArea.classList.remove('is-revealing');
         demoArea.classList.add('is-revealed');
@@ -4581,7 +5392,7 @@
       // Reduced-motion users see the final state immediately; reveal the
       // recruiter immediately too (the @media rule above also forces this
       // via CSS, but adding the class keeps state consistent).
-      const demoArea = document.querySelector('.idea-persistence__demo-area');
+      const demoArea = document.querySelector('.idea-action__demo-area');
       if (demoArea) demoArea.classList.add('is-revealed');
     }
 
@@ -4633,73 +5444,49 @@
     io.observe(cli);
   })();
 
-  /* === Share button → clipboard copy + confirmation modal ===
-     Wrapped in DOMContentLoaded because the modal HTML appears after this
-     script block in the document, so the modal isn't in the DOM yet when
-     this inline script runs synchronously. */
-  function initShareModal() {
+  /* === Share button → always opens the share modal (recruiter image +
+     confirmation message + Close), AND copies the page URL to the
+     clipboard at the same time. No native share sheet, no toast.
+     Triggered by any element carrying data-share-trigger (hero CTA,
+     sticky-panel Share button). */
+  function initShareTriggers() {
     const triggers = document.querySelectorAll('[data-share-trigger]');
     const modal = document.getElementById('shareModal');
     if (!triggers.length || !modal) return;
 
-    const confirmBtn = modal.querySelector('.share-modal__confirm');
-    const titleEl = modal.querySelector('#shareModalTitle');
-    const messageEl = modal.querySelector('#shareModalMessage');
-    let lastFocused = null;
-
-    // Cache the original i18n title/message HTML so we can restore them
-    // when the modal is reopened after a failed copy.
-    const originalTitleHTML = titleEl.innerHTML;
-    const originalMessageHTML = messageEl.innerHTML;
-
     async function copyToClipboard(text) {
-      // Modern Clipboard API (requires secure context)
       if (navigator.clipboard && window.isSecureContext) {
         try {
           await navigator.clipboard.writeText(text);
           return true;
-        } catch (err) { /* fall through to legacy */ }
+        } catch (err) { /* fall through */ }
       }
-      // Legacy execCommand fallback for older browsers / http://
       try {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        textarea.style.left = '-9999px';
-        textarea.setAttribute('readonly', '');
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        ta.style.left = '-9999px';
+        ta.setAttribute('readonly', '');
+        document.body.appendChild(ta);
+        ta.focus(); ta.select();
         const ok = document.execCommand('copy');
-        document.body.removeChild(textarea);
+        document.body.removeChild(ta);
         return ok;
-      } catch (err) {
-        return false;
-      }
+      } catch (err) { return false; }
     }
 
-    function openModal(copySuccess) {
-      // Restore i18n content first (in case a previous failure replaced it)
-      titleEl.innerHTML = originalTitleHTML;
-      messageEl.innerHTML = originalMessageHTML;
-
-      if (!copySuccess) {
-        // Overwrite with manual-copy fallback messaging (plain text — i18n
-        // spans replaced; acceptable since this is an edge-case error state).
-        const url = window.location.href;
-        titleEl.textContent = 'Could not copy automatically';
-        messageEl.textContent = 'Copy this URL manually: ' + url;
-      }
-
+    let lastFocused = null;
+    function openModal() {
+      lastFocused = document.activeElement;
       modal.hidden = false;
       document.body.style.overflow = 'hidden';
-      // Defer focus until next frame so the element is visible & focusable
+      // Defer focus to next frame so the modal is rendered before focus moves
       requestAnimationFrame(function() {
-        if (confirmBtn) confirmBtn.focus();
+        const closeBtn = modal.querySelector('.share-modal__close');
+        if (closeBtn) closeBtn.focus();
       });
     }
-
     function closeModal() {
       modal.hidden = true;
       document.body.style.overflow = '';
@@ -4710,59 +5497,654 @@
 
     async function handleShareClick(e) {
       e.preventDefault();
-      lastFocused = e.currentTarget;
-      const success = await copyToClipboard(window.location.href);
-      openModal(success);
+      // Fire-and-forget clipboard copy — modal opens immediately either way
+      copyToClipboard(window.location.href);
+      openModal();
     }
 
     triggers.forEach(function(btn) {
       btn.addEventListener('click', handleShareClick);
     });
 
-    // Dismiss handlers — backdrop, X button, Confirm button all share
-    // the data-modal-dismiss attribute.
+    // Close on backdrop / close-button / Got-it-button (any [data-modal-dismiss])
     modal.querySelectorAll('[data-modal-dismiss]').forEach(function(el) {
-      el.addEventListener('click', function(ev) {
-        ev.preventDefault();
-        closeModal();
-      });
+      el.addEventListener('click', closeModal);
     });
 
-    // Escape key while modal is open
-    document.addEventListener('keydown', function(ev) {
-      if (modal.hidden) return;
-      if (ev.key === 'Escape') {
-        ev.preventDefault();
-        closeModal();
-      }
-    });
-
-    // Focus trap: Tab cycles only between focusable elements inside the modal
-    modal.addEventListener('keydown', function(ev) {
-      if (ev.key !== 'Tab') return;
-      const focusable = modal.querySelectorAll(
-        'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-      if (!focusable.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (ev.shiftKey) {
-        if (document.activeElement === first) {
-          ev.preventDefault();
-          last.focus();
-        }
-      } else {
-        if (document.activeElement === last) {
-          ev.preventDefault();
-          first.focus();
-        }
-      }
+    // ESC key closes when modal is open
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && !modal.hidden) closeModal();
     });
   }
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initShareModal);
+    document.addEventListener('DOMContentLoaded', initShareTriggers);
   } else {
-    initShareModal();
+    initShareTriggers();
+  }
+
+  /* === Build Now button — disabled until the build phase opens.
+     Same target as the countdown (2026-06-08 15:00 KST). Click is a
+     no-op while disabled; activated state navigates to /build. */
+  const HERO_BUILD_TARGET = Date.UTC(2026, 5, 8, 6, 0, 0); // 2026-06-08T15:00:00+09:00 (KST 3pm)
+
+  function activateHeroBuildButton() {
+    // Hero pre-launch CTA
+    const btn = document.querySelector('.hero-build__btn');
+    // Meta span sits INSIDE the button (".hero-build__btn-meta")
+    // — hide it on activation so only "Build Now" remains.
+    const meta = document.querySelector('.hero-build__btn-meta');
+    if (btn && !btn.classList.contains('hero-build__btn--active')) {
+      btn.disabled = false;
+      btn.classList.add('hero-build__btn--active');
+      btn.setAttribute('aria-label', 'Start Building');
+      btn.removeAttribute('title');
+      if (meta) meta.hidden = true;
+      if (!btn._heroBuildBound) {
+        btn._heroBuildBound = true;
+        btn.addEventListener('click', function() {
+          window.location.href = '/build';
+        });
+      }
+    }
+
+    // Idea + Action section CTA — same target, same activation pattern.
+    // Removing .btn-build--waiting strips the muted purple + breathing
+    // border + not-allowed cursor, leaving the normal btn-primary purple
+    // CTA with its pulse animation visible.
+    const ideaBtn = document.querySelector('.idea-action__button-wrap .btn-build--waiting');
+    const ideaSubtext = document.querySelector('.idea-action__button-wrap .btn-build__subtext');
+    if (ideaBtn) {
+      ideaBtn.disabled = false;
+      ideaBtn.classList.remove('btn-build--waiting');
+      ideaBtn.setAttribute('aria-label', 'Start Building');
+      ideaBtn.removeAttribute('title');
+      if (ideaSubtext) ideaSubtext.hidden = true;
+      if (!ideaBtn._ideaBuildBound) {
+        ideaBtn._ideaBuildBound = true;
+        ideaBtn.addEventListener('click', function() {
+          window.location.href = '/build';
+        });
+      }
+    }
+
+    // Sticky panel CTA — same activation. Stripping the waiting modifier
+    // reveals the bright purple gradient and re-enables the hover lift.
+    const stickyBtn = document.querySelector('.sticky-panel__cta--waiting');
+    if (stickyBtn) {
+      stickyBtn.disabled = false;
+      stickyBtn.classList.remove('sticky-panel__cta--waiting');
+      stickyBtn.setAttribute('aria-label', 'Start Building');
+      stickyBtn.removeAttribute('title');
+      if (!stickyBtn._stickyBuildBound) {
+        stickyBtn._stickyBuildBound = true;
+        stickyBtn.addEventListener('click', function() {
+          window.location.href = '/build';
+        });
+      }
+    }
+  }
+
+  function initHeroBuildButton() {
+    // If the page is loaded after the target has already passed, activate
+    // immediately. Otherwise the countdown's tick will flip the button at
+    // the same moment it shows "Building is live!".
+    if (Date.now() >= HERO_BUILD_TARGET) activateHeroBuildButton();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHeroBuildButton);
+  } else {
+    initHeroBuildButton();
+  }
+
+  /* === Hero MSU Sparkle — WebGL diffraction-star shader.
+     Replaces all previous CSS halo/ray/twinkle effects. Renders a real
+     procedural sparkle behind the static MSU icon: bright Gaussian core,
+     4-point vertical/horizontal cross spikes, 4-point 45° diagonal spikes,
+     drifting warm dust particles, and a slow shimmer. WebGL 1.0 for max
+     compatibility. Pauses when off-screen. Falls back to display:none if
+     WebGL is unavailable. */
+  function initHeroSparkleBg() {
+    const canvas = document.getElementById('heroSparkleBg');
+    if (!canvas) return;
+
+    const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const gl = canvas.getContext('webgl', {
+      antialias: false,
+      alpha: true,
+      premultipliedAlpha: false
+    }) || canvas.getContext('experimental-webgl', {
+      antialias: false,
+      alpha: true,
+      premultipliedAlpha: false
+    });
+    if (!gl) { canvas.style.display = 'none'; return; }
+
+    const VS = [
+      'attribute vec2 a_position;',
+      'void main() {',
+      '  gl_Position = vec4(a_position, 0.0, 1.0);',
+      '}'
+    ].join('\n');
+
+    const FS = [
+      'precision highp float;',
+      '',
+      'uniform vec2 u_resolution;',
+      'uniform float u_time;',
+      '',
+      'float hash21(vec2 p) {',
+      '  p = fract(p * vec2(123.34, 456.21));',
+      '  p += dot(p, p + 45.32);',
+      '  return fract(p.x * p.y);',
+      '}',
+      '',
+      '// 4-point diffraction star — vertical + horizontal cross spikes',
+      '// plus a Gaussian core and soft halo.',
+      'float crossStar(vec2 d, float size, float spikeLen) {',
+      '  float r2 = dot(d, d);',
+      '  float core = exp(-r2 / (size * size));',
+      '  float halo = exp(-r2 / (size * size * 60.0)) * 0.50;',
+      '  float vSpike = exp(-(d.y * d.y) / (spikeLen * spikeLen * 0.30))',
+      '               * exp(-(d.x * d.x) / (size * size * 0.18));',
+      '  float hSpike = exp(-(d.x * d.x) / (spikeLen * spikeLen * 0.30))',
+      '               * exp(-(d.y * d.y) / (size * size * 0.18));',
+      '  return core + halo + (vSpike + hSpike) * 0.60;',
+      '}',
+      '',
+      '// Rotated cross — produces diagonals when combined with crossStar.',
+      'float diagSpike(vec2 d, float size, float spikeLen, float angle) {',
+      '  float c = cos(angle);',
+      '  float s = sin(angle);',
+      '  vec2 r = vec2(c * d.x + s * d.y, -s * d.x + c * d.y);',
+      '  float vSpike = exp(-(r.y * r.y) / (spikeLen * spikeLen * 0.30))',
+      '               * exp(-(r.x * r.x) / (size * size * 0.18));',
+      '  float hSpike = exp(-(r.x * r.x) / (spikeLen * spikeLen * 0.30))',
+      '               * exp(-(r.y * r.y) / (size * size * 0.18));',
+      '  return (vSpike + hSpike) * 0.45;',
+      '}',
+      '',
+      'void main() {',
+      '  vec2 uv = gl_FragCoord.xy / u_resolution.xy;',
+      '  float aspect = u_resolution.x / u_resolution.y;',
+      '  vec2 d = (uv - 0.5) * vec2(aspect, 1.0);',
+      '',
+      '  float t = u_time;',
+      '',
+      '  // Main 4-point cross with slow length pulse',
+      '  float mainPulse = 0.85 + 0.15 * sin(t * 0.7);',
+      '  float main4 = crossStar(d, 0.025, 0.30 * mainPulse);',
+      '',
+      '  // 45° diagonal spikes — slightly smaller, separate pulse → 8-point feel',
+      '  float diagPulse = 0.90 + 0.10 * sin(t * 0.9 + 1.5);',
+      '  float diag = diagSpike(d, 0.020, 0.22 * diagPulse, 0.7854);',
+      '',
+      '  // Independent shimmer modulation per spike system',
+      '  float shimmerA = 0.78 + 0.22 * sin(t * 1.6);',
+      '  float shimmerB = 0.72 + 0.28 * sin(t * 1.6 + 2.5);',
+      '',
+      '  // Color palette — warm white core, slow cyan ↔ purple shift on diagonals',
+      '  vec3 coreColor = vec3(1.00, 0.96, 0.88);  // warm white',
+      '  vec3 spikeCool = vec3(0.78, 0.95, 1.00);  // cyan-white',
+      '  vec3 spikeWarm = vec3(0.98, 0.85, 1.00);  // soft pink-purple',
+      '  vec3 diagColor = mix(spikeCool, spikeWarm, sin(t * 0.4) * 0.5 + 0.5);',
+      '',
+      '  vec3 color = coreColor * main4 * shimmerA;',
+      '  color += diagColor * diag * shimmerB;',
+      '',
+      '  // 6 drifting dust motes — each twinkles on its own clock so the',
+      '  // whole scene reads as ambient glints rather than a synced pulse.',
+      '  float dust = 0.0;',
+      '  for (int i = 0; i < 6; i++) {',
+      '    float fi = float(i);',
+      '    vec2 dustOffset = vec2(',
+      '      (hash21(vec2(fi, 17.0)) - 0.5) * 0.55,',
+      '      (hash21(vec2(fi, 31.0)) - 0.5) * 0.55',
+      '    );',
+      '    dustOffset.x += sin(t * 0.5 + fi * 1.7) * 0.04;',
+      '    dustOffset.y += cos(t * 0.4 + fi * 2.3) * 0.04;',
+      '    vec2 dd = d - dustOffset * vec2(aspect, 1.0);',
+      '    float d2 = dot(dd, dd);',
+      '    float speed = 1.5 + hash21(vec2(fi, 41.0)) * 2.5;',
+      '    float twinkle = 0.55 + 0.45 * sin(t * speed + fi * 2.8);',
+      '    twinkle = max(0.0, twinkle);',
+      '    dust += exp(-d2 * 5000.0) * twinkle;',
+      '  }',
+      '  color += vec3(1.0, 0.95, 0.92) * dust * 0.60;',
+      '',
+      '  // Premultiplied? No — context was created with premultipliedAlpha:false,',
+      '  // so output as straight RGBA. Alpha is the combined brightness so the',
+      '  // canvas blends naturally with the page behind it.',
+      '  float alpha = clamp(main4 + diag * 0.85 + dust * 0.70, 0.0, 1.0);',
+      '  gl_FragColor = vec4(color, alpha);',
+      '}'
+    ].join('\n');
+
+    function compile(type, src) {
+      const sh = gl.createShader(type);
+      gl.shaderSource(sh, src);
+      gl.compileShader(sh);
+      if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+        console.warn('Hero sparkle shader compile failed:', gl.getShaderInfoLog(sh));
+        gl.deleteShader(sh);
+        return null;
+      }
+      return sh;
+    }
+
+    const vs = compile(gl.VERTEX_SHADER, VS);
+    const fs = compile(gl.FRAGMENT_SHADER, FS);
+    if (!vs || !fs) { canvas.style.display = 'none'; return; }
+
+    const program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.warn('Hero sparkle program link failed:', gl.getProgramInfoLog(program));
+      canvas.style.display = 'none';
+      return;
+    }
+
+    // Fullscreen triangle (3 vertices covers viewport)
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1,  3, -1,  -1, 3]), gl.STATIC_DRAW);
+    const posLoc = gl.getAttribLocation(program, 'a_position');
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+    const uResLoc = gl.getUniformLocation(program, 'u_resolution');
+    const uTimeLoc = gl.getUniformLocation(program, 'u_time');
+
+    gl.useProgram(program);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.max(1, Math.floor(rect.width * dpr));
+      const h = Math.max(1, Math.floor(rect.height * dpr));
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+        gl.viewport(0, 0, w, h);
+      }
+    }
+
+    let isVisible = true;
+    let rafId = 0;
+    const startTime = performance.now();
+
+    function render(now) {
+      resize();
+      gl.uniform2f(uResLoc, canvas.width, canvas.height);
+      gl.uniform1f(uTimeLoc, (now - startTime) * 0.001);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+
+    function loop(now) {
+      if (!isVisible) { rafId = 0; return; }
+      render(now);
+      rafId = requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('resize', function() { render(performance.now()); });
+    if ('ResizeObserver' in window) {
+      const ro = new ResizeObserver(function() { render(performance.now()); });
+      ro.observe(canvas);
+    }
+
+    if (REDUCED) {
+      // Static snapshot, no animation loop
+      render(performance.now());
+      return;
+    }
+
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          const wasVisible = isVisible;
+          isVisible = entry.isIntersecting;
+          if (isVisible && !wasVisible && !rafId) {
+            rafId = requestAnimationFrame(loop);
+          }
+        });
+      }, { threshold: 0 });
+      io.observe(canvas);
+    }
+    rafId = requestAnimationFrame(loop);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHeroSparkleBg);
+  } else {
+    initHeroSparkleBg();
+  }
+
+  /* === Hero aurora background — WebGL fragment shader. Three soft aurora
+     sources blend via additive light against the galaxy hero background:
+       1. Bottom-left   : cyan-teal -> purple
+       2. Top-right     : purple    -> pink
+       3. Center        : cyan      -> pink-purple (behind the wordmark)
+     Domain-warped FBM noise drives organic flow; wavy sin bands give the
+     curtain-like aurora feel. mix-blend-mode: screen on the CSS side keeps
+     it additive on the busy background. IntersectionObserver pauses RAF
+     when the hero scrolls off; prefers-reduced-motion renders one static
+     frame. Same compile/link/loop pattern as the prize-pool + ip-compare
+     shaders, so the codepaths stay parallel and easy to reason about. */
+  function initHeroAuroraBg() {
+    const canvas = document.getElementById('heroAuroraBg');
+    if (!canvas) return;
+
+    const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const gl = canvas.getContext('webgl', {
+      antialias: false,
+      alpha: true,
+      premultipliedAlpha: false
+    }) || canvas.getContext('experimental-webgl', {
+      antialias: false,
+      alpha: true,
+      premultipliedAlpha: false
+    });
+    if (!gl) { canvas.style.display = 'none'; return; }
+
+    const VS = [
+      'attribute vec2 a_position;',
+      'void main() { gl_Position = vec4(a_position, 0.0, 1.0); }'
+    ].join('\n');
+
+    const FS = [
+      'precision highp float;',
+      '',
+      'uniform vec2 u_resolution;',
+      'uniform float u_time;',
+      '',
+      'float hash(vec2 p) {',
+      '  p = fract(p * vec2(123.34, 456.21));',
+      '  p += dot(p, p + 45.32);',
+      '  return fract(p.x * p.y);',
+      '}',
+      '',
+      'float vnoise(vec2 p) {',
+      '  vec2 i = floor(p);',
+      '  vec2 f = fract(p);',
+      '  vec2 u = f * f * (3.0 - 2.0 * f);',
+      '  return mix(mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), u.x),',
+      '             mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);',
+      '}',
+      '',
+      'float fbm(vec2 p) {',
+      '  float v = 0.0;',
+      '  float a = 0.5;',
+      '  for (int i = 0; i < 5; i++) {',
+      '    v += a * vnoise(p);',
+      '    p *= 2.1;',
+      '    a *= 0.5;',
+      '  }',
+      '  return v;',
+      '}',
+      '',
+      // Aurora source — domain-warped wavy bands of color falling off from
+      // a center point. col1 / col2 mix by band intensity for chromatic depth.
+      // Plasma aurora — combines THREE motion layers for the
+      // "flickering + bursting + dynamic" feel:
+      //   1. Radial ray bursts (sin of angle, sharpened) — rays of light
+      //      shooting outward from the center
+      //   2. Flame flicker (high-freq radial sin moving outward) — looks
+      //      like fire licking and dancing
+      //   3. Spiral swirl (angle + dist + time) — galactic rotation
+      // Three colors mix via these motion layers, then the whole thing
+      // is brightness-boosted (1.35x) so the colors read as vivid and
+      // saturated rather than washed-out haze.
+      'vec3 aurora(vec2 uv, vec2 center, vec3 colA, vec3 colB, vec3 colC, float t, float scale, float radius) {',
+      '  vec2 q = uv - center;',
+      '  float angle = atan(q.y, q.x);',
+      '  float dist = length(q);',
+      '',
+      // Two organic noise fields
+      '  float n1 = fbm(q * scale + vec2(t * 0.12, t * 0.07));',
+      '  float n2 = fbm(q * scale * 1.8 + vec2(-t * 0.09, t * 0.15));',
+      '',
+      // 1. Radial ray bursts — 5 arms rotating + warped by noise
+      '  float rays = sin(angle * 5.0 + n1 * 6.0 + t * 0.55) * 0.5 + 0.5;',
+      '  rays = pow(rays, 1.6);',
+      '',
+      // 2. Flame flicker — high-freq radial wave traveling outward
+      '  float flicker = sin(dist * 11.0 - t * 2.2 + n2 * 4.0) * 0.5 + 0.5;',
+      '',
+      // 3. Spiral swirl — galactic arms
+      '  float swirl = sin(angle * 2.5 + dist * 5.0 + t * 0.40 + n1 * 3.5) * 0.5 + 0.5;',
+      '',
+      // Multi-stop color mix: swirl picks between A/B, rays add C on top
+      '  vec3 col = mix(colA, colB, swirl);',
+      '  col = mix(col, colC, rays * 0.55 + n2 * 0.30);',
+      '',
+      // Brightness boost — pushes colors into vivid territory (clipped
+      // later by alpha smoothstep, which is fine).
+      '  col *= 1.35;',
+      '',
+      // Intensity pulse — flame + rays drive a 0.70~1.05 modulation.
+      // Floor at 0.70 keeps the source continuously visible (no
+      // evaporation), but the swing is big enough that flicker reads
+      // as actual flame motion rather than dead haze.
+      '  float pulse = 0.70 + flicker * 0.25 + rays * 0.10;',
+      '  float falloff = exp(-dist * radius);',
+      '',
+      '  return col * pulse * falloff;',
+      '}',
+      '',
+      'void main() {',
+      '  vec2 uv = gl_FragCoord.xy / u_resolution.xy;',
+      '  vec2 aspect = vec2(u_resolution.x / u_resolution.y, 1.0);',
+      '  vec2 p = (uv - 0.5) * aspect;',
+      '',
+      '  vec3 col = vec3(0.0);',
+      '',
+      // Two aurora sources, both centered behind the Vibe Camp wordmark
+      // (slight offset for organic depth). Each source takes THREE colors:
+      // cyan-teal, purple, and a pink accent. Counter-rotating phase on
+      // the second source gives the impression of two plasma layers
+      // interfering — more dynamic than a single rotation.
+      //
+      // Source 1: cyan-teal / purple / pink-magenta
+      '  col += aurora(p, vec2(0.0, 0.05),',
+      '                vec3(0.30, 0.92, 0.83),',
+      '                vec3(0.53, 0.22, 0.98),',
+      '                vec3(0.95, 0.32, 0.62),',
+      '                u_time, 1.4, 4.0);',
+      '',
+      // Source 2: purple-deeper / pink / cyan accent (counter-rotation)
+      '  col += aurora(p, vec2(0.05, 0.10),',
+      '                vec3(0.48, 0.18, 0.92),',
+      '                vec3(0.92, 0.42, 0.78),',
+      '                vec3(0.35, 0.88, 0.92),',
+      '                -u_time * 1.3 + 2.0, 1.8, 4.8) * 0.85;',
+      '',
+      // Alpha derived from color intensity. With the 1.35x brightness
+      // boost inside the aurora function, the source body easily clears
+      // the 0.30 threshold so the rays + flicker register as bright
+      // plasma. Outer fringe still cuts to transparent so the effect
+      // stays compact behind the wordmark.
+      '  float intensity = max(max(col.r, col.g), col.b);',
+      '  float alpha = smoothstep(0.0, 0.30, intensity);',
+      '',
+      '  gl_FragColor = vec4(col, alpha);',
+      '}'
+    ].join('\n');
+
+    function compile(type, src) {
+      const sh = gl.createShader(type);
+      gl.shaderSource(sh, src);
+      gl.compileShader(sh);
+      if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+        gl.deleteShader(sh);
+        return null;
+      }
+      return sh;
+    }
+
+    const vs = compile(gl.VERTEX_SHADER, VS);
+    const fs = compile(gl.FRAGMENT_SHADER, FS);
+    if (!vs || !fs) { canvas.style.display = 'none'; return; }
+
+    const program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      canvas.style.display = 'none';
+      return;
+    }
+
+    const posBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const aPos = gl.getAttribLocation(program, 'a_position');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+    const uResLoc = gl.getUniformLocation(program, 'u_resolution');
+    const uTimeLoc = gl.getUniformLocation(program, 'u_time');
+
+    gl.useProgram(program);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.max(1, Math.floor(rect.width * dpr));
+      const h = Math.max(1, Math.floor(rect.height * dpr));
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+        gl.viewport(0, 0, w, h);
+      }
+    }
+
+    let isVisible = true;
+    let rafId = 0;
+    const startTime = performance.now();
+
+    function render(now) {
+      resize();
+      gl.uniform2f(uResLoc, canvas.width, canvas.height);
+      gl.uniform1f(uTimeLoc, (now - startTime) * 0.001);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+
+    function loop(now) {
+      if (!isVisible) { rafId = 0; return; }
+      render(now);
+      rafId = requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('resize', function() { render(performance.now()); });
+    if ('ResizeObserver' in window) {
+      const ro = new ResizeObserver(function() { render(performance.now()); });
+      ro.observe(canvas);
+    }
+
+    if (REDUCED) {
+      render(performance.now());
+      return;
+    }
+
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          const wasVisible = isVisible;
+          isVisible = entry.isIntersecting;
+          if (isVisible && !wasVisible && !rafId) {
+            rafId = requestAnimationFrame(loop);
+          }
+        });
+      }, { threshold: 0 });
+      io.observe(canvas);
+    }
+    rafId = requestAnimationFrame(loop);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHeroAuroraBg);
+  } else {
+    initHeroAuroraBg();
+  }
+
+  /* === Hero countdown — live timer to June 8, 2026 15:00 KST (UTC+9).
+     Updates every 1s. When the target passes, the countdown box layout
+     is replaced with a single "Building is live!" line AND the Build Now
+     button transitions from disabled to active automatically.
+     The container has aria-live="polite" in the HTML, but per-second
+     updates would spam screen readers. We toggle aria-live to "off"
+     while the seconds tick and only flip it back to "polite" momentarily
+     when the minute value changes, so SR announces minute-level changes. */
+  function initHeroCountdown() {
+    const container = document.getElementById('heroCountdown');
+    if (!container) return;
+
+    // Shared with the Build Now button so both flip at the same moment
+    const target = HERO_BUILD_TARGET;
+
+    const els = {
+      days:  container.querySelector('[data-unit="days"]'),
+      hours: container.querySelector('[data-unit="hours"]'),
+      mins:  container.querySelector('[data-unit="mins"]'),
+      secs:  container.querySelector('[data-unit="secs"]')
+    };
+    if (!els.days || !els.hours || !els.mins || !els.secs) return;
+
+    // Throttle screen-reader announcements: keep aria-live off most of the
+    // time (sec ticks don't get announced), and only fire a polite update
+    // when the minute value actually changes.
+    container.setAttribute('aria-live', 'off');
+    let lastMinSnapshot = -1;
+    let announceTimer = 0;
+
+    function pad(n) { return String(Math.max(0, n)).padStart(2, '0'); }
+
+    let timerId = 0;
+    function tick() {
+      const diff = target - Date.now();
+      if (diff <= 0) {
+        clearInterval(timerId);
+        container.setAttribute('aria-live', 'polite');
+        container.innerHTML = '<div class="hero-countdown__live">Building is live!</div>';
+        // Flip the disabled Build Now button to its active state in lockstep
+        activateHeroBuildButton();
+        return;
+      }
+      const days  = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff / 3600000) % 24);
+      const mins  = Math.floor((diff / 60000) % 60);
+      const secs  = Math.floor((diff / 1000) % 60);
+      els.days.textContent  = pad(days);
+      els.hours.textContent = pad(hours);
+      els.mins.textContent  = pad(mins);
+      els.secs.textContent  = pad(secs);
+
+      // Minute boundary — briefly enable polite announcement so SR users
+      // hear "X days, Y hours, Z minutes" without per-second spam.
+      const minSnapshot = days * 1440 + hours * 60 + mins;
+      if (minSnapshot !== lastMinSnapshot) {
+        lastMinSnapshot = minSnapshot;
+        container.setAttribute('aria-live', 'polite');
+        clearTimeout(announceTimer);
+        announceTimer = setTimeout(function() {
+          container.setAttribute('aria-live', 'off');
+        }, 800);
+      }
+    }
+
+    tick();
+    timerId = setInterval(tick, 1000);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHeroCountdown);
+  } else {
+    initHeroCountdown();
   }
 
   /* === Prize cards carousel — sync pagination dots to scroll position
@@ -5432,20 +6814,24 @@ void main() {
   </div>
 
   <nav class="sticky-panel__nav">
-    <a href="#prize-marquee" class="sticky-panel__link" data-section="prize-pool" data-scroll-target="prize-marquee">
+    <a href="#hero" class="sticky-panel__link" data-section="hero">
       <span class="sticky-panel__num">01</span>
+      <span class="sticky-panel__name">Countdown</span>
+    </a>
+    <a href="#prize-marquee" class="sticky-panel__link" data-section="prize-pool" data-scroll-target="prize-marquee">
+      <span class="sticky-panel__num">02</span>
       <span class="sticky-panel__name">Prize Pool</span>
     </a>
     <a href="#shipping-to-millions" class="sticky-panel__link" data-section="shipping-to-millions">
-      <span class="sticky-panel__num">02</span>
+      <span class="sticky-panel__num">03</span>
       <span class="sticky-panel__name">Winners' Stack</span>
     </a>
-    <a href="#action-marquee" class="sticky-panel__link" data-section="idea-persistence" data-scroll-target="action-marquee">
-      <span class="sticky-panel__num">03</span>
+    <a href="#action-marquee" class="sticky-panel__link" data-section="idea-action" data-scroll-target="action-marquee">
+      <span class="sticky-panel__num">04</span>
       <span class="sticky-panel__name">Open to All</span>
     </a>
     <a href="#faq" class="sticky-panel__link" data-section="faq">
-      <span class="sticky-panel__num">04</span>
+      <span class="sticky-panel__num">05</span>
       <span class="sticky-panel__name">FAQ</span>
     </a>
   </nav>
@@ -5453,11 +6839,16 @@ void main() {
   <div class="sticky-panel__divider" aria-hidden="true"></div>
 
   <div class="sticky-panel__actions">
-    <a href="#apply" class="sticky-panel__cta sticky-panel__cta--primary">
-      <span class="live-pulse" aria-hidden="true"></span>
-      Build Now
-    </a>
-    <button class="sticky-panel__cta sticky-panel__cta--secondary" type="button" aria-label="Share Vibe Jam" data-share-trigger>
+    <!-- Pre-launch: Start Building disabled until June 8 (auto-activates
+         in lockstep with hero + idea-action build buttons via JS). Share
+         is always active. -->
+    <button class="sticky-panel__cta sticky-panel__cta--primary sticky-panel__cta--waiting"
+            type="button" disabled
+            aria-label="Start Building — opens June 8, 2026"
+            title="Opens June 8">
+      Start Building
+    </button>
+    <button class="sticky-panel__cta sticky-panel__cta--secondary" type="button" aria-label="Share" data-share-trigger>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
@@ -5474,13 +6865,17 @@ void main() {
   <span class="scroll-top__label">Top</span>
 </button>
 
-<!-- SHARE MODAL — appears after clipboard-copy on Share button click -->
+<!-- SHARE TOAST — fades in for ~2.4s on clipboard-copy when navigator.share is unavailable -->
+<div class="share-toast" id="shareToast" role="status" aria-live="polite"></div>
+
+<!-- SHARE MODAL — opens on every Share button click. Displays the
+     recruiter illustration, copies the page URL to the clipboard at
+     open time, and shows a confirmation message. -->
 <div class="share-modal"
      id="shareModal"
      role="dialog"
      aria-modal="true"
-     aria-labelledby="shareModalTitle"
-     aria-describedby="shareModalMessage"
+     aria-labelledby="shareModalMessage"
      hidden>
   <div class="share-modal__backdrop" data-modal-dismiss></div>
   <div class="share-modal__card" role="document">
@@ -5494,32 +6889,22 @@ void main() {
     </button>
 
     <div class="share-modal__visual">
-      <img src="assets/illustrations/share-modal.png" alt="" aria-hidden="true" />
+      <img src="assets/illustrations/share-recruiter.png"
+           alt=""
+           aria-hidden="true"
+           loading="lazy"
+           decoding="async" />
     </div>
 
     <div class="share-modal__content">
-      <div class="share-modal__check" aria-hidden="true">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="11" fill="#34D399"/>
-          <path d="M7 12.5l3.5 3.5L17 9" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-
-      <h3 id="shareModalTitle" class="share-modal__title" data-i18n-title>
-        <span class="t-en">Link copied!</span>
-        <span class="t-ko">페이지 링크가 복사되었습니다.</span>
-      </h3>
-
-      <p id="shareModalMessage" class="share-modal__message" data-i18n-message>
-        <span class="t-en">Send invitation to other builders.</span>
-        <span class="t-ko">다른 빌더에게 초대장을 보내세요.</span>
+      <p id="shareModalMessage" class="share-modal__message">
+        Link copied. Thanks for spreading the word! Pass it to anyone who&rsquo;d vibe with MapleStory.
       </p>
 
       <button class="share-modal__confirm"
               type="button"
               data-modal-dismiss>
-        <span class="t-en">Got it</span>
-        <span class="t-ko">확인</span>
+        Close
       </button>
     </div>
   </div>
