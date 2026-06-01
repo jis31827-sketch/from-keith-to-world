@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VIBEJAM · VIBE IP Gamejam 2026</title>
+<title>MapleStory Vibe Camp</title>
 <meta name="description" content="MapleStory, built by you. Played by millions. We fuel your journey there.">
 <link rel="icon" type="image/x-icon" href="favicon.ico" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1382,17 +1382,21 @@
   .hero-share-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
     background: rgba(255, 255, 255, 0.92);
     color: #0A0A1A;
     border: 1px solid rgba(0, 0, 0, 0.05);
     padding: 14px 28px;
+    min-height: 48px; /* match the two-line .hero-build__btn (Start Building) height */
     border-radius: 12px;
     font-family: var(--font-roboto);
     font-weight: 700;
     font-size: 14px;
+    line-height: 1.15;
     letter-spacing: 0.02em;
     cursor: pointer;
+    box-sizing: border-box;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     box-shadow: 0 6px 18px rgba(15, 20, 50, 0.30);
@@ -1406,6 +1410,13 @@
   .hero-share-btn:focus-visible {
     outline: 2px solid #FFFFFF;
     outline-offset: 3px;
+  }
+  /* Learn more button shares hero-share-btn styles but is an anchor —
+     normalize text-decoration and keep the same hover/focus polish. */
+  a.hero-learn-btn,
+  a.hero-learn-btn:visited {
+    text-decoration: none;
+    color: #0A0A1A;
   }
 
   /* ---------- Responsive ---------- */
@@ -1440,7 +1451,7 @@
     }
     .hero-cta { margin-top: 28px; flex-wrap: wrap; gap: 12px; }
     .hero-build__btn,
-    .hero-share-btn { padding: 12px 22px; font-size: 13px; }
+    .hero-share-btn { padding: 12px 22px; font-size: 13px; min-height: 53px; }
   }
 
   /* ---------- Reduced motion ---------- */
@@ -2186,6 +2197,27 @@
     font-size: clamp(18px, 1.5vw, 22px);
     padding: 0 12px;
   }
+  /* Anchor inside a marquee item — keeps the marquee typography but
+     adds a subtle underline so the link is clickable. The marquee
+     pauses on hover (.prize-marquee:hover rule above), giving users
+     time to click. */
+  .marquee-sub a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.45);
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1.5px;
+    transition: text-decoration-color 0.15s ease, color 0.15s ease;
+  }
+  .marquee-sub a:hover {
+    color: #FFFFFF;
+    text-decoration-color: #FFFFFF;
+  }
+  .marquee-sub a:focus-visible {
+    outline: 2px solid #FFFFFF;
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
 
   /* === ACTION MARQUEE — section break between Shipping and Idea+Action.
      Deep purple gradient — slightly lighter than the Shipping section's
@@ -2329,6 +2361,21 @@
     line-height: var(--lh-point-s);
     margin: 0;
     text-shadow: 0 0 18px rgba(163, 97, 255, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .prize-scoreboard__label-line {
+    display: block;
+  }
+  .prize-scoreboard__label-sub {
+    display: block;
+    font-size: clamp(13px, 1.4vw, 18px);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: rgba(253, 216, 53, 0.88);
+    text-shadow: 0 0 12px rgba(253, 216, 53, 0.35);
   }
   .prize-scoreboard__total {
     font-family: var(--font-sofia-sans-condensed);
@@ -2353,7 +2400,7 @@
   }
   .prize-card {
     position: relative;
-    padding: 28px 16px; /* 18 → 16 horizontal — gain a few px of content width per card */
+    padding: 36px 16px; /* increased vertical padding to balance the simplified content (no title/criteria) */
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
@@ -2382,6 +2429,117 @@
 
   /* Selection policy line — sits below dots, above timeline. Small,
      low-emphasis so it reads as fine print, not a headline. */
+  /* Prize Pool hook catchphrase — sits ABOVE "Total Prize Pool $60,000",
+     carries the campaign voice. Two-line composition where line 2 lands
+     with a heavier kinetic hit ("We bet on your hype"). */
+  .prize-scoreboard__hook {
+    text-align: center;
+    margin: 0 auto 32px;
+    max-width: min(960px, 92vw);
+  }
+  .prize-scoreboard__hook-line {
+    font-family: var(--font-sofia-sans-condensed);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin: 0;
+    /* Allow wrap — sub line is now four short phrases ("Three weeks.
+       Vibe coding. Official IP. Make a game that hits.") and won't
+       always fit a single line. */
+    text-wrap: balance;
+  }
+  /* Two-tier hierarchy — Main (top) clearly dominates, Sub (bottom)
+     reads as supporting copy underneath. Sub is roughly half the Main
+     size so the two lines no longer compete. */
+  .prize-scoreboard__hook-line--top {
+    font-size: clamp(30px, 4.8vw, 60px);
+    line-height: 1.1;
+  }
+  .prize-scoreboard__hook-line--bottom {
+    font-size: clamp(16px, 2.2vw, 28px);
+    line-height: 1.25;
+  }
+  /* Line 1 — set the scene. Bright white with a soft yellow halo.
+     Italic + skewX removed (double-tilt made the line read awkward). */
+  .prize-scoreboard__hook-line--top {
+    color: #FFFFFF;
+    text-shadow:
+      0 0 24px rgba(253, 216, 53, 0.22),
+      0 2px 6px rgba(0, 0, 0, 0.55);
+  }
+  /* Line 2 — payoff. Same size, heavier weight, gradient + neon glow. */
+  .prize-scoreboard__hook-line--bottom {
+    margin-top: 10px;
+    font-weight: 900;
+    letter-spacing: -0.015em;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.32em;
+    /* prevent drop-shadow/skew from being clipped by ancestor stacking */
+    overflow: visible;
+  }
+  .prize-scoreboard__hook-bet {
+    color: #FFFFFF;
+    opacity: 0.92;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  }
+  /* "your hype" — gradient + glow + subtle pulse to feel like neon.
+     Padding-right + inline-block + overflow:visible fix the trailing "e"
+     getting clipped when the skewX pushes the glyph past its box. */
+  .prize-scoreboard__hook-hype {
+    display: inline-block;
+    background: linear-gradient(
+      92deg,
+      #FDD835 0%,
+      #FF8A65 38%,
+      #EC4899 72%,
+      #A361FF 100%
+    );
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+            color: transparent;
+    filter:
+      drop-shadow(0 0 14px rgba(253, 216, 53, 0.55))
+      drop-shadow(0 0 28px rgba(236, 72, 153, 0.35));
+    animation: hype-pulse 2.6s ease-in-out infinite;
+    font-style: italic;
+    transform: skewX(-4deg);
+    transform-origin: left center;
+    padding-right: 0.22em;   /* breathing room so skewed "e" isn't clipped */
+    overflow: visible;
+  }
+  @keyframes hype-pulse {
+    0%, 100% {
+      filter:
+        drop-shadow(0 0 14px rgba(253, 216, 53, 0.55))
+        drop-shadow(0 0 28px rgba(236, 72, 153, 0.30));
+    }
+    50% {
+      filter:
+        drop-shadow(0 0 22px rgba(253, 216, 53, 0.85))
+        drop-shadow(0 0 40px rgba(236, 72, 153, 0.55));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .prize-scoreboard__hook-hype { animation: none; }
+  }
+  /* Mobile — keep both lines on a single line each, just scale the
+     shared font-size down. Line 2 still wraps if absolutely needed. */
+  @media (max-width: 600px) {
+    .prize-scoreboard__hook-line--top,
+    .prize-scoreboard__hook-line--bottom {
+      font-size: clamp(22px, 7vw, 36px);
+    }
+    .prize-scoreboard__hook-line--bottom {
+      flex-wrap: wrap;
+      gap: 0.18em 0.32em;
+    }
+  }
+  /* Emphasized "Check MSU and Verse8 on X" CTA — promoted from fine print
+     to a pill-shaped link that reads as the next step after the prize total. */
   .prize-policy {
     text-align: center;
     font-family: var(--font-roboto);
@@ -2391,6 +2549,60 @@
     letter-spacing: 0.01em;
     margin: 12px 0 0;
   }
+  .prize-policy--cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 28px auto 0;
+    padding: 12px 22px 12px 24px;
+    border-radius: 999px;
+    background: rgba(253, 216, 53, 0.10);
+    border: 1px solid rgba(253, 216, 53, 0.55);
+    color: #FFFFFF;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    box-shadow: 0 4px 14px rgba(253, 216, 53, 0.15);
+  }
+  .prize-policy--cta .prize-policy__text strong {
+    color: #FDD835;
+    font-weight: 800;
+  }
+  .prize-policy--cta:hover,
+  .prize-policy--cta:focus-visible {
+    background: rgba(253, 216, 53, 0.20);
+    border-color: #FDD835;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(253, 216, 53, 0.30);
+    outline: none;
+  }
+  .prize-policy--cta .prize-policy__arrow {
+    flex-shrink: 0;
+    transition: transform 0.18s ease;
+  }
+  .prize-policy--cta:hover .prize-policy__arrow {
+    transform: translateX(3px);
+  }
+  /* Layout wrapper to center the pill-shaped CTA (since it's now an
+     inline-flex anchor, not a block-level <p>) */
+  .prize-scoreboard__container > .prize-policy--cta {
+    display: flex;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  @media (max-width: 767px) {
+    .prize-policy--cta {
+      font-size: 13px;
+      padding: 10px 18px;
+      gap: 8px;
+    }
+    .prize-scoreboard__hook-line {
+      font-size: clamp(22px, 6vw, 32px);
+    }
+  }
   .prize-card__amount {
     font-family: var(--font-sofia-sans-condensed);
     font-size: clamp(40px, 5vw, 64px);
@@ -2399,43 +2611,15 @@
     text-shadow: 0 0 16px rgba(253, 216, 53, 0.5);
     line-height: 1;
   }
-  .prize-card__multiplier {
-    font-size: clamp(14px, 1.2vw, 18px);
+  /* Rank + multiplier line — single label below the amount.
+     Replaces the previous multiplier / name / line1 / line2 stack. */
+  .prize-card__rank {
+    font-size: clamp(13px, 1.1vw, 16px);
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.7);
-    margin-top: 8px;
+    color: rgba(255, 255, 255, 0.85);
+    margin-top: 12px;
     font-family: var(--font-roboto);
-  }
-  /* Main title (headline) — largest, brightest, heaviest. Clearly
-     the name of the prize tier. */
-  .prize-card__name {
-    font-size: clamp(18px, 1.5vw, 22px);
-    font-weight: 800;
-    color: #FFFFFF;
-    letter-spacing: -0.01em;
-    line-height: 1.15;
-    margin-top: 16px;
-  }
-  /* Subtitle (eyebrow label) — uppercase + tracked, mid-tone muted.
-     Deliberately a different typographic CLASS from the headline above
-     (label vs headline) so the two never read as the same hierarchy
-     level — solves the "main and sub feel too similar" problem. */
-  .prize-card__line1 {
-    font-size: clamp(10px, 0.82vw, 12px);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.10em;
-    color: rgba(255, 255, 255, 0.65);
-    margin-top: 14px;
-    line-height: 1.35;
-  }
-  /* Body description — small, faintest. Supporting detail line. */
-  .prize-card__line2 {
-    font-size: clamp(11px, 0.95vw, 13px);
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.55);
-    margin-top: 6px;
-    line-height: 1.45;
+    letter-spacing: 0.01em;
   }
 
   /* Mobile/tablet: horizontal scroll-snap carousel of cards */
@@ -3710,19 +3894,19 @@
     right: clamp(16px, 2vw, 32px);
     top: 50%;
     z-index: 100;
-    width: 208px;
+    width: 110px;
     background: rgba(255, 255, 255, 0.96);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(33, 39, 42, 0.08);
-    border-radius: 18px;
+    border-radius: 12px;
     box-shadow:
-      0 12px 40px rgba(33, 39, 42, 0.12),
-      0 4px 12px rgba(33, 39, 42, 0.06);
-    padding: 18px 12px;
+      0 8px 24px rgba(33, 39, 42, 0.12),
+      0 3px 8px rgba(33, 39, 42, 0.06);
+    padding: 10px 6px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
     opacity: 0;
     transform: translateY(-50%) translateX(20px);
     pointer-events: none;
@@ -3735,28 +3919,28 @@
     pointer-events: auto;
   }
   .sticky-panel__header {
-    padding: 4px 4px 8px;
+    padding: 2px 3px 5px;
     border-bottom: 1px solid rgba(33, 39, 42, 0.06);
-    margin-bottom: 4px;
+    margin-bottom: 2px;
   }
   .sticky-panel__label {
-    font-size: 11px;
+    font-size: 9px;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.10em;
     text-transform: uppercase;
     color: rgba(33, 39, 42, 0.5);
   }
   .sticky-panel__nav {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
   }
   .sticky-panel__link {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 6px;
-    border-radius: 10px;
+    gap: 6px;
+    padding: 5px 4px;
+    border-radius: 6px;
     text-decoration: none;
     transition: background-color 0.15s ease, color 0.15s ease;
     cursor: pointer;
@@ -3771,14 +3955,14 @@
   }
   .sticky-panel__num {
     font-family: var(--font-roboto-mono);
-    font-size: 11px;
+    font-size: 9px;
     font-weight: 700;
     color: rgba(33, 39, 42, 0.35);
-    min-width: 22px;
+    min-width: 14px;
     transition: color 0.15s ease;
   }
   .sticky-panel__name {
-    font-size: 14px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--text-icon-primary);
     flex: 1;
@@ -3802,21 +3986,21 @@
   .sticky-panel__divider {
     height: 1px;
     background: rgba(33, 39, 42, 0.08);
-    margin: 8px 0;
+    margin: 4px 0;
   }
   .sticky-panel__actions {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
   }
   .sticky-panel__cta {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 12px 16px;
-    border-radius: 12px;
-    font-size: 13px;
+    gap: 5px;
+    padding: 7px 8px;
+    border-radius: 8px;
+    font-size: 11px;
     font-weight: 700;
     text-decoration: none;
     cursor: pointer;
@@ -3840,11 +4024,11 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.30);
   }
   .sticky-panel__cta--primary .live-pulse {
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
     border-radius: 50%;
     background: #FA4D56;
-    box-shadow: 0 0 8px rgba(250, 77, 86, 0.8);
+    box-shadow: 0 0 6px rgba(250, 77, 86, 0.8);
     animation: live-dot-blink 1.2s ease-in-out infinite;
     flex-shrink: 0;
   }
@@ -3884,8 +4068,8 @@
 
   /* Tablet: slightly narrower panel */
   @media (max-width: 1279px) {
-    .sticky-panel { width: 188px; right: 16px; }
-    .sticky-panel__name { font-size: 13px; }
+    .sticky-panel { width: 96px; right: 12px; }
+    .sticky-panel__name { font-size: 10px; }
   }
   /* Mobile: collapse to bottom bar, CTAs only (TOC hidden) */
   @media (max-width: 767px) {
@@ -4316,7 +4500,7 @@
       <p class="hero-info__sub">Three weeks of building&nbsp;&nbsp;&middot;&nbsp;&nbsp;Winners announced July 22</p>
     </div>
 
-    <!-- 4. CTA row: disabled Build Now (auto-activates June 8) + Share with Friends -->
+    <!-- 4. CTA row: disabled Build Now (auto-activates June 8) + Learn more + Share with Friends -->
     <div class="hero-cta">
       <div class="hero-build">
         <button class="hero-build__btn" type="button" disabled
@@ -4326,6 +4510,17 @@
           <span class="hero-build__btn-meta">June 8</span>
         </button>
       </div>
+      <a class="hero-share-btn hero-learn-btn"
+         href="https://x.com/maplestoryu"
+         target="_blank"
+         rel="noopener noreferrer"
+         aria-label="Learn more on X (opens in a new tab)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+          <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Learn more
+      </a>
       <button class="hero-share-btn" type="button" aria-label="Share" data-share-trigger>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -4336,39 +4531,37 @@
   </div>
 </section>
 
-<!-- MARQUEE PRIZE TICKER — dominant $60K total + 3 component subs.
-     Acts as the anchor target for the Prize Pool nav link so the marquee
-     lands flush under the GNB on smooth scroll. -->
-<section class="prize-marquee" id="prize-marquee" aria-label="Prize pool breakdown">
+<!-- SCHEDULE + INFO MARQUEE — between hero and prize-pool. Five items
+     loop seamlessly: total prize, build sprint window, winners date,
+     teaser, builder signup. Reuses the existing .prize-marquee CSS
+     (defined for the earlier prize ticker, now repurposed). -->
+<section class="prize-marquee" id="schedule-marquee"
+         aria-label="Camp schedule and key info">
   <div class="prize-marquee__track">
     <span class="marquee-set">
       <span class="marquee-total">$60,000 TOTAL PRIZE POOL</span>
-      <span class="marquee-op">=</span>
-      <span class="marquee-sub">$3,000 × 5 TIME-TRAPPER</span>
-      <span class="marquee-op">+</span>
-      <span class="marquee-sub">$2,000 × 2 ULTIMATE CAMPSITE</span>
-      <span class="marquee-op">+</span>
-      <span class="marquee-sub">$2,000 × 1 SUMMONER</span>
-      <span class="marquee-op">+</span>
-      <span class="marquee-sub">$500 × 50 TOP TRAFFIC</span>
-      <span class="marquee-op">+</span>
-      <span class="marquee-sub">$50 × ALL CAMPERS</span>
+      <span class="marquee-divider">◆</span>
+      <span class="marquee-sub">JUN 8 &ndash; JUN 29 &middot; BUILD + SUBMIT (3 WEEKS)</span>
+      <span class="marquee-divider">◆</span>
+      <span class="marquee-sub">JUL 22 &middot; WINNERS ANNOUNCED</span>
+      <span class="marquee-divider">◆</span>
+      <span class="marquee-sub">MORE INFO REVEALING JUNE 8</span>
+      <span class="marquee-divider">◆</span>
+      <span class="marquee-sub">REGISTER AS BUILDER &middot; <a href="https://msu.io/builder" target="_blank" rel="noopener noreferrer">MSU.IO/BUILDER</a></span>
+      <span class="marquee-divider">◆</span>
     </span>
-    <span class="marquee-divider">◆</span>
     <span class="marquee-set" aria-hidden="true">
       <span class="marquee-total">$60,000 TOTAL PRIZE POOL</span>
-      <span class="marquee-op">=</span>
-      <span class="marquee-sub">$3,000 × 5 TIME-TRAPPER</span>
-      <span class="marquee-op">+</span>
-      <span class="marquee-sub">$2,000 × 2 ULTIMATE CAMPSITE</span>
-      <span class="marquee-op">+</span>
-      <span class="marquee-sub">$2,000 × 1 SUMMONER</span>
-      <span class="marquee-op">+</span>
-      <span class="marquee-sub">$500 × 50 TOP TRAFFIC</span>
-      <span class="marquee-op">+</span>
-      <span class="marquee-sub">$50 × ALL CAMPERS</span>
+      <span class="marquee-divider">◆</span>
+      <span class="marquee-sub">JUN 8 &ndash; JUN 29 &middot; BUILD + SUBMIT (3 WEEKS)</span>
+      <span class="marquee-divider">◆</span>
+      <span class="marquee-sub">JUL 22 &middot; WINNERS ANNOUNCED</span>
+      <span class="marquee-divider">◆</span>
+      <span class="marquee-sub">MORE INFO REVEALING JUNE 8</span>
+      <span class="marquee-divider">◆</span>
+      <span class="marquee-sub">REGISTER AS BUILDER &middot; <a href="https://msu.io/builder" target="_blank" rel="noopener noreferrer" tabindex="-1">MSU.IO/BUILDER</a></span>
+      <span class="marquee-divider">◆</span>
     </span>
-    <span class="marquee-divider" aria-hidden="true">◆</span>
   </div>
 </section>
 
@@ -4376,58 +4569,23 @@
 <section class="prize-scoreboard" id="prize-pool" aria-label="Prize pool details">
   <canvas id="prizePoolBg" class="prize-scoreboard__bg" aria-hidden="true"></canvas>
   <div class="prize-scoreboard__container">
+    <div class="prize-scoreboard__hook">
+      <p class="prize-scoreboard__hook-line prize-scoreboard__hook-line--top">You don't need a studio. You have MapleStory.</p>
+    </div>
     <div class="prize-scoreboard__header">
-      <h2 class="prize-scoreboard__label">Total Prize Pool</h2>
+      <h2 class="prize-scoreboard__label">
+        <span class="prize-scoreboard__label-line">Exclusive Prize Pool</span>
+      </h2>
     </div>
     <div class="prize-scoreboard__total" data-target="60000">
       <span class="currency">$</span>
       <span class="count">0</span>
     </div>
-    <div class="prize-scoreboard__cards">
-      <div class="prize-card prize-card--time">
-        <div class="prize-card__amount" data-target="3000">$0</div>
-        <div class="prize-card__multiplier">× 5 teams</div>
-        <div class="prize-card__name">The Time-Trapper</div>
-        <div class="prize-card__line1">Games players can't put down</div>
-        <div class="prize-card__line2">Top 5 by playtime + community vote</div>
-      </div>
-      <div class="prize-card prize-card--camp">
-        <div class="prize-card__amount" data-target="2000">$0</div>
-        <div class="prize-card__multiplier">× 2 teams</div>
-        <div class="prize-card__name">The Ultimate Campsite</div>
-        <div class="prize-card__line1">Formats other builders remix</div>
-        <div class="prize-card__line2">Most-spun games across the camp</div>
-      </div>
-      <div class="prize-card prize-card--summon">
-        <div class="prize-card__amount" data-target="2000">$0</div>
-        <div class="prize-card__multiplier">× 1 team</div>
-        <div class="prize-card__name">The Summoner</div>
-        <div class="prize-card__line1">Bring the world in</div>
-        <div class="prize-card__line2">Most external players via referrals &amp; shares</div>
-      </div>
-      <div class="prize-card prize-card--traffic">
-        <div class="prize-card__amount" data-target="500">$0</div>
-        <div class="prize-card__multiplier">× 50 teams</div>
-        <div class="prize-card__name">Top Traffic Game 50</div>
-        <div class="prize-card__line1">Highest-played games</div>
-        <div class="prize-card__line2">Top 50 by total play count</div>
-      </div>
-      <div class="prize-card prize-card--campers">
-        <div class="prize-card__amount" data-target="14000">$0</div>
-        <div class="prize-card__multiplier">shared pool</div>
-        <div class="prize-card__name">The Campers</div>
-        <div class="prize-card__line1">Everyone who clears qualification</div>
-        <div class="prize-card__line2">All qualifying teams share $14,000</div>
-      </div>
-    </div>
-    <div class="prize-cards-dots" role="tablist" aria-label="Prize card navigation">
-      <button type="button" class="prize-cards-dots__dot" data-index="0" aria-label="Show Time-Trapper card"></button>
-      <button type="button" class="prize-cards-dots__dot" data-index="1" aria-label="Show Ultimate Campsite card"></button>
-      <button type="button" class="prize-cards-dots__dot" data-index="2" aria-label="Show Summoner card"></button>
-      <button type="button" class="prize-cards-dots__dot" data-index="3" aria-label="Show Top Traffic card"></button>
-      <button type="button" class="prize-cards-dots__dot" data-index="4" aria-label="Show Campers card"></button>
-    </div>
-    <p class="prize-policy">One team per category. Duplicate picks roll to the next-ranked team.</p>
+    <p class="prize-scoreboard__hook-line prize-scoreboard__hook-line--bottom">
+      <span class="prize-scoreboard__hook-bet">Three weeks. Vibe coding. Official IP.</span>
+      <span class="prize-scoreboard__hook-hype">Make a game that hits.</span>
+    </p>
+
     <div class="prize-timeline" aria-label="Key dates">
       <div class="prize-timeline__node prize-timeline__node--sprint">
         <div class="prize-timeline__dates">JUN 8 &ndash; JUN 29</div>
@@ -4464,8 +4622,210 @@
         <div class="prize-timeline__label">Winners Announced</div>
       </div>
     </div>
+    <a class="prize-policy prize-policy--cta"
+       href="https://msu.io/builder"
+       target="_blank"
+       rel="noopener noreferrer"
+       aria-label="Register as MSU Builder now to get unlimited vibecoding tokens (opens in a new tab)">
+      <span class="prize-policy__text"><strong>Register as MSU Builder Now</strong> to get unlimited vibecoding tokens</span>
+      <svg class="prize-policy__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+
   </div>
   <img src="assets/images/planet_top.png" alt="" aria-hidden="true" class="prize-pool__planet">
+</section>
+
+<!-- ACTION MARQUEE — section break + opening reminder, flush between Shipping and Idea+Action.
+     Acts as the anchor target for the Open to All nav link so the marquee
+     lands flush under the GNB on smooth scroll. -->
+<section class="action-marquee" id="action-marquee" aria-label="Vibe Jam opening reminder">
+  <div class="action-marquee__track">
+    <span class="action-marquee__item action-marquee__item--primary">⚡ OPENS JUNE 8, 2026</span>
+    <span class="action-marquee__sep" aria-hidden="true">◆</span>
+    <span class="action-marquee__item">GET YOUR IDEAS READY</span>
+    <span class="action-marquee__sep" aria-hidden="true">◆</span>
+    <span class="action-marquee__item">PRE-REGISTER ON THE BUILDER</span>
+    <span class="action-marquee__sep" aria-hidden="true">◆</span>
+    <span class="action-marquee__item action-marquee__item--primary" aria-hidden="true">⚡ OPENS JUNE 8, 2026</span>
+    <span class="action-marquee__sep" aria-hidden="true">◆</span>
+    <span class="action-marquee__item" aria-hidden="true">GET YOUR IDEAS READY</span>
+    <span class="action-marquee__sep" aria-hidden="true">◆</span>
+    <span class="action-marquee__item" aria-hidden="true">PRE-REGISTER ON THE BUILDER</span>
+    <span class="action-marquee__sep" aria-hidden="true">◆</span>
+  </div>
+</section>
+
+<!-- IDEA + PERSISTENCE WANTED — entry-level reassurance (light breather section) -->
+<section class="idea-action" id="idea-action" aria-label="Who this is for">
+  <div class="idea-action__container">
+    <div class="idea-action__header">
+      <span class="idea-action__eyebrow">
+        <span class="t-en">WHO THIS IS FOR</span>
+        <span class="t-ko">누가 참가하나</span>
+      </span>
+      <h2 class="idea-action__title">
+        <span class="t-en">You don't need to code, just an idea.</span>
+        <span class="t-ko">개발자일 필요 없습니다.</span>
+      </h2>
+      <p class="idea-action__subtitle">
+        <span class="t-en">Start with a line of fun idea.</span>
+        <span class="t-ko">"이거 재밌겠다"는 한 줄이면 시작입니다.</span>
+      </p>
+    </div>
+
+    <!-- 2-column demo area: recruiter character on the left, CLI demo on the right -->
+    <div class="idea-action__demo-area">
+      <div class="recruiter">
+        <img src="assets/illustrations/recruiter.png"
+             alt="MSU recruiter cat pointing at you"
+             class="recruiter__character" />
+        <div class="recruiter__call">
+          <span class="recruiter__sparkle recruiter__sparkle--tl" aria-hidden="true">★</span>
+          <span class="recruiter__sparkle recruiter__sparkle--tr" aria-hidden="true">★</span>
+          <span class="recruiter__sparkle recruiter__sparkle--br" aria-hidden="true">★</span>
+          <span class="recruiter__small">
+            <span class="t-en">YES,</span><span class="t-ko">바로</span>
+          </span>
+          <span class="recruiter__big">
+            <span class="t-en">YOU.</span><span class="t-ko">당신.</span>
+          </span>
+          <span class="recruiter__line">
+            <span class="t-en">I want <u>you</u> to build something.</span>
+            <span class="t-ko"><u>당신</u>이 만들어 줬으면 합니다.</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- CLI animation — auto-playing demo of the vibe coding workflow -->
+      <div class="cli-demo"
+           id="cli-demo"
+           role="region"
+           tabindex="0"
+           aria-label="Live demo: building a game with Vibe coding">
+        <div class="cli-demo__chrome">
+          <div class="cli-demo__traffic-lights" aria-hidden="true">
+            <span class="dot dot--red"></span>
+            <span class="dot dot--yellow"></span>
+            <span class="dot dot--green"></span>
+          </div>
+          <div class="cli-demo__title">vibejam-terminal &mdash; 80&times;24</div>
+        </div>
+        <div class="cli-demo__screen">
+          <div class="cli-demo__output" id="cli-output" aria-live="polite"></div>
+        </div>
+        <div class="cli-demo__hint" id="cli-hint" aria-hidden="true">Paused &mdash; hover to read</div>
+      </div>
+    </div>
+
+    <div class="idea-action__cta">
+      <p class="idea-action__call">
+        <em>Write</em> it down and have it <em>built</em>.
+      </p>
+      <div class="button-group idea-action__button-wrap">
+        <button class="btn btn-primary btn-build btn-build--xl btn-build--waiting" type="button" disabled
+                aria-label="Start Building — opens June 8, 2026"
+                title="Building opens June 8, 2026">
+          <span class="t-en">Stay Tuned, June 8</span>
+          <span class="t-ko">6월 8일 오픈</span>
+        </button>
+        <p class="btn-build__subtext">Opens June 8, 2026</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IP COMPARE — genre showcase + before/after slider with WebGL liquid mesh background -->
+<section class="ip-compare-section" id="ip-compare" aria-label="Genre and MapleStory IP showcase">
+  <canvas class="ip-compare-section__bg" id="ipCompareBg" aria-hidden="true"></canvas>
+  <div class="ip-compare-section__content">
+    <div class="ip-compare__inner">
+      <!-- IP value proposition: subtitle + relocated hashtags (with #deck-builders highlighted) + before/after slider -->
+      <div class="ip-compare">
+        <span class="ip-compare__eyebrow">BUILT-IN POLISH</span>
+        <h3 class="ip-compare__subtitle">
+          <span class="t-en">Choose your genre.<br>The <span class="accent">MapleStory mood</span> comes built in.</span>
+          <span class="t-ko">장르는 자유롭게.<br><span class="accent">MapleStory 무드</span>는 기본 탑재입니다.</span>
+        </h3>
+
+      <p class="ip-compare__lead">
+        <span class="t-en">Whatever you build, MapleStory IP arrives pre-packaged as skills &mdash; characters, animations, world systems, sound. You bring the idea, we bring the polish.</span>
+        <span class="t-ko">무엇을 만들든, MapleStory IP가 스킬로 패키징되어 제공됩니다 &mdash; 캐릭터, 애니메이션, 월드 시스템, 사운드까지. 아이디어는 당신, 폴리시는 우리.</span>
+      </p>
+
+      <div class="ip-compare__tags genre-tags" aria-label="Game genres welcomed in Vibe Jam">
+        <span class="genre-tag genre-tag--pink">#survival</span>
+        <span class="genre-tag genre-tag--cyan">#collection</span>
+        <span class="genre-tag genre-tag--highlight">#deck-builders</span>
+        <span class="genre-tag genre-tag--green">#combat</span>
+        <span class="genre-tag genre-tag--yellow">#defense</span>
+        <span class="genre-tag genre-tag--pink">#platformer</span>
+        <span class="genre-tag genre-tag--cyan">#simulations</span>
+        <span class="genre-tag genre-tag--purple">#roguelites</span>
+        <span class="genre-tag genre-tag--green">#party-games</span>
+        <span class="genre-tag genre-tag--yellow">#tower-defense</span>
+        <span class="genre-tag genre-tag--pink">#puzzle</span>
+        <span class="genre-tag genre-tag--cyan">#rhythm</span>
+        <span class="genre-tag genre-tag--purple">#idle</span>
+        <span class="genre-tag genre-tag--green">#adventure</span>
+        <span class="genre-tag genre-tag--more">
+          <span class="t-en">+ anything else</span>
+          <span class="t-ko">+ 그 외 무엇이든</span>
+        </span>
+      </div>
+
+      <div class="compare-slider"
+           id="ipCompareSlider"
+           role="region"
+           aria-label="Before and after MapleStory IP comparison">
+        <div class="compare-slider__frame">
+          <!-- BASE LAYER: WITH IP (always full visible) -->
+          <img src="assets/illustrations/compare-with-ip.png"
+               alt="Same game built with MapleStory IP"
+               class="compare-slider__base"
+               draggable="false" />
+
+          <!-- TOP LAYER: WITHOUT IP (clipped to reveal left portion) -->
+          <div class="compare-slider__top">
+            <img src="assets/illustrations/compare-no-ip.png"
+                 alt="Same game built without MapleStory IP"
+                 draggable="false" />
+          </div>
+
+          <!-- DIVIDER LINE + DRAG HANDLE -->
+          <div class="compare-slider__divider"
+               role="slider"
+               aria-label="Drag to compare with and without MapleStory IP"
+               aria-valuemin="0"
+               aria-valuemax="100"
+               aria-valuenow="50"
+               tabindex="0">
+            <div class="compare-slider__handle" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M8 6l-4 6 4 6M16 6l4 6-4 6"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- CORNER LABELS -->
+          <div class="compare-slider__label compare-slider__label--left">
+            <span class="t-en">Basic</span>
+            <span class="t-ko">Basic</span>
+          </div>
+          <div class="compare-slider__label compare-slider__label--right">
+            <span class="t-en">With MapleStory IP</span>
+            <span class="t-ko">MapleStory 감성 적용</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
 </section>
 
 <!-- SHIPPING TO MILLIONS — post-jam support for selected teams -->
@@ -4473,8 +4833,8 @@
   <div class="shipping__container">
     <div class="shipping__header">
       <p class="shipping__subhead">
-        <span class="t-en">Five winners go all the way.</span>
-        <span class="t-ko">5팀, 끝까지 함께 갑니다.</span>
+        <span class="t-en">Winner's Stack</span>
+        <span class="t-ko">Winner's Stack</span>
       </p>
       <h2 class="shipping__title">
         <span class="t-en">Shipping to Millions</span>
@@ -4486,9 +4846,6 @@
       </p>
     </div>
 
-    <img src="assets/illustrations/shipping-banner.png"
-         alt="Game development journey from coding to global launch"
-         class="shipping__banner" />
 
     <div class="shipping__pillars">
       <!-- 1. Game Design -->
@@ -4581,199 +4938,7 @@
   </div>
 </section>
 
-<!-- ACTION MARQUEE — section break + opening reminder, flush between Shipping and Idea+Action.
-     Acts as the anchor target for the Open to All nav link so the marquee
-     lands flush under the GNB on smooth scroll. -->
-<section class="action-marquee" id="action-marquee" aria-label="Vibe Jam opening reminder">
-  <div class="action-marquee__track">
-    <span class="action-marquee__item action-marquee__item--primary">⚡ OPENS JUNE 8, 2026</span>
-    <span class="action-marquee__sep" aria-hidden="true">◆</span>
-    <span class="action-marquee__item">GET YOUR IDEAS READY</span>
-    <span class="action-marquee__sep" aria-hidden="true">◆</span>
-    <span class="action-marquee__item">START BUILDING NOW</span>
-    <span class="action-marquee__sep" aria-hidden="true">◆</span>
-    <span class="action-marquee__item action-marquee__item--primary" aria-hidden="true">⚡ OPENS JUNE 8, 2026</span>
-    <span class="action-marquee__sep" aria-hidden="true">◆</span>
-    <span class="action-marquee__item" aria-hidden="true">GET YOUR IDEAS READY</span>
-    <span class="action-marquee__sep" aria-hidden="true">◆</span>
-    <span class="action-marquee__item" aria-hidden="true">START BUILDING NOW</span>
-    <span class="action-marquee__sep" aria-hidden="true">◆</span>
-  </div>
-</section>
 
-<!-- IDEA + PERSISTENCE WANTED — entry-level reassurance (light breather section) -->
-<section class="idea-action" id="idea-action" aria-label="Who this is for">
-  <div class="idea-action__container">
-    <div class="idea-action__header">
-      <span class="idea-action__eyebrow">
-        <span class="t-en">WHO THIS IS FOR</span>
-        <span class="t-ko">누가 참가하나</span>
-      </span>
-      <h2 class="idea-action__title">
-        <span class="t-en">Idea + Action Wanted.</span>
-        <span class="t-ko">아이디어 + 실행, 그뿐.</span>
-      </h2>
-      <p class="idea-action__subtitle">
-        <span class="t-en">You don't need to be a developer. You need an idea that says "this would be fun."</span>
-        <span class="t-ko">개발자일 필요 없습니다. "이거 재밌겠다"는 아이디어 하나면 됩니다.</span>
-      </p>
-    </div>
-
-    <!-- 2-column demo area: recruiter character on the left, CLI demo on the right -->
-    <div class="idea-action__demo-area">
-      <div class="recruiter">
-        <img src="assets/illustrations/recruiter.png"
-             alt="MSU recruiter cat pointing at you"
-             class="recruiter__character" />
-        <div class="recruiter__call">
-          <span class="recruiter__sparkle recruiter__sparkle--tl" aria-hidden="true">★</span>
-          <span class="recruiter__sparkle recruiter__sparkle--tr" aria-hidden="true">★</span>
-          <span class="recruiter__sparkle recruiter__sparkle--br" aria-hidden="true">★</span>
-          <span class="recruiter__small">
-            <span class="t-en">YES,</span><span class="t-ko">바로</span>
-          </span>
-          <span class="recruiter__big">
-            <span class="t-en">YOU.</span><span class="t-ko">당신.</span>
-          </span>
-          <span class="recruiter__line">
-            <span class="t-en">I want <u>you</u> to build something.</span>
-            <span class="t-ko"><u>당신</u>이 만들어 줬으면 합니다.</span>
-          </span>
-        </div>
-      </div>
-
-      <!-- CLI animation — auto-playing demo of the vibe coding workflow -->
-      <div class="cli-demo"
-           id="cli-demo"
-           role="region"
-           tabindex="0"
-           aria-label="Live demo: building a game with Vibe coding">
-        <div class="cli-demo__chrome">
-          <div class="cli-demo__traffic-lights" aria-hidden="true">
-            <span class="dot dot--red"></span>
-            <span class="dot dot--yellow"></span>
-            <span class="dot dot--green"></span>
-          </div>
-          <div class="cli-demo__title">vibejam-terminal &mdash; 80&times;24</div>
-        </div>
-        <div class="cli-demo__screen">
-          <div class="cli-demo__output" id="cli-output" aria-live="polite"></div>
-        </div>
-        <div class="cli-demo__hint" id="cli-hint" aria-hidden="true">Paused &mdash; hover to read</div>
-      </div>
-    </div>
-
-    <div class="idea-action__cta">
-      <p class="idea-action__call">
-        <em>Write</em> it down and have it <em>built</em>.
-      </p>
-      <p class="idea-action__microcopy">
-        All great games start with a line of fun idea. Show us yours.
-      </p>
-      <div class="button-group idea-action__button-wrap">
-        <button class="btn btn-primary btn-build btn-build--xl btn-build--waiting" type="button" disabled
-                aria-label="Start Building — opens June 8, 2026"
-                title="Building opens June 8, 2026">
-          <span class="t-en">Start Building</span>
-          <span class="t-ko">지금 빌드</span>
-        </button>
-        <p class="btn-build__subtext">Opens June 8, 2026</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- IP COMPARE — genre showcase + before/after slider with WebGL liquid mesh background -->
-<section class="ip-compare-section" id="ip-compare" aria-label="Genre and MapleStory IP showcase">
-  <canvas class="ip-compare-section__bg" id="ipCompareBg" aria-hidden="true"></canvas>
-  <div class="ip-compare-section__content">
-    <div class="ip-compare__inner">
-      <!-- IP value proposition: subtitle + relocated hashtags (with #deck-builders highlighted) + before/after slider -->
-      <div class="ip-compare">
-        <span class="ip-compare__eyebrow">BUILT-IN POLISH</span>
-        <h3 class="ip-compare__subtitle">
-          <span class="t-en">Choose your genre. The <span class="accent">Maple feel</span> comes built in.</span>
-          <span class="t-ko">장르는 자유롭게. <span class="accent">메이플 감성</span>은 기본 탑재입니다.</span>
-        </h3>
-
-      <p class="ip-compare__lead">
-        <span class="t-en">Whatever you build, MapleStory IP arrives pre-packaged as skills &mdash; characters, animations, world systems, sound. You bring the idea, we bring the polish.</span>
-        <span class="t-ko">무엇을 만들든, MapleStory IP가 스킬로 패키징되어 제공됩니다 &mdash; 캐릭터, 애니메이션, 월드 시스템, 사운드까지. 아이디어는 당신, 폴리시는 우리.</span>
-      </p>
-
-      <div class="ip-compare__tags genre-tags" aria-label="Game genres welcomed in Vibe Jam">
-        <span class="genre-tag genre-tag--pink">#survival</span>
-        <span class="genre-tag genre-tag--cyan">#collection</span>
-        <span class="genre-tag genre-tag--highlight">#deck-builders</span>
-        <span class="genre-tag genre-tag--green">#combat</span>
-        <span class="genre-tag genre-tag--yellow">#defense</span>
-        <span class="genre-tag genre-tag--pink">#platformer</span>
-        <span class="genre-tag genre-tag--cyan">#simulations</span>
-        <span class="genre-tag genre-tag--purple">#roguelites</span>
-        <span class="genre-tag genre-tag--green">#party-games</span>
-        <span class="genre-tag genre-tag--yellow">#tower-defense</span>
-        <span class="genre-tag genre-tag--pink">#puzzle</span>
-        <span class="genre-tag genre-tag--cyan">#rhythm</span>
-        <span class="genre-tag genre-tag--purple">#idle</span>
-        <span class="genre-tag genre-tag--green">#adventure</span>
-        <span class="genre-tag genre-tag--more">
-          <span class="t-en">+ anything else</span>
-          <span class="t-ko">+ 그 외 무엇이든</span>
-        </span>
-      </div>
-
-      <div class="compare-slider"
-           id="ipCompareSlider"
-           role="region"
-           aria-label="Before and after MapleStory IP comparison">
-        <div class="compare-slider__frame">
-          <!-- BASE LAYER: WITH IP (always full visible) -->
-          <img src="assets/illustrations/compare-with-ip.png"
-               alt="Same game built with MapleStory IP"
-               class="compare-slider__base"
-               draggable="false" />
-
-          <!-- TOP LAYER: WITHOUT IP (clipped to reveal left portion) -->
-          <div class="compare-slider__top">
-            <img src="assets/illustrations/compare-no-ip.png"
-                 alt="Same game built without MapleStory IP"
-                 draggable="false" />
-          </div>
-
-          <!-- DIVIDER LINE + DRAG HANDLE -->
-          <div class="compare-slider__divider"
-               role="slider"
-               aria-label="Drag to compare with and without MapleStory IP"
-               aria-valuemin="0"
-               aria-valuemax="100"
-               aria-valuenow="50"
-               tabindex="0">
-            <div class="compare-slider__handle" aria-hidden="true">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M8 6l-4 6 4 6M16 6l4 6-4 6"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"/>
-              </svg>
-            </div>
-          </div>
-
-          <!-- CORNER LABELS -->
-          <div class="compare-slider__label compare-slider__label--left">
-            <span class="t-en">Without IP</span>
-            <span class="t-ko">IP 없음</span>
-          </div>
-          <div class="compare-slider__label compare-slider__label--right">
-            <span class="t-en">With MapleStory IP</span>
-            <span class="t-ko">MapleStory IP 적용</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  </div>
-</section>
 
 
 <!-- FAQ -->
@@ -4796,7 +4961,7 @@
     </details>
     <details class="faq-item">
       <summary class="q">3. I can't code — can I still join?</summary>
-      <div class="a">Yes, that's exactly the point of Vibe Camp. With vibe coding, you simply describe the game you want — <em>"I want to make a game like this"</em> — and the AI builds it with you. We'll show a live demo at our online seminar on <strong>June 11</strong>. Follow MSU on X for details.</div>
+      <div class="a">Yes, that's exactly the point of Vibe Camp. With vibe coding, you simply describe the game you want — <em style="color: #000;">"I want to make a game like this"</em> — and the AI builds it with you. We'll show a live demo at our online seminar on <strong>June 11</strong>. Follow MSU on X for details.</div>
     </details>
     <details class="faq-item">
       <summary class="q">4. Who can participate?</summary>
@@ -4804,11 +4969,11 @@
     </details>
     <details class="faq-item">
       <summary class="q">5. Is there an entry fee?</summary>
-      <div class="a">No, it's free. You'll need credits to build, but if you sign up for the <a href="https://msu.io/builder" target="_blank" rel="noopener noreferrer" aria-label="MSU Builder Web (opens in a new tab)">MSU Builder Web</a>, $50 in credits will be refilled daily once your balance runs out &mdash; for the entire duration of the camp.</div>
+      <div class="a">No, it's free. You'll need credits to build, but signing up for the <a href="https://msu.io/builder" target="_blank" rel="noopener noreferrer" aria-label="MSU Builder Web (opens in a new tab)">MSU Builder Web</a> gets you unlimited credits for the entire duration of the camp &mdash; highly recommended.</div>
     </details>
     <details class="faq-item">
       <summary class="q">6. How do I participate?</summary>
-      <div class="a">Head to Verse8 MSU Space (<a href="https://verse8.io/msu" target="_blank" rel="noopener noreferrer">verse8.io/msu</a>), sign up, build your game, then submit it through the submission page along with your game info. Once submitted, you're officially in the camp. More details on MSU X.</div>
+      <div class="a">MSU Space launches on <a href="https://verse8.io" target="_blank" rel="noopener noreferrer">Verse8</a> on <strong>June 8</strong>. Sign up, create your game, and submit it with your game details to join the camp. Stay tuned for more information on <a href="https://x.com/maplestoryu" target="_blank" rel="noopener noreferrer">MSU X</a>.</div>
     </details>
     <details class="faq-item">
       <summary class="q">7. Do I have to sign up for MSU Builder Web?</summary>
@@ -4820,7 +4985,7 @@
     </details>
     <details class="faq-item">
       <summary class="q">9. Can I only use MapleStory assets?</summary>
-      <div class="a">That's right. You're free to use MapleStory's designs, music, and other assets.</div>
+      <div class="a">Yes. You're free to use MapleStory's designs, music, and other assets.</div>
     </details>
     <details class="faq-item">
       <summary class="q">10. What tool should I use to build?</summary>
@@ -4962,24 +5127,43 @@
       });
     }
 
-    // Scroll-spy: section is active when its top half crosses viewport center
+    // Scroll-spy: position-based. Each section becomes active the moment
+    // its top edge crosses an imaginary reference line (35% from viewport
+    // top) on the way down. This avoids the bug where very tall sections
+    // (e.g. FAQ) get a low intersectionRatio inside a narrow observation
+    // band and lose to shorter sections still partially in view.
     if (sections.length) {
-      const spyIO = new IntersectionObserver(function(entries) {
-        // Pick the section closest to the viewport center among intersecting ones
-        let best = null;
-        let bestRatio = 0;
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting && entry.intersectionRatio > bestRatio) {
-            bestRatio = entry.intersectionRatio;
-            best = entry.target;
+      let spyTicking = false;
+      const updateActive = function() {
+        const referenceY = window.innerHeight * 0.35;
+        let activeId = sections[0].id;
+        for (let i = 0; i < sections.length; i++) {
+          const rect = sections[i].getBoundingClientRect();
+          if (rect.top <= referenceY) {
+            activeId = sections[i].id;
           }
-        });
-        if (best) setActive(best.id);
-      }, {
-        rootMargin: '-30% 0px -50% 0px',
-        threshold: [0, 0.25, 0.5, 0.75, 1]
-      });
-      sections.forEach(function(s) { spyIO.observe(s); });
+        }
+        // Edge case: at the very bottom of the page where the last
+        // section can't reach the reference line, force-activate it.
+        const scrollBottomReached =
+          window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+        if (scrollBottomReached) {
+          activeId = sections[sections.length - 1].id;
+        }
+        setActive(activeId);
+      };
+      const onScroll = function() {
+        if (!spyTicking) {
+          spyTicking = true;
+          requestAnimationFrame(function() {
+            updateActive();
+            spyTicking = false;
+          });
+        }
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      updateActive();
     }
   }
   if (document.readyState === 'loading') {
@@ -6280,7 +6464,7 @@ float staticStars(vec2 uv, float gridY, float density, float seed, float aspect)
 // as they approach the viewer. Forward motion via z-projection.
 float warpStars(vec2 cuv, float speed, float seed) {
   float total = 0.0;
-  const int N = 10;  // fewer slots so fewer big near-stars at any time
+  const int N = 1;  // further reduced from 3 → 1 per design tweak
   for (int i = 0; i < N; i++) {
     float fi = float(i);
     float phase = fract(u_time * speed + fi / float(N));
@@ -6336,12 +6520,12 @@ void main() {
   vec2 cuv = (uv - 0.5) * vec2(aspect, 1.0);
 
   float stars = 0.0;
-  // Dense small stars (fine grain) — 30% reduced density
-  stars += staticStars(uv, 40.0, 0.12, 7.0,  aspect) * 0.75;
-  // Medium occasional stars
-  stars += staticStars(uv, 20.0, 0.07, 23.0, aspect) * 0.95;
-  // Rare large twinkling stars
-  stars += staticStars(uv, 10.0, 0.04, 41.0, aspect) * 1.15;
+  // Dense small stars (fine grain) — further reduced to ~1/3 again per design tweak
+  stars += staticStars(uv, 40.0, 0.013, 7.0,  aspect) * 0.75;
+  // Medium occasional stars — further ~1/3 reduction
+  stars += staticStars(uv, 20.0, 0.008, 23.0, aspect) * 0.95;
+  // Rare large twinkling stars — further ~1/3 reduction
+  stars += staticStars(uv, 10.0, 0.005, 41.0, aspect) * 1.15;
   // Forward-motion warp stars (subtle, fewer)
   stars += warpStars(cuv, 0.04, 53.0) * 0.55;
   stars += warpStars(cuv, 0.07, 71.0) * 0.45;
@@ -6818,17 +7002,17 @@ void main() {
       <span class="sticky-panel__num">01</span>
       <span class="sticky-panel__name">Countdown</span>
     </a>
-    <a href="#prize-marquee" class="sticky-panel__link" data-section="prize-pool" data-scroll-target="prize-marquee">
+    <a href="#prize-pool" class="sticky-panel__link" data-section="prize-pool" data-scroll-target="prize-pool">
       <span class="sticky-panel__num">02</span>
       <span class="sticky-panel__name">Prize Pool</span>
     </a>
-    <a href="#shipping-to-millions" class="sticky-panel__link" data-section="shipping-to-millions">
-      <span class="sticky-panel__num">03</span>
-      <span class="sticky-panel__name">Winners' Stack</span>
-    </a>
     <a href="#action-marquee" class="sticky-panel__link" data-section="idea-action" data-scroll-target="action-marquee">
-      <span class="sticky-panel__num">04</span>
+      <span class="sticky-panel__num">03</span>
       <span class="sticky-panel__name">Open to All</span>
+    </a>
+    <a href="#shipping-to-millions" class="sticky-panel__link" data-section="shipping-to-millions">
+      <span class="sticky-panel__num">04</span>
+      <span class="sticky-panel__name">Winner's Stack</span>
     </a>
     <a href="#faq" class="sticky-panel__link" data-section="faq">
       <span class="sticky-panel__num">05</span>
@@ -6846,7 +7030,7 @@ void main() {
             type="button" disabled
             aria-label="Start Building — opens June 8, 2026"
             title="Opens June 8">
-      Start Building
+      Stay Tuned, June 8
     </button>
     <button class="sticky-panel__cta sticky-panel__cta--secondary" type="button" aria-label="Share" data-share-trigger>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
