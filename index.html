@@ -922,7 +922,16 @@
       aspect-ratio: auto;
       min-height: 70vh;
       max-height: none;
+      overflow: visible; /* let stack push hero down on narrow viewports */
       background-position: 55% center;
+    }
+    /* On mobile the stack lays out in normal flow so the section grows
+       with its content — CTA buttons no longer get clipped by the
+       hero's fixed-size frame. */
+    .hero-stack,
+    .hero-stack--prelaunch {
+      position: relative;
+      inset: auto;
     }
     .hero-stack {
       padding: clamp(40px, 6vh, 72px) 20px clamp(28px, 4vh, 48px);
