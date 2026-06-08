@@ -996,6 +996,59 @@
     gap: 28px; /* spec: 24-32px gap so the two wordmarks read as a single brand statement */
     width: clamp(414px, 69vw, 828px); /* +15% on Vibe Camp wordmark */
   }
+  /* Mark wrapper — shrink-wraps to the centered combined wordmark so the
+     partner credit can be anchored to the wordmark's OWN right edge (not the
+     wider .hero-brand box). The wordmark itself stays centered. */
+  .hero-brand__mark {
+    position: relative;
+    align-self: center;
+    width: 100%;
+    max-width: 540px; /* matches .hero-brand__combined cap so edges line up */
+  }
+  /* "with [Verse8 logo]" — partner credit, anchored just outside the
+     wordmark's right edge and aligned to the wordmark's BOTTOM, so it reads
+     beside the logo while the main wordmark stays centered. */
+  .hero-brand__partner {
+    position: absolute;
+    left: 100%;
+    bottom: 0;
+    margin-left: -6px; /* tucked closer to the wordmark (nudged ~20px left from the original 14px gap) */
+    z-index: 3;
+    /* max-content keeps the credit at its natural width — left:100% leaves
+       ~0 available space against the container's right edge, which would
+       otherwise squeeze it into a sliver. */
+    width: max-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    white-space: nowrap;
+    font-family: var(--font-roboto);
+    font-weight: 500;
+    font-size: clamp(13px, 1.2vw, 17px);
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow:
+      0 1px 2px rgba(15, 20, 50, 0.85),
+      0 4px 14px rgba(15, 20, 50, 0.55);
+  }
+  /* Verse8 logo recreation (uses the page's loaded display font) */
+  .verse8-logo {
+    height: 1.45em;
+    width: auto;
+    display: inline-block;
+    filter: drop-shadow(0 2px 6px rgba(15, 20, 50, 0.6));
+  }
+  @media (max-width: 767px) {
+    /* Not enough horizontal room beside the wordmark on phones — drop the
+       partner back into flow, centered just below the wordmark. */
+    .hero-brand__partner {
+      position: static;
+      left: auto;
+      top: auto;
+      margin: 4px 0 0;
+      width: 100%;
+      justify-content: center;
+    }
+  }
 
   /* MapleStory wordmark — massive environmental typography. Sits HIGH in
      the hero (top edge ~40-60px below the GNB), with width 195vw so it
@@ -1072,9 +1125,11 @@
   }
   @media (max-width: 1279px) {
     .hero-brand__combined { max-width: 460px; }
+    .hero-brand__mark { max-width: 460px; }
   }
   @media (max-width: 767px) {
     .hero-brand__combined { max-width: 360px; }
+    .hero-brand__mark { max-width: 360px; }
   }
 
   .hero-brand__vibecamp {
@@ -1166,6 +1221,93 @@
     z-index: 2;
   }
 
+  /* Moved Start Building button — centered under the Now Open line */
+  .hero-build--center { margin-top: 22px; }
+  /* Oversized hero Join Now CTA — gold pill, matches the brand key art */
+  .hero-build__btn.hero-build__btn--xl {
+    font-size: clamp(22px, 2.4vw, 34px);
+    font-weight: 800;
+    text-decoration: none;
+    padding: 15px 60px;
+    border-radius: 999px;
+    letter-spacing: 0.01em;
+    color: #FFFFFF;
+    background: linear-gradient(180deg, #FFE079 0%, #F6C544 46%, #E9A719 100%);
+    border: 3px solid #C8861A;
+    cursor: pointer;
+    text-shadow:
+      0 1px 0 rgba(150, 95, 8, 0.5),
+      0 2px 6px rgba(120, 70, 0, 0.45);
+    box-shadow:
+      0 14px 38px rgba(233, 167, 25, 0.5),
+      inset 0 2px 0 rgba(255, 255, 255, 0.55),
+      inset 0 -3px 6px rgba(180, 120, 10, 0.35);
+    animation: none;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+  }
+  .hero-build__btn.hero-build__btn--xl:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+    box-shadow:
+      0 18px 46px rgba(233, 167, 25, 0.6),
+      inset 0 2px 0 rgba(255, 255, 255, 0.6),
+      inset 0 -3px 6px rgba(180, 120, 10, 0.35);
+  }
+  @media (max-width: 767px) {
+    .hero-build__btn.hero-build__btn--xl { font-size: 24px; padding: 13px 44px; }
+  }
+
+  /* Hero CTA block — was the second .hero-countdown-block; given its own
+     class so the date→button gap can be tightened independently of the
+     wordmark→countdown gap above the countdown. */
+  .hero-cta-block {
+    position: relative;
+    z-index: 2;
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  /* Live-now badge — pinned to the Build Now button's top-right corner.
+     position:absolute keeps it out of flow so it adds zero stack height.
+     White border = static ring; live-pulse-ring = expanding red halo. */
+  .hero-live-badge {
+    position: absolute;
+    top: -12px;
+    right: -14px;
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: var(--red-600);
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
+    color: #FFFFFF;
+    font-family: var(--font-roboto);
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    animation: live-pulse-ring 1.8s ease-out infinite;
+    pointer-events: none;
+  }
+  .hero-live-badge__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+    animation: live-dot-blink 1.2s ease-in-out infinite;
+  }
+  @media (max-width: 767px) {
+    .hero-live-badge { font-size: 11px; padding: 4px 9px; top: -10px; right: -8px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-live-badge,
+    .hero-live-badge__dot { animation: none; }
+  }
+
   /* ---------- 2. Countdown block ---------- */
   .hero-countdown-block {
     position: relative;
@@ -1247,7 +1389,7 @@
   .hero-info {
     position: relative;
     z-index: 2;
-    margin-top: 25px; /* tightened from 32 */
+    margin-top: clamp(16px, 2.4vh, 30px); /* tightened gap between the countdown and the date so the CTA stays inside the hero */
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -1302,6 +1444,7 @@
     gap: 16px;
   }
   .hero-build {
+    position: relative; /* anchor for the absolutely-positioned .hero-live-badge */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1866,6 +2009,13 @@
     line-height: 1.65;
     padding: 18px 26px 22px 26px; /* symmetric horizontal padding after Q badge removal */
   }
+  .faq-item .a .a-steps {
+    margin: 10px 0 0;
+    padding-left: 22px;
+  }
+  .faq-item .a .a-steps li {
+    margin: 6px 0;
+  }
   .faq-item .a a {
     color: var(--orange);
     text-decoration: underline;
@@ -2157,7 +2307,7 @@
   .prize-marquee__track {
     display: flex;
     align-items: center;
-    gap: 48px;
+    gap: 16px;
     white-space: nowrap;
     animation: marquee 48s linear infinite;
     will-change: transform;
@@ -2497,6 +2647,25 @@
   /* "your hype" — gradient + glow + subtle pulse to feel like neon.
      Padding-right + inline-block + overflow:visible fix the trailing "e"
      getting clipped when the skewX pushes the glyph past its box. */
+  /* White word inside the yellow Join CTA */
+  .prize-policy--cta .prize-policy__text strong .ms-white {
+    color: #FFFFFF;
+    -webkit-text-fill-color: #FFFFFF;
+  }
+  /* Gradient word accent — same fill as 'Make a game that hits.' */
+  .hype-text {
+    background: linear-gradient(
+      92deg,
+      #FDD835 0%,
+      #FF8A65 38%,
+      #EC4899 72%,
+      #A361FF 100%
+    );
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+            color: transparent;
+  }
   .prize-scoreboard__hook-hype {
     display: inline-block;
     background: linear-gradient(
@@ -2602,6 +2771,25 @@
     margin-left: auto;
     margin-right: auto;
   }
+  /* Text-only subline under the Join CTA */
+  .prize-policy__note {
+    text-align: center;
+    font-family: var(--font-roboto);
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.65);
+    letter-spacing: 0.01em;
+    margin: 12px auto 0;
+    max-width: 520px;
+  }
+  .faq-jump {
+    color: #FDD835;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .faq-jump:hover { color: #FFE57A; }
   @media (max-width: 767px) {
     .prize-policy--cta {
       font-size: 13px;
@@ -3115,6 +3303,7 @@
   .idea-action__call {
     font-size: clamp(24px, 2.4vw, 38px);
     font-weight: 800;
+    font-style: italic;
     color: #21272A;
     text-align: center;
     margin: 0;
@@ -3158,7 +3347,7 @@
   .genre-tag {
     display: inline-flex;
     align-items: center;
-    padding: 8px 16px;
+    padding: 7px 14px;
     font-family: var(--font-roboto);
     font-size: clamp(13px, 1.1vw, 15px);
     font-weight: 600;
@@ -3210,6 +3399,17 @@
   .genre-tag--yellow:hover { background: rgba(253, 216, 53, 0.28); }
 
   /* Closer chip: dashed border + italic signals "this list isn't exhaustive" */
+  .genre-tag-pair {
+    display: inline-flex;
+    align-items: center;
+    gap: clamp(8px, 1vw, 12px);
+  }
+  /* Forces the following tags onto a new (second) row */
+  .genre-tags__break {
+    flex-basis: 100%;
+    width: 100%;
+    height: 0;
+  }
   .genre-tag--more {
     color: rgba(255, 255, 255, 0.75);
     border: 1.5px dashed rgba(255, 255, 255, 0.4);
@@ -3278,7 +3478,7 @@
       #3D1F5C 35%,
       #5D2E8C 65%,
       #9B3FBF 100%);
-    padding: clamp(56px, 9vh, 100px) clamp(24px, 4vw, 80px);
+    padding: clamp(32px, 5vh, 60px) clamp(24px, 4vw, 80px);
     color: #FFFFFF;
   }
   .ip-compare-section__bg {
@@ -3316,7 +3516,7 @@
     border: 1px solid rgba(236, 59, 209, 0.4);
     padding: 6px 14px;
     border-radius: 999px;
-    margin-bottom: 18px;
+    margin-bottom: 10px;
   }
   @media (prefers-reduced-motion: reduce) {
     .ip-compare-section__bg { display: none; }
@@ -3329,7 +3529,7 @@
     line-height: 1.25;
     letter-spacing: -0.015em;
     max-width: 880px;
-    margin: 0 auto 16px;
+    margin: 0 auto 10px;
     text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
   }
   .ip-compare__subtitle .accent {
@@ -3347,18 +3547,52 @@
     text-align: center;
     line-height: 1.6;
     max-width: 720px;
-    margin: 0 auto clamp(32px, 5vh, 48px);
+    margin: 0 auto clamp(14px, 2vh, 24px);
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
   }
   .ip-compare__tags {
     margin-top: 0;
-    margin-bottom: clamp(40px, 6vh, 64px);
+    margin-bottom: clamp(16px, 2.5vh, 28px);
   }
+
+  /* === Play the demo CTA — under the IP comparison slider === */
+  .ip-compare__demo-cta {
+    display: flex;
+    justify-content: center;
+    margin-top: clamp(14px, 2vh, 24px);
+  }
+  .ip-compare__demo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 34px;
+    border-radius: 999px;
+    border: 0;
+    text-decoration: none;
+    font-family: var(--font-roboto);
+    font-weight: 700;
+    font-size: clamp(15px, 1.1vw, 17px);
+    letter-spacing: 0.02em;
+    color: #fff;
+    background: linear-gradient(135deg, #8632FB 0%, #6D20D9 100%);
+    box-shadow:
+      0 6px 20px rgba(134, 50, 251, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .ip-compare__demo-btn:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 10px 28px rgba(134, 50, 251, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  .ip-compare__demo-btn .arrow { transition: transform 0.2s ease; }
+  .ip-compare__demo-btn:hover .arrow { transform: translateX(4px); }
 
   /* === BEFORE/AFTER COMPARISON SLIDER === */
   .compare-slider {
-    margin-top: clamp(40px, 6vh, 64px);
-    max-width: 1100px;
+    margin-top: clamp(16px, 2.5vh, 28px);
+    max-width: 780px;
     margin-left: auto;
     margin-right: auto;
   }
@@ -4470,73 +4704,76 @@
          in. Replaces the previous 3-layer MapleStory stack + Vibe Camp
          image + WebGL sparkle overlay. -->
     <div class="hero-brand" role="img" aria-label="MapleStory Vibe Camp">
-      <img class="hero-brand__combined"
-           src="assets/brand/MSVC_wordmark.png"
-           alt="MapleStory Vibe Camp"
-           decoding="async">
-    </div>
-
-    <!-- 2. Countdown label + 4-box live timer -->
-    <div class="hero-countdown-block">
-      <p class="hero-countdown-label">Building opens in</p>
-      <div class="hero-countdown" id="heroCountdown" aria-label="Time until building opens" aria-live="polite">
-        <div class="hero-countdown__box">
-          <span class="hero-countdown__num" data-unit="days">00</span>
-          <span class="hero-countdown__label">DAYS</span>
-        </div>
-        <span class="hero-countdown__sep" aria-hidden="true">:</span>
-        <div class="hero-countdown__box">
-          <span class="hero-countdown__num" data-unit="hours">00</span>
-          <span class="hero-countdown__label">HOURS</span>
-        </div>
-        <span class="hero-countdown__sep" aria-hidden="true">:</span>
-        <div class="hero-countdown__box">
-          <span class="hero-countdown__num" data-unit="mins">00</span>
-          <span class="hero-countdown__label">MINS</span>
-        </div>
-        <span class="hero-countdown__sep" aria-hidden="true">:</span>
-        <div class="hero-countdown__box">
-          <span class="hero-countdown__num" data-unit="secs">00</span>
-          <span class="hero-countdown__label">SECS</span>
+      <div class="hero-brand__mark">
+        <img class="hero-brand__combined"
+             src="assets/brand/MSVC_wordmark.png"
+             alt="MapleStory Vibe Camp"
+             decoding="async">
+        <!-- "with [Verse8 logo]" — partner credit, absolutely anchored to
+             the RIGHT side of the centered wordmark (upper-right). Keeps the
+             main wordmark centered and leaves the area below it open. -->
+        <div class="hero-brand__partner">
+          <span class="hero-brand__with">with</span>
+          <img class="verse8-logo" src="logos_cw.png" alt="Verse8" decoding="async">
         </div>
       </div>
     </div>
 
-    <!-- 3. Prominent date display (replaces the $60K hook in the hero — full
-         prize breakdown lives in the Prize Pool section below). -->
+    <!-- Submission countdown — live timer to the June 29, 2026 15:00 KST
+         submission deadline. Boxes tick every second via
+         initSubmissionCountdown(); on expiry the block is replaced with a
+         single "Submissions closed" line. -->
+    <div class="hero-countdown-block" id="submissionCountdown"
+         role="timer" aria-live="polite"
+         aria-label="Time remaining until submissions close">
+      <p class="hero-countdown-label">Submission closes in</p>
+      <div class="hero-countdown">
+        <div class="hero-countdown__box">
+          <span class="hero-countdown__num" data-unit="days">00</span>
+          <span class="hero-countdown__label">Days</span>
+        </div>
+        <span class="hero-countdown__sep" aria-hidden="true">:</span>
+        <div class="hero-countdown__box">
+          <span class="hero-countdown__num" data-unit="hours">00</span>
+          <span class="hero-countdown__label">Hours</span>
+        </div>
+        <span class="hero-countdown__sep" aria-hidden="true">:</span>
+        <div class="hero-countdown__box">
+          <span class="hero-countdown__num" data-unit="mins">00</span>
+          <span class="hero-countdown__label">Mins</span>
+        </div>
+        <span class="hero-countdown__sep" aria-hidden="true">:</span>
+        <div class="hero-countdown__box">
+          <span class="hero-countdown__num" data-unit="secs">00</span>
+          <span class="hero-countdown__label">Secs</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Date display — moved directly under the title -->
     <div class="hero-info">
       <p class="hero-info__date">June 8 &ndash; June 29, 2026</p>
       <p class="hero-info__sub">Three weeks of building&nbsp;&nbsp;&middot;&nbsp;&nbsp;Winners announced July 22</p>
     </div>
 
-    <!-- 4. CTA row: disabled Build Now (auto-activates June 8) + Learn more + Share with Friends -->
-    <div class="hero-cta">
-      <div class="hero-build">
-        <button class="hero-build__btn" type="button" disabled
-                aria-label="Start Building — opens June 8, 2026"
-                title="Building opens June 8, 2026">
-          <span class="hero-build__btn-main">Start Building</span>
-          <span class="hero-build__btn-meta">June 8</span>
-        </button>
+    <!-- Hero CTA — oversized gold "Build Now" pill with a live-now badge. -->
+    <div class="hero-cta-block">
+      <div class="hero-build hero-build--center">
+        <a class="hero-build__btn hero-build__btn--active hero-build__btn--xl"
+           href="http://verse8.io/msu"
+           target="_blank" rel="noopener noreferrer"
+           aria-label="Build Now — live now">
+          <span class="hero-build__btn-main">Build Now</span>
+        </a>
+        <!-- Blinking LIVE badge — absolutely anchored to the button's
+             top-right corner, so it flags the live state as a design accent
+             without adding any vertical height to the hero stack. -->
+        <span class="hero-live-badge" role="status" aria-label="Live now">
+          <span class="hero-live-badge__dot" aria-hidden="true"></span>Live
+        </span>
       </div>
-      <a class="hero-share-btn hero-learn-btn"
-         href="https://x.com/maplestoryu"
-         target="_blank"
-         rel="noopener noreferrer"
-         aria-label="Learn more on X (opens in a new tab)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-          <path d="M12 16v-4M12 8h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        Learn more
-      </a>
-      <button class="hero-share-btn" type="button" aria-label="Share" data-share-trigger>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Share
-      </button>
     </div>
+
   </div>
 </section>
 
@@ -4548,25 +4785,25 @@
          aria-label="Camp schedule and key info">
   <div class="prize-marquee__track">
     <span class="marquee-set">
-      <span class="marquee-total">$60,000 TOTAL PRIZE POOL</span>
+      <span class="marquee-sub">CLAIM YOUR EXCLUSIVE REWARD</span>
       <span class="marquee-divider">◆</span>
       <span class="marquee-sub">JUN 8 &ndash; JUN 29 &middot; BUILD + SUBMIT (3 WEEKS)</span>
       <span class="marquee-divider">◆</span>
       <span class="marquee-sub">JUL 22 &middot; WINNERS ANNOUNCED</span>
       <span class="marquee-divider">◆</span>
-      <span class="marquee-sub">MORE INFO REVEALING JUNE 8</span>
+      <span class="marquee-sub">TURN YOUR IDEAS INTO GAMES</span>
       <span class="marquee-divider">◆</span>
       <span class="marquee-sub">REGISTER AS BUILDER &middot; <a href="https://msu.io/builder" target="_blank" rel="noopener noreferrer">MSU.IO/BUILDER</a></span>
       <span class="marquee-divider">◆</span>
     </span>
     <span class="marquee-set" aria-hidden="true">
-      <span class="marquee-total">$60,000 TOTAL PRIZE POOL</span>
+      <span class="marquee-sub">CLAIM YOUR EXCLUSIVE REWARD</span>
       <span class="marquee-divider">◆</span>
       <span class="marquee-sub">JUN 8 &ndash; JUN 29 &middot; BUILD + SUBMIT (3 WEEKS)</span>
       <span class="marquee-divider">◆</span>
       <span class="marquee-sub">JUL 22 &middot; WINNERS ANNOUNCED</span>
       <span class="marquee-divider">◆</span>
-      <span class="marquee-sub">MORE INFO REVEALING JUNE 8</span>
+      <span class="marquee-sub">TURN YOUR IDEAS INTO GAMES</span>
       <span class="marquee-divider">◆</span>
       <span class="marquee-sub">REGISTER AS BUILDER &middot; <a href="https://msu.io/builder" target="_blank" rel="noopener noreferrer" tabindex="-1">MSU.IO/BUILDER</a></span>
       <span class="marquee-divider">◆</span>
@@ -4632,15 +4869,16 @@
       </div>
     </div>
     <a class="prize-policy prize-policy--cta"
-       href="https://msu.io/builder"
+       href="https://x.com/Verse_Eight"
        target="_blank"
        rel="noopener noreferrer"
-       aria-label="Register as MSU Builder now to get unlimited vibecoding tokens (opens in a new tab)">
-      <span class="prize-policy__text"><strong>Register as MSU Builder Now</strong> to get unlimited vibecoding tokens</span>
+       aria-label="Check details in Verse8 X (opens in a new tab)">
+      <span class="prize-policy__text"><strong>Check details in Verse8 X</strong></span>
       <svg class="prize-policy__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </a>
+    <p class="prize-policy__note">Need extra Verse8 credits for building your games? Be sure to check <a class="faq-jump" href="#faq-7">FAQ #7</a></p>
 
   </div>
   <img src="assets/images/planet_top.png" alt="" aria-hidden="true" class="prize-pool__planet">
@@ -4651,17 +4889,25 @@
      lands flush under the GNB on smooth scroll. -->
 <section class="action-marquee" id="action-marquee" aria-label="Vibe Jam opening reminder">
   <div class="action-marquee__track">
-    <span class="action-marquee__item action-marquee__item--primary">⚡ OPENS JUNE 8, 2026</span>
+    <span class="action-marquee__item action-marquee__item--primary">CLAIM YOUR EXCLUSIVE REWARD</span>
     <span class="action-marquee__sep" aria-hidden="true">◆</span>
-    <span class="action-marquee__item">GET YOUR IDEAS READY</span>
+    <span class="action-marquee__item">JUN 8 &ndash; JUN 29 &middot; BUILD + SUBMIT (3 WEEKS)</span>
     <span class="action-marquee__sep" aria-hidden="true">◆</span>
-    <span class="action-marquee__item">PRE-REGISTER ON THE BUILDER</span>
+    <span class="action-marquee__item">JUL 22 &middot; WINNERS ANNOUNCED</span>
     <span class="action-marquee__sep" aria-hidden="true">◆</span>
-    <span class="action-marquee__item action-marquee__item--primary" aria-hidden="true">⚡ OPENS JUNE 8, 2026</span>
+    <span class="action-marquee__item">TURN YOUR IDEAS INTO GAMES</span>
     <span class="action-marquee__sep" aria-hidden="true">◆</span>
-    <span class="action-marquee__item" aria-hidden="true">GET YOUR IDEAS READY</span>
+    <span class="action-marquee__item">REGISTER AS BUILDER &middot; <a href="https://msu.io/builder" target="_blank" rel="noopener noreferrer">MSU.IO/BUILDER</a></span>
     <span class="action-marquee__sep" aria-hidden="true">◆</span>
-    <span class="action-marquee__item" aria-hidden="true">PRE-REGISTER ON THE BUILDER</span>
+    <span class="action-marquee__item action-marquee__item--primary" aria-hidden="true">CLAIM YOUR EXCLUSIVE REWARD</span>
+    <span class="action-marquee__sep" aria-hidden="true">◆</span>
+    <span class="action-marquee__item" aria-hidden="true">JUN 8 &ndash; JUN 29 &middot; BUILD + SUBMIT (3 WEEKS)</span>
+    <span class="action-marquee__sep" aria-hidden="true">◆</span>
+    <span class="action-marquee__item" aria-hidden="true">JUL 22 &middot; WINNERS ANNOUNCED</span>
+    <span class="action-marquee__sep" aria-hidden="true">◆</span>
+    <span class="action-marquee__item" aria-hidden="true">TURN YOUR IDEAS INTO GAMES</span>
+    <span class="action-marquee__sep" aria-hidden="true">◆</span>
+    <span class="action-marquee__item" aria-hidden="true">REGISTER AS BUILDER &middot; <a href="https://msu.io/builder" target="_blank" rel="noopener noreferrer" tabindex="-1">MSU.IO/BUILDER</a></span>
     <span class="action-marquee__sep" aria-hidden="true">◆</span>
   </div>
 </section>
@@ -4719,7 +4965,7 @@
             <span class="dot dot--yellow"></span>
             <span class="dot dot--green"></span>
           </div>
-          <div class="cli-demo__title">vibejam-terminal &mdash; 80&times;24</div>
+          <div class="cli-demo__title">vibe camp-terminal &mdash; 80&times;24</div>
         </div>
         <div class="cli-demo__screen">
           <div class="cli-demo__output" id="cli-output" aria-live="polite"></div>
@@ -4729,17 +4975,10 @@
     </div>
 
     <div class="idea-action__cta">
-      <p class="idea-action__call">
-        <em>Write</em> it down and have it <em>built</em>.
-      </p>
+      <p class="idea-action__call">Need help turning your idea into a game?</p>
       <div class="button-group idea-action__button-wrap">
-        <button class="btn btn-primary btn-build btn-build--xl btn-build--waiting" type="button" disabled
-                aria-label="Start Building — opens June 8, 2026"
-                title="Building opens June 8, 2026">
-          <span class="t-en">Stay Tuned, June 8</span>
-          <span class="t-ko">6월 8일 오픈</span>
-        </button>
-        <p class="btn-build__subtext">Opens June 8, 2026</p>
+        <a class="btn btn-primary idea-action__guide-btn"
+           href="http://docs.msu.io/msu-space/getting-started-with-msu-space" target="_blank" rel="noopener noreferrer">Check Out Tips &amp; Guides <span class="arrow" aria-hidden="true">→</span></a>
       </div>
     </div>
   </div>
@@ -4769,18 +5008,19 @@
         <span class="genre-tag genre-tag--highlight">#deck-builders</span>
         <span class="genre-tag genre-tag--green">#combat</span>
         <span class="genre-tag genre-tag--yellow">#defense</span>
-        <span class="genre-tag genre-tag--pink">#platformer</span>
         <span class="genre-tag genre-tag--cyan">#simulations</span>
         <span class="genre-tag genre-tag--purple">#roguelites</span>
         <span class="genre-tag genre-tag--green">#party-games</span>
-        <span class="genre-tag genre-tag--yellow">#tower-defense</span>
         <span class="genre-tag genre-tag--pink">#puzzle</span>
         <span class="genre-tag genre-tag--cyan">#rhythm</span>
-        <span class="genre-tag genre-tag--purple">#idle</span>
-        <span class="genre-tag genre-tag--green">#adventure</span>
-        <span class="genre-tag genre-tag--more">
-          <span class="t-en">+ anything else</span>
-          <span class="t-ko">+ 그 외 무엇이든</span>
+        <span class="genre-tags__break" aria-hidden="true"></span>
+        <span class="genre-tag-pair">
+          <span class="genre-tag genre-tag--purple">#idle</span>
+          <span class="genre-tag genre-tag--green">#adventure</span>
+          <span class="genre-tag genre-tag--more">
+            <span class="t-en">+ anything else</span>
+            <span class="t-ko">+ 그 외 무엇이든</span>
+          </span>
         </span>
       </div>
 
@@ -4831,6 +5071,14 @@
             <span class="t-ko">MapleStory 감성 적용</span>
           </div>
         </div>
+      </div>
+
+      <div class="ip-compare__demo-cta">
+        <a class="btn btn-primary ip-compare__demo-btn"
+           href="https://verse8.io/N2j2S3T" target="_blank" rel="noopener noreferrer">
+          Try out the SpireStory Demo
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
       </div>
     </div>
   </div>
@@ -4961,16 +5209,16 @@
   </div>
   <div class="inner faq-wrap" style="max-width: 820px; margin: 0 auto;">
     <details class="faq-item">
-      <summary class="q">1. What is Vibe Camp?</summary>
-      <div class="a">A 3-week global game camp where you build and play games using MapleStory IP — powered by prompts. Combine Verse8's AI-powered vibe coding tools with MapleStory's full asset library (characters, monsters, backgrounds, music) and bring your idea to life.</div>
+      <summary class="q">1. What is MapleStory Vibe Camp?</summary>
+      <div class="a">A 3-week global game camp where you build and play games using MapleStory IP. Taking place in MSU Space on Verse8, it allows you to bring your ideas to life using MapleStory's full asset library, including characters, monsters, backgrounds, and music.</div>
     </details>
     <details class="faq-item">
       <summary class="q">2. When does it start and end?</summary>
-      <div class="a">Vibe Camp launches on <strong>June 8</strong> alongside MSU Space, with game submissions closing on <strong>June 29</strong>. After Round 1 screening and Round 2 deep review, the final winners will be announced on <strong>July 22</strong>.</div>
+      <div class="a">Vibe Camp launches on <strong>June 8</strong> alongside MSU Space in Verse8, with game submissions closing on <strong>June 29</strong>. After Round 1 screening and Round 2 deep review, the final winners will be announced on <strong>July 22</strong>.</div>
     </details>
     <details class="faq-item">
       <summary class="q">3. I can't code — can I still join?</summary>
-      <div class="a">Yes, that's exactly the point of Vibe Camp. With vibe coding, you simply describe the game you want — <em style="color: #000;">"I want to make a game like this"</em> — and the AI builds it with you. We'll show a live demo at our online seminar on <strong>June 11</strong>. Follow MSU on X for details.</div>
+      <div class="a">Yes, that's exactly the point of Vibe Camp. With vibe coding, you simply describe the game you want — <em style="color: #000;">"I want to make a game like this"</em> — and the AI builds it with you. We'll show a live demo at <strong><a href="https://t.co/jeubidgcjL" target="_blank" rel="noopener noreferrer">Verse8 Discord</a></strong> on <strong>June 11</strong>. Follow MSU on X for details.</div>
     </details>
     <details class="faq-item">
       <summary class="q">4. Who can participate?</summary>
@@ -4982,11 +5230,16 @@
     </details>
     <details class="faq-item">
       <summary class="q">6. How do I participate?</summary>
-      <div class="a">MSU Space launches on <a href="https://verse8.io" target="_blank" rel="noopener noreferrer">Verse8</a> on <strong>June 8</strong>. Sign up, create your game, and submit it with your game details to join the camp. Stay tuned for more information on <a href="https://x.com/maplestoryu" target="_blank" rel="noopener noreferrer">MSU X</a>.</div>
+      <div class="a">After logging into <a href="http://verse8.io/msu" target="_blank" rel="noopener noreferrer">MSU Space</a> on Verse8, create a game using the MapleStory IP and submit it through the <a href="https://docs.google.com/forms/d/1SFGnMPy1suW3CGjY5f8exKnxRkVAEWmj6ZNv9atVoQE/edit" target="_blank" rel="noopener noreferrer">application form</a> to join the Vibe Camp. For more information, please refer to <a href="https://x.com/Verse_Eight" target="_blank" rel="noopener noreferrer">Verse8 X</a>.</div>
     </details>
-    <details class="faq-item">
-      <summary class="q">7. Do I have to sign up for MSU Builder Web?</summary>
-      <div class="a">Not mandatory, but Builder Web members receive <strong>unlimited credits</strong> throughout the camp, so we strongly recommend it.</div>
+    <details class="faq-item" id="faq-7">
+      <summary class="q">7. How can I get more Verse8 credits for game creation?</summary>
+      <div class="a">If you have an MSU Builder account and connect it with Verse8, you can continue to receive unlimited credit support. If you only have a regular MSU user account, you will need to sign up for a new Builder account first.<br><br><strong>How to connect MSU Builder account with Verse8:</strong>
+        <ol class="a-steps">
+          <li>Click &lsquo;Get started&rsquo; on the <a href="http://verse8.io/msu" target="_blank" rel="noopener noreferrer">MSU Space</a> home screen.</li>
+          <li>Agree to the &lsquo;Terms &amp; Application&rsquo; on the Creator program page, then click &lsquo;Connect your MSU Builder account&rsquo; under the Credit Refill policy.</li>
+          <li>Click &lsquo;Connect with MSU Builder&rsquo; on the MSU Builder banner.</li>
+        </ol></div>
     </details>
     <details class="faq-item">
       <summary class="q">8. Can one person submit multiple games?</summary>
@@ -4998,7 +5251,7 @@
     </details>
     <details class="faq-item">
       <summary class="q">10. What tool should I use to build?</summary>
-      <div class="a">Build inside <strong>MSU Space</strong>, Verse8's MapleStory IP vibe coding environment. Available tools and guides will be released at <a href="https://docs.msu.io/" target="_blank" rel="noopener noreferrer">docs.msu.io</a> on <strong>June 8</strong>.</div>
+      <div class="a">Build inside <strong>MSU Space</strong>, Verse8's MapleStory IP vibe coding environment. Be sure to check out our available <a href="http://docs.msu.io/msu-space/getting-started-with-msu-space" target="_blank" rel="noopener noreferrer">guides and tips</a> to help you along the way!</div>
     </details>
     <details class="faq-item">
       <summary class="q">11. Is there a fixed genre?</summary>
@@ -5396,9 +5649,9 @@
       const cursorLine = appendLine('<span class="cli-cursor"></span>');
       await wait(500, t);
 
-      // [t=0.5] $ vibejam build --new
+      // [t=0.5] $ vibe camp build --new
       cursorLine.remove();
-      appendLine('<span class="cli-prompt">$</span> vibejam build --new');
+      appendLine('<span class="cli-prompt">$</span> vibe camp build --new');
       await wait(1000, t);
 
       // [t=1.5] welcome
@@ -5569,7 +5822,7 @@
     function showFinalState() {
       clearScreen();
       output.innerHTML = [
-        '<div class="cli-line is-instant"><span class="cli-prompt">$</span> vibejam build --new</div>',
+        '<div class="cli-line is-instant"><span class="cli-prompt">$</span> vibe camp build --new</div>',
         '<div class="cli-line is-instant">Welcome to MapleStory Universe — Vibe Build Mode</div>',
         '<div class="cli-line cli-line--user is-instant"><span class="cli-bubble">I want to build a deck-building game with MapleStory IP.</span></div>',
         '<div class="cli-line is-instant"><span class="cli-check">✓</span> Understood. Initializing MSU build environment...</div>',
@@ -6266,20 +6519,19 @@
     initHeroAuroraBg();
   }
 
-  /* === Hero countdown — live timer to June 8, 2026 15:00 KST (UTC+9).
-     Updates every 1s. When the target passes, the countdown box layout
-     is replaced with a single "Building is live!" line AND the Build Now
-     button transitions from disabled to active automatically.
-     The container has aria-live="polite" in the HTML, but per-second
-     updates would spam screen readers. We toggle aria-live to "off"
-     while the seconds tick and only flip it back to "polite" momentarily
-     when the minute value changes, so SR announces minute-level changes. */
-  function initHeroCountdown() {
-    const container = document.getElementById('heroCountdown');
+  /* === Submission countdown — live timer to June 29, 2026 15:00 KST (UTC+9),
+     the submission deadline. Updates every 1s. When the target passes, the
+     countdown box layout is replaced with a single "Submissions closed" line.
+     The container has aria-live="polite" in the HTML, but per-second updates
+     would spam screen readers. We toggle aria-live to "off" while the seconds
+     tick and only flip it back to "polite" momentarily when the minute value
+     changes, so SR announces minute-level changes. */
+  const SUBMISSION_CLOSE_TARGET = Date.UTC(2026, 5, 29, 6, 0, 0); // 2026-06-29T15:00:00+09:00 (KST 3pm)
+  function initSubmissionCountdown() {
+    const container = document.getElementById('submissionCountdown');
     if (!container) return;
 
-    // Shared with the Build Now button so both flip at the same moment
-    const target = HERO_BUILD_TARGET;
+    const target = SUBMISSION_CLOSE_TARGET;
 
     const els = {
       days:  container.querySelector('[data-unit="days"]'),
@@ -6304,9 +6556,7 @@
       if (diff <= 0) {
         clearInterval(timerId);
         container.setAttribute('aria-live', 'polite');
-        container.innerHTML = '<div class="hero-countdown__live">Building is live!</div>';
-        // Flip the disabled Build Now button to its active state in lockstep
-        activateHeroBuildButton();
+        container.innerHTML = '<div class="hero-countdown__live">Submissions closed</div>';
         return;
       }
       const days  = Math.floor(diff / 86400000);
@@ -6335,9 +6585,9 @@
     timerId = setInterval(tick, 1000);
   }
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initHeroCountdown);
+    document.addEventListener('DOMContentLoaded', initSubmissionCountdown);
   } else {
-    initHeroCountdown();
+    initSubmissionCountdown();
   }
 
   /* === Prize cards carousel — sync pagination dots to scroll position
@@ -7009,7 +7259,7 @@ void main() {
   <nav class="sticky-panel__nav">
     <a href="#hero" class="sticky-panel__link" data-section="hero">
       <span class="sticky-panel__num">01</span>
-      <span class="sticky-panel__name">Countdown</span>
+      <span class="sticky-panel__name">Build Now</span>
     </a>
     <a href="#prize-pool" class="sticky-panel__link" data-section="prize-pool" data-scroll-target="prize-pool">
       <span class="sticky-panel__num">02</span>
@@ -7035,12 +7285,12 @@ void main() {
     <!-- Pre-launch: Start Building disabled until June 8 (auto-activates
          in lockstep with hero + idea-action build buttons via JS). Share
          is always active. -->
-    <button class="sticky-panel__cta sticky-panel__cta--primary sticky-panel__cta--waiting"
-            type="button" disabled
-            aria-label="Start Building — opens June 8, 2026"
-            title="Opens June 8">
-      Stay Tuned, June 8
-    </button>
+    <a class="sticky-panel__cta sticky-panel__cta--primary"
+       href="http://verse8.io/msu"
+       target="_blank" rel="noopener noreferrer"
+       aria-label="Go Create">
+      Go Create
+    </a>
     <button class="sticky-panel__cta sticky-panel__cta--secondary" type="button" aria-label="Share" data-share-trigger>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -7103,5 +7353,30 @@ void main() {
   </div>
 </div>
 
+<script>
+(function(){
+  function openFaq(hash){
+    if(!hash || hash.indexOf('#faq-')!==0) return;
+    var el=document.querySelector(hash);
+    if(el && el.tagName==='DETAILS'){
+      el.open=true;
+      el.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  }
+  document.addEventListener('click',function(e){
+    var a=e.target.closest ? e.target.closest('a[href^="#faq-"]') : null;
+    if(!a) return;
+    e.preventDefault();
+    var hash=a.getAttribute('href');
+    if(history.replaceState) history.replaceState(null,'',hash);
+    openFaq(hash);
+  });
+  window.addEventListener('hashchange',function(){ openFaq(location.hash); });
+  if(location.hash.indexOf('#faq-')===0){
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){openFaq(location.hash);});
+    else openFaq(location.hash);
+  }
+})();
+</script>
 </body>
 </html>

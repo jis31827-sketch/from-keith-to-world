@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 566 120" fill="none" role="img" aria-label="Verse8">
+  <!-- V (with cyan top-left flag) -->
+  <g>
+    <polygon points="0,10 24,10 45,80 66,10 90,10 57,110 33,110" fill="#FFFFFF"/>
+    <polygon points="0,10 24,10 34,40 10,40" fill="#1FB6E8"/>
+  </g>
+  <!-- E -->
+  <g transform="translate(108,0)" fill="#FFFFFF">
+    <rect x="0" y="10" width="20" height="100"/>
+    <rect x="0" y="10" width="72" height="20"/>
+    <rect x="0" y="50" width="56" height="20"/>
+    <rect x="0" y="90" width="72" height="20"/>
+  </g>
+  <!-- R -->
+  <g transform="translate(198,0)" fill="#FFFFFF">
+    <rect x="0" y="10" width="20" height="100"/>
+    <rect x="0" y="10" width="54" height="20"/>
+    <rect x="54" y="10" width="20" height="42"/>
+    <rect x="0" y="48" width="54" height="18"/>
+    <polygon points="36,60 54,60 74,110 56,110"/>
+  </g>
+  <!-- S -->
+  <g transform="translate(290,0)" fill="#FFFFFF">
+    <rect x="0" y="10" width="72" height="20"/>
+    <rect x="0" y="10" width="20" height="46"/>
+    <rect x="0" y="50" width="72" height="20"/>
+    <rect x="52" y="60" width="20" height="50"/>
+    <rect x="0" y="90" width="72" height="20"/>
+  </g>
+  <!-- E -->
+  <g transform="translate(380,0)" fill="#FFFFFF">
+    <rect x="0" y="10" width="20" height="100"/>
+    <rect x="0" y="10" width="72" height="20"/>
+    <rect x="0" y="50" width="56" height="20"/>
+    <rect x="0" y="90" width="72" height="20"/>
+  </g>
+  <!-- 8 -->
+  <path transform="translate(492,0)" fill-rule="evenodd" fill="#FFFFFF"
+        d="M0,10 H64 V110 H0 Z  M16,28 H48 V48 H16 Z  M16,72 H48 V92 H16 Z"/>
+</svg>
