@@ -1382,7 +1382,23 @@
       0 2px 8px rgba(15, 20, 50, 0.7);
     letter-spacing: var(--ls-point-heading);
     text-align: center;
-    padding: 12px 24px;
+    padding: 4px 24px;
+  }
+
+  /* ---------- Submission-closed states (auto-applied at the deadline) ---------- */
+  .hero-countdown__thanks {
+    margin: 3px 0 6px;
+    font-family: var(--font-sofia-sans-condensed);
+    font-weight: var(--fw-point-bold);
+    font-size: clamp(15px, 1.6vw, 22px);
+    color: rgba(255, 255, 255, 0.92);
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+  /* In the closed state the copy is taller than the countdown row, so tighten
+     the gap above the date to keep the CTA inside the hero on desktop. */
+  .hero-stack.is-submissions-closed .hero-info {
+    margin-top: 14px;
   }
 
   /* ---------- 3. Prominent date display ---------- */
@@ -6655,9 +6671,51 @@
      tick and only flip it back to "polite" momentarily when the minute value
      changes, so SR announces minute-level changes. */
   const SUBMISSION_CLOSE_TARGET = Date.UTC(2026, 5, 29, 6, 0, 0); // 2026-06-29T15:00:00+09:00 (KST 3pm)
+
+  // Manual override: set to true to force the closed state regardless of the
+  // clock (e.g. clock-skew emergency). Leave false for normal automatic behavior.
+  const SUBMISSION_FORCE_CLOSED = false;
+
+  /* Once submissions close, both build CTAs stay ACTIVE but are relabelled to
+     point users to MSU Space (submissions are over, the platform is still open).
+     Called from the countdown tick at expiry AND on load if the page opens
+     after the deadline. Also tags the hero stack so the closed copy + button
+     fit inside the hero. */
+  function closeBuildCtas() {
+    // Tighten the hero stack spacing for the (taller) closed copy
+    const heroStack = document.querySelector('.hero-stack');
+    if (heroStack) heroStack.classList.add('is-submissions-closed');
+
+    // Hero CTA: "Build Now" -> "Go to MSU Space" (remains an active link)
+    const heroMain = document.querySelector('.hero-build__btn .hero-build__btn-main');
+    if (heroMain) heroMain.textContent = 'Go to MSU Space';
+    const heroBtn = document.querySelector('.hero-build__btn');
+    if (heroBtn) heroBtn.setAttribute('aria-label', 'Go to MSU Space');
+
+    // Remove the "LIVE" badge — submissions are no longer live
+    const liveBadge = document.querySelector('.hero-live-badge');
+    if (liveBadge) liveBadge.remove();
+
+    // Sticky-panel CTA: "Go Create" -> "MSU Space" (remains an active link)
+    const sticky = document.querySelector('.sticky-panel__cta--primary');
+    if (sticky) {
+      sticky.textContent = 'MSU Space';
+      sticky.setAttribute('aria-label', 'MSU Space');
+    }
+  }
+
   function initSubmissionCountdown() {
     const container = document.getElementById('submissionCountdown');
     if (!container) return;
+
+    // Manual override — render the closed state immediately and stop.
+    if (SUBMISSION_FORCE_CLOSED) {
+      container.setAttribute('aria-live', 'polite');
+      container.innerHTML = '<div class="hero-countdown__live">Submissions closed</div>'
+        + '<p class="hero-countdown__thanks">Thank you for your participation</p>';
+      closeBuildCtas();
+      return;
+    }
 
     const target = SUBMISSION_CLOSE_TARGET;
 
@@ -6684,7 +6742,9 @@
       if (diff <= 0) {
         clearInterval(timerId);
         container.setAttribute('aria-live', 'polite');
-        container.innerHTML = '<div class="hero-countdown__live">Submissions closed</div>';
+        container.innerHTML = '<div class="hero-countdown__live">Submissions closed</div>'
+          + '<p class="hero-countdown__thanks">Thank you for your participation</p>';
+        closeBuildCtas();
         return;
       }
       const days  = Math.floor(diff / 86400000);
